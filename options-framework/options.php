@@ -83,6 +83,7 @@ function wds_base_plugins(){
 		array(
 			'name'      => 'WEBDOGS Support + Maintenance',
 			'slug'      => 'webdogs-support-integration',
+			/*'file_path' => WPMU_PLUGIN_DIR . WEBDOGS_FILE_PATH,*/
 			'source'    => 'https://github.com/theWEBDOGS/webdogs-support-integration/archive/master.zip',
 			'required'           => true, // If false, the plugin is only 'recommended' instead of required.
 			'version'            => WEBDOGS_LATEST_VERSION, // E.g. 1.0.0. If set, the active plugin must be this version or higher. If the plugin version is higher than the plugin version installed, the user will be notified to update the plugin.
@@ -328,7 +329,7 @@ function optionsframework_options() {
 
 	$delete_base = empty($delete_base) ? "Nothing to cleanup." : $delete_base ;
 
-	$exclude_domain = stripos( of_get_option( 'exclude_domain' ), site_url() ) !== false ? "Current doamin: Excluded" : "Current domain: Not excluded";
+	$exclude_domain = stripos( of_get_option( 'exclude_domain' ), site_url() ) !== false ? '<strong>Current domain:</strong> Excluded' : '<strong>Current domain:</strong> Not&nbsp;excluded';
 
 	/**
 	 *  Notifications| Tab 1
@@ -341,19 +342,18 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'name' => __('Maintenance Service', 'options_check'),
-		// 'desc' => __('Active Maintenance Customer', 'options_check'),
 		'id' => 'active_maintenance_customer',
 		'std' => '0',
 		'type' => 'select',
 		'class' => 'small alignleft mini',
-		'options' => $service_array); //mini, tiny, small
+		'options' => $service_array); 
 
 	$options[] = array(
 		'name' => __('Notification Frequency', 'options_check'),
 		'id' => 'maintenance_notification_frequency',
 		'std' => '1',
 		'type' => 'radio',
-		'class' => 'alignleft inline', //mini, tiny, small
+		'class' => 'alignleft inline', 
 		'options' => $frequency_array);
 
 	$options[] = array(
@@ -362,7 +362,7 @@ function optionsframework_options() {
 		'id' => 'maintenance_notification_offset',
 		'std' => '1',
 		'type' => 'select',
-		'class' => 'mini alignleft', //mini, tiny, small
+		'class' => 'mini alignleft', 
 		'options' => $day_offset);
 
 	$options[] = array(
@@ -378,15 +378,20 @@ function optionsframework_options() {
 				'slideUp' => '1'
 			), 
 		),
-		'class' => 'clear bottom-pad top-border inset', //mini, tiny, small
+		'class' => 'clear bottom-pad top-border inset',
 		'type' => 'text');
 
 	$options[] = array(
+		'id' => 'maintenance_notes_wrap',
+		'type' => 'info',
+		'wrap' => array( 
+			'start' => true, 
+			'class' => 'clear top-border'));
+
+	$options[] = array(
 		'name' => __('Maintenance Instructions', 'options_check'),
-		// 'desc' => __( WEBDOGS()->webdogs_maintenance_message(), 'options_check'),
 		'id' => 'maintenance_notes',
-		// 'std' => "",
-		'class' => 'clear top-border alignleft',
+		'class' => 'clear alignleft',
 		'type' => 'textarea');
 
 	$options[] = array(
@@ -394,12 +399,14 @@ function optionsframework_options() {
 		'desc' => $exclude_domain,
 		'id' => 'exclude_domain',
 		'std' => 'staging',
-		'class' => 'alignleft mini', //mini, tiny, small
+		'class' => 'alignleft mini', 
 		'type' => 'text');
 
 	$options[] = array(
 		'type' => 'info',
-		'class' => 'clear'
+		'class' => 'clear',
+		'wrap' => array( 
+			'end' => true)
 		);
 
 
@@ -468,7 +475,19 @@ function optionsframework_options() {
 
 
 	/**
-	 *  Company Login | Tab 3
+	 *  Plugin Installer | Tab 3
+	 */
+
+	/*$options[] = array(
+		'name' => __('Plugins', 'options_check'),
+		'capability'  => 'manage_options',
+		'type' => 'heading',
+		'class' => 'inset bottom-pad',
+		'function' => 'Options_Framework_Install_Plugins_Page' ); */
+		
+
+	/**
+	 *  Company Login | Tab 4
 	 */
 
 	$options[] = array(
@@ -486,33 +505,23 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'name' => __('Login Logo and Background', 'options_check'),
-		// 'desc' => __('Customize login logo and background color.', 'options_check'),
 		'id' => 'login_logo_css',
 		'std' => $background_defaults,
 		'type' => 'background');
 
 	$options[] = array(
-		// 'name' => __('Logo Height', 'options_check'),
 		'desc' => __('Logo Height', 'options_check'),
 		'id' => 'login_logo_height',
 		'std' => '100',
 		'type' => 'select',
-		'class' => 'mini alignright inline', //mini, tiny, small
+		'class' => 'mini alignright inline', 
 		'options' => $login_logo_height_array);
-
-	$options[] = array(
-		'name' => __('Company Information', 'options_check'),
-		// 'desc' => __( WEBDOGS()->webdogs_maintenance_message(), 'options_check'),
-		'id' => 'company_notes',
-		// 'std' => "",
-		'class' => 'alignleft',
-		'type' => 'textarea');
-
 
 	$options[] = array(
 		'type' => 'info',
 		'class' => 'clear'
 		);
+
 
 
 	return $options;

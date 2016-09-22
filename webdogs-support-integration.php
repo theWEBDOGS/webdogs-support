@@ -3,7 +3,7 @@
 Plugin Name: WEBDOGS Support + Maintenance
 Plugin URI: https://github.com/theWEBDOGS/webdogs-support-integration
 Description: WEBDOGS Support + Maintenance Configuration Tools: scheduled maintenance notifications, login page customizations, base plugin recommendations and more.
-Version: 2.0.2
+Version: 2.0.3
 Author: WEBDOGS Support Team
 Author URI: http://WEBDOGS.COM
 License: GPLv2
@@ -15,20 +15,15 @@ if (!class_exists('WEBDOGS')) {
     define( 'WEBDOGS_TITLE', "WEBDOGS Support" );
     define( 'WEBDOGS_SUPPORT', "support@webdogs.com" );
     define( 'WEBDOGS_DOMAIN', "webdogs.com" );
-    define( 'WEBDOGS_VERSION', "2.0.2" );
+    define( 'WEBDOGS_VERSION', "2.0.3" );
 
-    if(FALSE===($wds_version=file_get_contents('https://webdogsplugins.wpengine.com/wds.version') ) && !defined( 'WEBDOGS_LATEST_VERSION' ) ) {
-        define('WEBDOGS_LATEST_VERSION','2.0.1');
-    } elseif(!defined('WEBDOGS_LATEST_VERSION')) { 
-        define('WEBDOGS_LATEST_VERSION',$wds_version);
-    }
 
     /////////////////////////////////////////////////
     //
     // The class is useless if we do not start it, 
     // when plugins are loaded let's start the class.
     //
-    add_action ('plugins_loaded', 'WEBDOGS');
+    add_action ( 'plugins_loaded', 'WEBDOGS' ); 
 
     if(!function_exists('WEBDOGS')) {
 
@@ -359,33 +354,22 @@ if (!class_exists('WEBDOGS')) {
 
     function wd_send_maintenance_notification( $test = false ){
 
-    	wd_create_daily_notification_schedule();
         //bail is not a mantainance account
-        // if( ! defined('DB_NAME') ){ return; }
-        // if(   defined('DB_NAME') && stripos( DB_NAME, 'snapshot' ) !== false ) { return; }
         if( stripos( of_get_option( 'exclude_domain' ), site_url() ) !== false ) { return; }
 
-
-        $freq = of_get_option( 'maintenance_notification_frequency', 4  );
-         $day = of_get_option( 'maintenance_notification_offset',   '1' );
-
-        $mon_date = date('n');
-        $day_date = date('j');
+        $prev_date = get_option( 'wd_maintenance_notification_proof' );
+             $freq = of_get_option( 'maintenance_notification_frequency', 4  );
+              $day = of_get_option( 'maintenance_notification_offset',   '1' );
+        
+         $new_date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
+         $mon_date = date('n');
+         $day_date = date('j');
 
         // MATCH THE RULE
         $check = ( $mon_date % $freq === 0 && $day == $day_date );
 
         // PROOF CHECK TO PREVENT DUPLCATES 
-        // SAVE THE LAST MATCHING DATE AND CHECK TO SEE IF WE ALREADY SENT THE NOTIFICATION
-         $new_proof = $mon_date ."%" .$freq . "=" . ($mon_date % $freq) ."|". $day ."=". $day_date;
-        $prev_proof = get_option( 'wd_maintenance_notification_proof' );
-		
-		$text = "";
-        $text .= "prev:" . $prev_proof . "<br>";
-        $text .= "new: " . $new_proof . "<br>";
-
-        $proof = ( $new_proof !== $prev_proof );
-        // echo 'Maintainance Notification Sent.';
+        $proof = ( $new_date !== $prev_date );
 
         // IF THE DATE IS A MATCH 
         // AND THE PROOFS DO NOT ->> SEND NOTIFICATION EMAIL
@@ -393,22 +377,20 @@ if (!class_exists('WEBDOGS')) {
 
             // SAVE THE PROOF SO IF WE CHECK AGAIN
             // THE PROOF WILL MATCH AND PASS
-            update_option( 'wd_maintenance_notification_proof', $new_proof );
+            update_option( 'wd_maintenance_notification_proof', $new_date );
 
             // DO NOTIFICATION
             extract( wd_get_notification( of_get_option( 'active_maintenance_customer', false ) ) );
             
-			if(!function_exists('wp_mail')) include_once( ABSPATH . 'wp-includes/pluggable.php');
+            if(!function_exists('wp_mail')) include_once( ABSPATH . 'wp-includes/pluggable.php');
 
-            $text .= ( wp_mail( $to, $subject, $message, $headers ) ) ? 'Maintainance Notification SENT.' : 'Maintainance Notification NOT SENT.';
+            $message = ( wp_mail( $to, $subject, $message, $headers ) ) ? 'Maintainance notification sent.' : 'Maintainance notification not sent.';
 
-            add_settings_error( 'options-framework', 'notification_sent', 'Maintainance Notification Sent.', 'webdogs-nag' );
-
-            // wp_die($text);
         }
 
-        $text .= 'Maintainance Notification ALREADY SENT.';
-        // wp_die($text);
+        $message = 'Maintainance Notification already sent.';
+        
+        if( $test ){ wp_die( $message ); }
     }
 
     if (isset(  $_GET['wd_send_maintenance_notification']) 

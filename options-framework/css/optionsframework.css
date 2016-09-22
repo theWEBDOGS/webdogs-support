@@ -296,6 +296,16 @@
 	cursor:pointer;
 }
 
+#maintenance_notes {
+    width: 584px !important;
+}
+#section-exclude_domain {
+    margin-right: 0 !important;
+}
+#section-exclude_domain .explain {
+    clear: left;
+    max-width: 74% !important;
+}
 /* Company Notes */
 
 #company_notes, 

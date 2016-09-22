@@ -2134,9 +2134,9 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 * Echo the current Options Framework version number to the page.<strong></strong>
 		 */
 		public function show_optionsframework_version() {
-			echo '<p style="float: right; padding: 0em 1.5em 0.5em 0;"><small>',
-				esc_html( sprintf( _x( 'Options Framework v%s', '%s = version number', 'optionsframework' ), self::OPTIONS_FRAMEWORK_VERSION ) ),
-				'</small></p>';
+			// echo '<p style="float: right; padding: 0em 1.5em 0.5em 0;"><small>',
+				// esc_html( sprintf( _x( 'Options Framework v%s', '%s = version number', 'optionsframework' ), self::OPTIONS_FRAMEWORK_VERSION ) ),
+				// '</small></p>';
 		}
 
 		/**
@@ -2309,7 +2309,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		 * @return array CSS classnames.
 		 */
 		public function get_table_classes() {
-			return array( 'widefat', 'fixed' );
+			return array( 'widefat', 'striped' );
 		}
 
 		/**

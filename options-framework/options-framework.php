@@ -27,7 +27,6 @@ if ( ! defined( 'WPINC' ) ) {
 }
 function optionsframework_init() {
 
-
 	// Instantiate the login logo plugin class.
 	require plugin_dir_path( __FILE__ ) . 'includes/class-options-framework-login-logo.php';
 

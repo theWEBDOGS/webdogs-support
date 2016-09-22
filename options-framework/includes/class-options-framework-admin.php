@@ -140,7 +140,7 @@ class Options_Framework_Admin {
      */
 	function add_custom_options_page() {
 
-		$menu = $this->menu_settings();
+		$menu = Self::menu_settings();
 
         switch( $menu['mode'] ) {
 
@@ -184,14 +184,14 @@ class Options_Framework_Admin {
 	    padding-top: 2px;
 	    margin-left: -3px;
 	}
+
+	.webdogs-nag, 
 	.webdogs-nag.notice {
 	    color: #FFFFFF;
 	    text-align: left;
 	    vertical-align: middle;
 	    background-color: #666666;
 	    border-left-color: #377A9F;
-	    padding-top: 0;
-	    padding-bottom: 18px;
 	    padding-left: 12px;
 	}
 	.webdogs-nag .webdogs-logo,
@@ -204,15 +204,14 @@ class Options_Framework_Admin {
 	    text-transform: uppercase;
 	    padding-right: 20px;
 	    padding-left: 42px;
-	    margin-top: 18px;
 	    padding-top: 0px;
 	    padding-bottom: 2px;
 	    border-right: 1px solid #bbb;
+	    margin-top: 18px;
 	    margin-right: 20px;
 	    height: 100% !important;
 	    line-height: 42px !important;
 	    overflow: visible;
-	    vertical-align: middle;
 	    display: inline-block;
 	}
 	.webdogs-nag .webdogs-logo span {
@@ -225,7 +224,6 @@ class Options_Framework_Admin {
 	    text-decoration: none;
 	    display: inline-block;
 	    vertical-align: middle;
-        margin: 12px 0 4px !important;
         max-width: 68%;
         min-width: 280px;
 	}
@@ -241,6 +239,17 @@ class Options_Framework_Admin {
 	.webdogs-nag p em {
 		font-weight:400;
 		font-style: normal;
+	}
+	.webdogs-nag p span {
+	    display: block;
+	    margin: 0.5em 0.5em 0.5em 0 !important;
+	    clear: both;
+	}
+	p.wd_last_notification_sent, 
+	p.wd_notification_scheduled {
+	    padding: 0 !important;
+	    line-height: 28px;
+	    margin-top: 0;
 	}
 </style><?php
 
@@ -285,19 +294,18 @@ class Options_Framework_Admin {
 	 *
      * @since 1.7.0
      */
-	 function options_page() { ?>
+	function options_page() { ?>
 
-		<div id="optionsframework-wrap" class="wrap">
+	<div id="optionsframework-wrap" class="wrap">
 
-		<?php $menu = $this->menu_settings(); ?>
+		<?php $menu = Self::menu_settings(); ?>
 		<h1><?php echo esc_html( $menu['page_title'] ); ?></h1>
+
+	    <?php settings_errors( 'options-framework' ); ?>
 
 	    <h2 class="nav-tab-wrapper">
 	        <?php echo Options_Framework_Interface::optionsframework_tabs(); ?>
 	    </h2>
-
-	    <?php settings_errors( 'options-framework' ); ?>
-
 	    <div id="optionsframework-metabox" class="metabox-holder">
 		    <div id="optionsframework" class="postbox">
 				<form action="options.php" method="post">
@@ -306,14 +314,10 @@ class Options_Framework_Admin {
 				<div id="optionsframework-submit">
 					<input type="submit" class="button-primary" name="update" value="<?php esc_attr_e( 'Save Options', 'options-framework' ); ?>" />
 					<?php $prev_proof = get_option( 'wd_maintenance_notification_proof' ); ?>
-					<?php if($prev_proof) : 
-						$mon = explode('%', $prev_proof ); $mon =$mon[0];
-						$day = explode('=', $prev_proof ); $day =$day[2]; ?>
-						<?php if($mon&&$day) : ?>
-							<span><?php printf('Last notification sent: %d-%d', $mon, $day ); ?></span>
-						<?php endif; ?>
+					<?php if($prev_proof) : ?>
+						<p class="wd_last_notification_sent"><?php printf(__('Last notification: %s'), date(' F j, Y' , $prev_proof ) ); ?></p>
 					<?php elseif( wd_create_daily_notification_schedule() ): ?>
-							<span><?php print( __('Maintanace Notification is scheduled.') ); ?></span>
+						<p class="wd_notification_scheduled"><?php print( __('Maintanace notifications are scheduled.') ); ?></p>
 					<?php endif; ?>
 					<input type="submit" class="reset-button button-secondary hide" name="reset" value="<?php esc_attr_e( 'Restore Defaults', 'options-framework' ); ?>" onclick="return confirm( '<?php print esc_js( __( 'Click OK to reset. Any theme settings will be lost!', 'options-framework' ) ); ?>' );" />
 					<div class="clear"></div>
@@ -322,20 +326,7 @@ class Options_Framework_Admin {
 			</div> <!-- / #container -->
 		</div>
 		<?php do_action( 'optionsframework_after' ); ?>
-		<pre><?php 
-/*
-		$config = get_option( 'optionsframework' );
-
-        if ( ! isset( $config['id'] ) ) {
-            return $default;
-        }
-
-        $options = get_option( $config['id'] );
-		
-		var_export( $options ); */
-
-		  ?></pre>
-		</div> <!-- / .wrap -->
+	</div> <!-- / .wrap -->
 
 	<?php
 	}
@@ -470,7 +461,7 @@ class Options_Framework_Admin {
 
 	function optionsframework_admin_bar() {
 
-		$menu = $this->menu_settings();
+		$menu = Self::menu_settings();
 
 		global $wp_admin_bar;
 
@@ -488,6 +479,20 @@ class Options_Framework_Admin {
 		);
 
 		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar', $args ) );
+
+
+		$plugin_activation = $GLOBALS['optionsframeworkpluginactivation'];
+
+		$href = $plugin_activation->get_optionsframework_url();
+		
+		$args = array(
+			'parent' => 'of_theme_options',
+			'id' => $plugin_activation->slug,
+			'title' => $plugin_activation->strings['menu_title'],
+			'href' => $href
+		);
+
+		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar_submenu', $args ) );
 	}
 
 }
