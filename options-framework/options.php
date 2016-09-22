@@ -404,7 +404,6 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'type' => 'info',
-		'class' => 'clear',
 		'wrap' => array( 
 			'end' => true)
 		);

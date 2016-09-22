@@ -299,7 +299,7 @@ class Options_Framework_Admin {
 	<div id="optionsframework-wrap" class="wrap">
 
 		<?php $menu = Self::menu_settings(); ?>
-		<h1><?php echo esc_html( $menu['page_title'] ); ?></h1>
+		<h1><?php echo esc_html( $menu['page_title'] ); ?> <span class="subtitle alignright">v<?php print WEBDOGS_VERSION; ?></span></h1>
 
 	    <?php settings_errors( 'options-framework' ); ?>
 
