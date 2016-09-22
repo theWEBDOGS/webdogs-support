@@ -555,7 +555,7 @@ function wds_bundled_themes(){
 function wds_base_strings(){
 
 	return  array(
-		'page_title'                      => __( 'Install Required Plugins', 'webdogs-support' ),
+		'page_title'                      => __( 'Install Recommended Plugins', 'webdogs-support' ),
 		'menu_title'                      => __( 'Install Plugins', 'webdogs-support' ),
 		'installing'                      => __( 'Installing Plugin: %s', 'webdogs-support' ), // %s = plugin name.
 		'oops'                            => __( 'Something went wrong with the plugin API.', 'webdogs-support' ),
