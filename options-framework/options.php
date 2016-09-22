@@ -634,7 +634,7 @@ function wds_base_strings(){
 		'activated_successfully'          => __( 'The following plugin was activated successfully:', 'webdogs-support' ),
 		'plugin_already_active'           => __( 'No action taken. Plugin %1$s was already active.', 'webdogs-support' ),  // %1$s = plugin name(s).
 		'plugin_needs_higher_version'     => __( 'Plugin not activated. A higher version of %s is needed. Please update the plugin.', 'webdogs-support' ),  // %1$s = plugin name(s).
-		'complete'                        => __( 'All plugins installed and activated successfully. %1$s', 'webdogs-support' ), // %s = dashboard link.
+		'complete'                        => __( 'All plugins and themes have been installed and activated successfully. %1$s', 'webdogs-support' ), // %s = dashboard link.
 		'contact_admin'                   => __( 'Please contact WEBDOGS for support.', 'webdogs-support' ),
 
 		'nag_type'                        => 'webdogs-nag', // Determines admin notice type - can only be 'updated', 'update-nag' or 'error'.
