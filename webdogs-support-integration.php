@@ -17,6 +17,12 @@ if (!class_exists('WEBDOGS')) {
     define( 'WEBDOGS_DOMAIN', "webdogs.com" );
     define( 'WEBDOGS_VERSION', "2.0.2" );
 
+    if(FALSE===($wds_version=file_get_contents('https://webdogsplugins.wpengine.com/wds.version') ) && !defined( 'WEBDOGS_LATEST_VERSION' ) ) {
+        define('WEBDOGS_LATEST_VERSION','2.0.1');
+    } elseif(!defined('WEBDOGS_LATEST_VERSION')) { 
+        define('WEBDOGS_LATEST_VERSION',$wds_version);
+    }
+
     /////////////////////////////////////////////////
     //
     // The class is useless if we do not start it, 
