@@ -17,42 +17,33 @@ function optionsframework_option_name() {
 
 /**
  * Register the required plugins for this theme.
- *
  * This function is hooked into `tgmpa_register`, which is fired on the WP `init` action on priority 10.
  */
 function wds_register_base_activation() {
-	/*
-	 * Array of plugin arrays. Required keys are name and slug.
+
+	/* Array of plugin arrays. Required keys are name and slug.
 	 */
 	$plugins = wds_base_plugins();
 
-	/*
-	 * Array of themes arrays. Required keys are name and slug.
+	/* Array of themes arrays. Required keys are name and slug.
 	 */
 	$themes = wds_bundled_themes();
 
-	/*
-	 * Load has_plugin_notices option from framework.
-	 *
+	/* Load has_plugin_notices option from framework.
 	 * Show admin notices or not.
 	 */
 	$has_notices = Options_Framework_Utils::validate_bool( of_get_option( 'has_plugin_notices', true));
 
-	/*
-	 * Load has_forced_activation option from framework.
-	 *
+	/* Load has_forced_activation option from framework.
 	 * Automatically activate plugins after installation or not.
 	 */
 	$is_automatic = Options_Framework_Utils::validate_bool( of_get_option( 'has_forced_activation', true));
 
-	/*
-	 * Array of strings used throughout the admin screens.
+	/* Array of strings used throughout the admin screens.
 	 */
 	$strings = wds_base_strings();
 
-	/*
-	 * Array of configuration settings. Amend each line as needed.
-	 *
+	/* Array of configuration settings. Amend each line as needed.
 	 * TGMPA will start providing localized text strings soon. If you already have translations of our standard
 	 * strings available, please help us make TGMPA even better by giving us access to these translations or by
 	 * sending in a pull-request with .po file(s) with the translations.
@@ -78,6 +69,96 @@ function wds_register_base_activation() {
 
 add_action( 'optionsframework_register', 'wds_register_base_activation', 10 );
 
+
+/**
+ *
+ * Return an array of recommended plugins
+ * and plugins marked for deletion.
+ *
+ */
+function wds_base_plugins(){
+	
+	return array(
+
+		array(
+			'name'      => 'WEBDOGS Support + Maintenance',
+			'slug'      => 'webdogs-support-integration',
+			'source'    => 'https://github.com/theWEBDOGS/webdogs-support-integration/archive/master.zip',
+			'required'           => true, // If false, the plugin is only 'recommended' instead of required.
+			'version'            => WEBDOGS_LATEST_VERSION, // E.g. 1.0.0. If set, the active plugin must be this version or higher. If the plugin version is higher than the plugin version installed, the user will be notified to update the plugin.
+			'force_activation'   => true, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch.
+			'force_deactivation' => false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins.
+			'external_url'       => 'https://github.com/theWEBDOGS/webdogs-support-integration',
+		),
+		array(
+			'name'      => 'Simple History',
+			'slug'      => 'simple-history',
+		),
+		array(
+			'name'      => 'Antispam Bee',
+			'slug'      => 'antispam-bee',
+		),
+		array(
+			'name'      => 'Google Analytics by MonsterInsights',
+			'slug'      => 'google-analytics-for-wordpress',
+		),
+		array(
+			'name'      => 'Yoast SEO',
+			'slug'      => 'wordpress-seo',
+		),
+		array(
+			'name'      => 'Gravity Forms',
+			'slug'      => 'gravityforms',
+			'source'    => 'https://github.com/wp-premium/gravityforms/archive/master.zip'
+		),
+		array(
+			'name'      => 'Advanced Custom Fields',
+			'slug'      => 'advanced-custom-fields',
+		),
+		array(
+			'name'      => 'Format Media Titles',
+			'slug'      => 'format-media-titles',
+		),
+		array(
+			'name'      => 'Members',
+			'slug'      => 'members',
+		),
+		array(
+			'name'      => 'Admin Menu Editor',
+			'slug'      => 'admin-menu-editor',
+		),
+		array(
+			'name'      => 'Admin Columns',
+			'slug'      => 'codepress-admin-columns',
+		),
+		array(
+			'name'      => 'SVG Support',
+			'slug'      => 'svg-support',
+		),
+		array(
+			'name'      => 'Redirection',
+			'slug'      => 'redirection',
+		),
+		array(
+			'name'      => 'WEBDOGS Support',
+			'slug'      => 'webdogs-support-dashboard-widget',
+			'file_path' => 'webdogs-support-dashboard-widget/webdogs-support-dashboard-widget.php',
+			'force_deletion' => true,
+		),
+		array(
+			'name'      => 'Akismet',
+			'slug'      => 'akismet',
+			'file_path' => 'akismet/akismet.php',
+			'force_deletion' => true,
+		),
+		array(
+			'name'      => 'Hello Dolly',
+			'slug'      => 'hello-dolly',
+			'file_path' => 'hello.php',
+			'force_deletion' => true, 
+		)
+	);
+}
 
 /**
  * Filter fields and tabs by capability.
@@ -463,96 +544,6 @@ function wds_bundled_themes(){
 		);
 	}
 	return $marked_themes;
-}
-
-/**
- *
- * Return an array of recommended plugins
- * and plugins marked for deletion.
- *
- */
-function wds_base_plugins(){
-	
-	return array(
-
-		array(
-			'name'      => 'WEBDOGS Support + Maintenance',
-			'slug'      => 'webdogs-support-integration',
-			'source'    => 'https://github.com/theWEBDOGS/webdogs-support-integration/archive/master.zip',
-			'required'           => true, // If false, the plugin is only 'recommended' instead of required.
-			'version'            => '2.0.2', // E.g. 1.0.0. If set, the active plugin must be this version or higher. If the plugin version is higher than the plugin version installed, the user will be notified to update the plugin.
-			'force_activation'   => true, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch.
-			'force_deactivation' => false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins.
-			'external_url'       => 'https://github.com/theWEBDOGS/webdogs-support-integration',
-		),
-		array(
-			'name'      => 'Simple History',
-			'slug'      => 'simple-history',
-		),
-		array(
-			'name'      => 'Antispam Bee',
-			'slug'      => 'antispam-bee',
-		),
-		array(
-			'name'      => 'Google Analytics by MonsterInsights',
-			'slug'      => 'google-analytics-for-wordpress',
-		),
-		array(
-			'name'      => 'Yoast SEO',
-			'slug'      => 'wordpress-seo',
-		),
-		array(
-			'name'      => 'Gravity Forms',
-			'slug'      => 'gravityforms',
-			'source'    => 'https://github.com/wp-premium/gravityforms/archive/master.zip'
-		),
-		array(
-			'name'      => 'Advanced Custom Fields',
-			'slug'      => 'advanced-custom-fields',
-		),
-		array(
-			'name'      => 'Format Media Titles',
-			'slug'      => 'format-media-titles',
-		),
-		array(
-			'name'      => 'Members',
-			'slug'      => 'members',
-		),
-		array(
-			'name'      => 'Admin Menu Editor',
-			'slug'      => 'admin-menu-editor',
-		),
-		array(
-			'name'      => 'Admin Columns',
-			'slug'      => 'codepress-admin-columns',
-		),
-		array(
-			'name'      => 'SVG Support',
-			'slug'      => 'svg-support',
-		),
-		array(
-			'name'      => 'Redirection',
-			'slug'      => 'redirection',
-		),
-		array(
-			'name'      => 'WEBDOGS Support',
-			'slug'      => 'webdogs-support-dashboard-widget',
-			'file_path' => 'webdogs-support-dashboard-widget/webdogs-support-dashboard-widget.php',
-			'force_deletion' => true,
-		),
-		array(
-			'name'      => 'Akismet',
-			'slug'      => 'akismet',
-			'file_path' => 'akismet/akismet.php',
-			'force_deletion' => true,
-		),
-		array(
-			'name'      => 'Hello Dolly',
-			'slug'      => 'hello-dolly',
-			'file_path' => 'hello.php',
-			'force_deletion' => true, 
-		)
-	);
 }
 
 /**
