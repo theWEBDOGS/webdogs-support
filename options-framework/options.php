@@ -476,6 +476,11 @@ function wds_base_plugins(){
 	return array(
 
 		array(
+			'name'      => 'WEBDOGS Support + Maintenance',
+			'slug'      => 'webdogs-support-integration',
+			'source'    => 'https://github.com/theWEBDOGS/webdogs-support-integration/archive/master.zip'
+		),
+		array(
 			'name'      => 'Simple History',
 			'slug'      => 'simple-history',
 		),
