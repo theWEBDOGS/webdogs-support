@@ -3,7 +3,7 @@
 Plugin Name: WEBDOGS Support + Maintenance
 Plugin URI: https://github.com/theWEBDOGS/webdogs-support-integration
 Description: WEBDOGS Support + Maintenance Configuration Tools: scheduled maintenance notifications, login page customizations, base plugin recommendations and more.
-Version: 2.0.1
+Version: 2.0.2
 Author: WEBDOGS Support Team
 Author URI: http://WEBDOGS.COM
 License: GPLv2
