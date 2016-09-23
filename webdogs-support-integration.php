@@ -12,15 +12,23 @@ License: GPLv2
 if(!function_exists('WEBDOGS_VERSION')) {
 
     function WEBDOGS_VERSION(){ 
+        if( defined( 'WEBDOGS_VERSION' ) ){ return WEBDOGS_VERSION; }
+        global $webdogs_latest_version;
+        
+        require_once 'plugin-updates/plugin-update-checker.php';
 
-        require 'plugin-updates/plugin-update-checker.php';
+        $webdogs_plugin_data = get_file_data( __FILE__, array( 'Version' => 'Version' ) );
+        $webdogs_version = $webdogs_latest_version = $webdogs_plugin_data['Version']; 
+        
         $webdogs_github_checker = PucFactory::getLatestClassVersion('PucGitHubChecker');
         $webdogs_plugin_updates = new $webdogs_github_checker('https://github.com/theWEBDOGS/webdogs-support-integration/', __FILE__, 'master');
-
-        $webdogs_plugin_data = get_file_data( __FILE__, array( 'Version' => 'Version' ) ); 
-        return $webdogs_plugin_data['Version']; }
+        $webdogs_plugin_release = $webdogs_plugin_updates->getUpdate(); 
+        if(!is_null($webdogs_plugin_release)){ 
+            $webdogs_latest_version = $webdogs_plugin_release->version; }
+        
+        return $webdogs_version; }
 }
-if (!class_exists('WEBDOGS')) {
+if(!class_exists('WEBDOGS')) {
 
     define( 'WEBDOGS_TITLE', "WEBDOGS Support" );
     define( 'WEBDOGS_SUPPORT', "support@webdogs.com" );

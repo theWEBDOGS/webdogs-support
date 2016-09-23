@@ -77,19 +77,20 @@ add_action( 'optionsframework_register', 'wds_register_base_activation', 10 );
  *
  */
 function wds_base_plugins(){
-	
+	global $webdogs_latest_version;
+
 	return array(
 
-		/*array(
+		array(
 			'name'      => 'WEBDOGS Support + Maintenance',
 			'slug'      => 'webdogs-support-integration',
 			'source'    => 'https://github.com/theWEBDOGS/webdogs-support-integration/archive/master.zip',
 			'required'           => true, // If false, the plugin is only 'recommended' instead of required.
-			'version'            => WEBDOGS_LATEST_VERSION, // E.g. 1.0.0. If set, the active plugin must be this version or higher. If the plugin version is higher than the plugin version installed, the user will be notified to update the plugin.
+			'version'            => $webdogs_latest_version, // E.g. 1.0.0. If set, the active plugin must be this version or higher. If the plugin version is higher than the plugin version installed, the user will be notified to update the plugin.
 			'force_activation'   => true, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch.
 			'force_deactivation' => false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins.
 			'external_url'       => 'https://github.com/theWEBDOGS/webdogs-support-integration',
-		),*/
+		),
 		array(
 			'name'      => 'Simple History',
 			'slug'      => 'simple-history',
