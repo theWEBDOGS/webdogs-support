@@ -323,6 +323,12 @@
     clear: left;
 }
 
+/* Plugins tab */
+
+#optionsframework .column-source {
+    display: none;
+}
+
 /* Bottom Section */
 
 #optionsframework-submit {

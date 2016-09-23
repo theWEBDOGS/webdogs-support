@@ -3,19 +3,29 @@
 Plugin Name: WEBDOGS Support + Maintenance
 Plugin URI: https://github.com/theWEBDOGS/webdogs-support-integration
 Description: WEBDOGS Support + Maintenance Configuration Tools: scheduled maintenance notifications, login page customizations, base plugin recommendations and more.
-Version: 2.0.3
+Version: 2.0.4
 Author: WEBDOGS Support Team
 Author URI: http://WEBDOGS.COM
 License: GPLv2
 */
 
+if(!function_exists('WEBDOGS_VERSION')) {
 
+    function WEBDOGS_VERSION(){ 
+
+        require 'plugin-updates/plugin-update-checker.php';
+        $webdogs_github_checker = PucFactory::getLatestClassVersion('PucGitHubChecker');
+        $webdogs_plugin_updates = new $webdogs_github_checker('https://github.com/theWEBDOGS/webdogs-support-integration/', __FILE__, 'master');
+
+        $webdogs_plugin_data = get_file_data( __FILE__, array( 'Version' => 'Version' ) ); 
+        return $webdogs_plugin_data['Version']; }
+}
 if (!class_exists('WEBDOGS')) {
 
     define( 'WEBDOGS_TITLE', "WEBDOGS Support" );
     define( 'WEBDOGS_SUPPORT', "support@webdogs.com" );
     define( 'WEBDOGS_DOMAIN', "webdogs.com" );
-    define( 'WEBDOGS_VERSION', "2.0.3" );
+    define( 'WEBDOGS_VERSION', WEBDOGS_VERSION() );
 
 
     /////////////////////////////////////////////////
@@ -29,7 +39,7 @@ if (!class_exists('WEBDOGS')) {
 
         function WEBDOGS() { return WEBDOGS::instance(); }
     }
-
+    
     /**
      * WEBDOGS
      */

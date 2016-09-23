@@ -744,7 +744,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 
 			if( ! $included ) : ?>
 			<div class="optionsframework wrap">
-				<h3><?php echo esc_html( get_admin_page_title() ); ?></h3>
+				<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 			<?php endif; ?>
 
 				<?php $plugin_table->prepare_items(); ?>
@@ -767,6 +767,12 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			<?php if( ! $included ) : ?>
 			</div>
 			<?php endif;
+
+
+			wp_enqueue_script( 'updates' );
+			wp_print_request_filesystem_credentials_modal();
+			wp_print_admin_notice_templates();
+			wp_print_update_row_templates();
 		}
 
 		/**
@@ -2309,7 +2315,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		 * @return array CSS classnames.
 		 */
 		public function get_table_classes() {
-			return array( 'widefat', 'striped' );
+			return array( 'widefat', 'plugins', 'striped' );
 		}
 
 		/**
@@ -2358,7 +2364,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 				if ( ! empty( $upgrade_notice ) ) {
 					$table_data[ $i ]['upgrade_notice'] = $upgrade_notice;
 
-					add_action( "optionsframework_after_plugin_row_$slug", array( $this, 'wp_plugin_update_row' ), 10, 2 );
+					add_action( "optionsframework_after_plugin_row_$slug", array( $this, 'wp_plugin_update_row' ), 10, 3 );
 				}
 
 				$table_data[ $i ] = apply_filters( 'optionsframework_table_data_item', $table_data[ $i ], $plugin );
@@ -2791,6 +2797,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 			return apply_filters( "optionsframework_{$prefix}plugin_action_links", array_filter( $action_links ), $item['slug'], $item, $this->view_context );
 		}
 
+		
 		/**
 		 * Generates content for a single row of the table.
 		 *
@@ -2799,7 +2806,40 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		 * @param object $item The current item.
 		 */
 		public function single_row( $item ) {
-			parent::single_row( $item );
+			global $status;
+
+			$plugin_data = $item;
+			$plugin = $this->optionsframework->plugins[ $plugin_data['slug'] ];
+			$plugin_file = $plugin['file_path'];
+
+			$is_active = ( stripos( $plugin_data['status'], 'Active') !== FALSE && stripos($plugin_data['status'], 'Not Activated') === FALSE );
+			$is_update = ( stripos( $plugin_data['status'], 'Update') !== FALSE );
+
+			$class = $is_active ? 'active' : 'inactive';
+
+			$checkbox_id =  "checkbox_" . md5($plugin_data['slug']);
+			if ( in_array( $status, array( 'mustuse', 'dropins' ) ) ) {
+				$checkbox = '';
+			} else {
+				$checkbox = "<label class='screen-reader-text' for='" . $checkbox_id . "' >" . sprintf( __( 'Select %s' ), $plugin_data['sanitized_plugin'] ) . "</label>"
+					. "<input type='checkbox' name='checked[]' value='" . esc_attr( $plugin_file ) . "' id='" . $checkbox_id . "' />";
+			}
+			$description = '<p>' . ( $plugin_data['type'] ? $plugin_data['type'] : '&nbsp;' ) . '</p>';
+			$plugin_name = $plugin_data['sanitized_plugin'];
+
+			if ( $is_update )
+				$class .= ' update';
+
+			$plugin_slug = isset( $plugin_data['slug'] ) ? $plugin_data['slug'] : sanitize_title( $plugin_name );
+			printf( '<tr class="%s" data-slug="%s" data-plugin="%s">',
+				esc_attr( $class ),
+				esc_attr( $plugin_slug ),
+				esc_attr( $plugin_file )
+			);
+
+			parent::single_row_columns( $item );
+
+			echo '</tr>';
 
 			/**
 			 * Fires after each specific row in the Options Framework Plugins list table.
@@ -2809,7 +2849,8 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 			 *
 			 * @since 2.5.0
 			 */
-			do_action( "optionsframework_after_plugin_row_{$item['slug']}", $item['slug'], $item, $this->view_context );
+			$slug = $item['slug'];
+			do_action( "optionsframework_after_plugin_row_{$slug}", $item['slug'], $item, $this->view_context );
 		}
 
 		/**
@@ -2823,7 +2864,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		 * @param array  $item The information available in this table row.
 		 * @return null Return early if upgrade notice is empty.
 		 */
-		public function wp_plugin_update_row( $slug, $item ) {
+		public function wp_plugin_update_row( $slug, $item, $context ) {
 			if ( empty( $item['upgrade_notice'] ) ) {
 				return;
 			}

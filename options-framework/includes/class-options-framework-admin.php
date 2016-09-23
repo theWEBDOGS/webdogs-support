@@ -314,8 +314,11 @@ class Options_Framework_Admin {
 				<div id="optionsframework-submit">
 					<input type="submit" class="button-primary" name="update" value="<?php esc_attr_e( 'Save Options', 'options-framework' ); ?>" />
 					<?php $prev_proof = get_option( 'wd_maintenance_notification_proof' ); ?>
+					<?php $next_notice = wd_create_daily_notification_schedule(); ?>
 					<?php if($prev_proof) : ?>
-						<p class="wd_last_notification_sent"><?php printf(__('Last notification: %s'), date(' F j, Y' , $prev_proof ) ); ?></p>
+						<p class="wd_last_notification_sent">
+						<?php printf(__('Last notification: %s'), date(' F j, Y' , $prev_proof ) ); ?> | 
+						<?php printf(__('Next notification: %s'), date(' F j, Y H:i' , $next_notice ) ); ?></p>
 					<?php elseif( wd_create_daily_notification_schedule() ): ?>
 						<p class="wd_notification_scheduled"><?php print( __('Maintanace notifications are scheduled.') ); ?></p>
 					<?php endif; ?>

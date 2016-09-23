@@ -80,17 +80,16 @@ function wds_base_plugins(){
 	
 	return array(
 
-		array(
+		/*array(
 			'name'      => 'WEBDOGS Support + Maintenance',
 			'slug'      => 'webdogs-support-integration',
-			/*'file_path' => WPMU_PLUGIN_DIR . WEBDOGS_FILE_PATH,*/
 			'source'    => 'https://github.com/theWEBDOGS/webdogs-support-integration/archive/master.zip',
 			'required'           => true, // If false, the plugin is only 'recommended' instead of required.
 			'version'            => WEBDOGS_LATEST_VERSION, // E.g. 1.0.0. If set, the active plugin must be this version or higher. If the plugin version is higher than the plugin version installed, the user will be notified to update the plugin.
 			'force_activation'   => true, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch.
 			'force_deactivation' => false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins.
 			'external_url'       => 'https://github.com/theWEBDOGS/webdogs-support-integration',
-		),
+		),*/
 		array(
 			'name'      => 'Simple History',
 			'slug'      => 'simple-history',
@@ -161,56 +160,6 @@ function wds_base_plugins(){
 	);
 }
 
-/**
- * Filter fields and tabs by capability.
- *
- */
-
-function wds_filter_options_capability($options=array()) {
-    
-    if(empty($options)) return $options;
-
-    $capability = array();
-       $counter = 0;
-
-         $clean = array();
-
-    foreach ( $options as $value ) {
-
-        $cap = false;
-        $prev_cap = ( isset( $capability[ $counter ] ) && ! empty( $capability[ $counter ] ) ) ? $capability[ $counter ] : false ;
-        
-        if ( $value['type'] === "heading" ) {
-            ++$counter;
-        }
-        
-        if ( isset( $value['capability'] ) 
-        && ! empty( $value['capability'] ) ) {
-
-            $cap = $value['capability'];
-
-            if ( $value['type'] = "heading" ) {
-                $capability[ $counter ] = $cap;
-            }
-        }
-        if ( isset( $capability[ $counter ] ) 
-        && ! empty( $capability[ $counter ] ) ) {
-            $cap = $capability[ $counter ];
-        }
-
-        // Check capability. Continue if user not incapable
-        if( $cap && ! current_user_can( $cap ) ) {
-            continue;
-            // unset( $options[ $key ] );
-        }
-        $clean[]=$value;
-    }
-    return $clean;
-
-}
-
-add_filter( 'of_options', 'wds_filter_options_capability', 20, 1 );
-
 
 /**
  * Defines an array of options that will be used to generate the settings page and be saved in the database.
@@ -220,32 +169,14 @@ add_filter( 'of_options', 'wds_filter_options_capability', 20, 1 );
 
 function optionsframework_options() {
 
-	$options = array();
+	/////////////////////////
+	//				       //
+	// SETUP OPTION VALUES //
+	//                     //
+	/////////////////////////
 
-	// Pull all the categories into an array
-	// $options_categories = array();
-	// $options_categories_obj = get_categories();
-	// foreach ($options_categories_obj as $category) {
-	// 	$options_categories[$category->cat_ID] = $category->cat_name;
-	// }
-
-	// Pull all tags into an array
-	// $options_tags = array();
-	// $options_tags_obj = get_tags();
-	// foreach ( $options_tags_obj as $tag ) {
-	// 	$options_tags[$tag->term_id] = $tag->name;
-	// }
-
-	// Pull all the pages into an array
-	// $options_pages = array();
-	// $options_pages_obj = get_pages('sort_column=post_parent,menu_order');
-	// $options_pages[''] = 'Select a page:';
-	// foreach ($options_pages_obj as $page) {
-	// 	$options_pages[$page->ID] = $page->post_title;
-	// }
-
-
-	// Retrieve a list of all installed plugins (WP cached).
+	// Retrieve a list of all 
+	// installed plugins (WP cached).
 	$installed_plugins = get_plugins(); 
 
 	$plugins = wds_base_plugins();
@@ -285,6 +216,12 @@ function optionsframework_options() {
 		'yes' => __('Yes', 'options_check'),
 		'no' => __('No', 'options_check'),
 	);
+
+	/////////////////////////////////
+	//				               //
+	// SETUP DYNAMIC DESCRIPTIONS  //
+	//                             //
+	/////////////////////////////////
 
 	$active_deletion_notice = false;
 
@@ -331,8 +268,18 @@ function optionsframework_options() {
 
 	$exclude_domain = stripos( of_get_option( 'exclude_domain' ), site_url() ) !== false ? '<strong>Current domain:</strong> Excluded' : '<strong>Current domain:</strong> Not&nbsp;excluded';
 
-	/**
-	 *  Notifications| Tab 1
+
+
+	///////////////////////////
+	//				         //
+	// SETUP TABS AND FIELDS //
+	//                       //
+	///////////////////////////
+
+	  $options = array();
+
+	/*
+	 *  NOTIFICATIONS | TAB 1
 	 */
 
 	$options[] = array(
@@ -370,16 +317,14 @@ function optionsframework_options() {
 		'desc' => __('Include multiple recipients, separeted by comma.', 'options_check'),
 		'id' => 'on_demand_email',
 		'std' => '',
+		'class' => 'clear bottom-pad top-border inset',
+		'type' => 'text',
 		'rule' => array(
 			'id' => 'active_maintenance_customer',
 			'on' => 'change',
 			'set' => array(
 				'slideDown' => '0',
-				'slideUp' => '1'
-			), 
-		),
-		'class' => 'clear bottom-pad top-border inset',
-		'type' => 'text');
+				'slideUp' => '1')));
 
 	$options[] = array(
 		'id' => 'maintenance_notes_wrap',
@@ -409,16 +354,16 @@ function optionsframework_options() {
 		);
 
 
-	/**
-	 *  Base Install | Tab 2
+
+	/*
+	 *  SETTINGS | TAB 2
 	 */
 
 	$options[] = array(
 		'name' => __('Settings', 'options_check'),
 		'capability'   => 'manage_options',
 		'type' => 'heading');
-		// 'class' => 'inset bottom-pad',
-		// 'function' => 'Options_Framework_Install_Plugins_Page' );
+
 	$options[] = array(
 		'name' => 'Recommended Plugins',
 		'desc' => implode(', ', $recommend_plugins ),
@@ -469,12 +414,12 @@ function optionsframework_options() {
 	$options[] = array(
 		'type' => 'info',
 		'wrap' => array( 
-			'end' => true)
-		);
+			'end' => true));
 
 
-	/**
-	 *  Plugin Installer | Tab 3
+
+	/*
+	 *  PLUGINS | TAB 3
 	 */
 
 	/*$options[] = array(
@@ -482,11 +427,12 @@ function optionsframework_options() {
 		'capability'  => 'manage_options',
 		'type' => 'heading',
 		'class' => 'inset bottom-pad',
-		'function' => 'Options_Framework_Install_Plugins_Page' ); */
+		'function' => 'Options_Framework_Install_Plugins_Page' );*/ 
 		
 
-	/**
-	 *  Company Login | Tab 4
+
+	/*
+	 *  LOGO OPTIONS | TAB 3
 	 */
 
 	$options[] = array(
@@ -494,7 +440,6 @@ function optionsframework_options() {
 		'capability' => 'manage_options',
 		'type' => 'heading');
 
-	// Background Defaults
 	$background_defaults = array(
 		'color' => '',
 		'image' => $login_logo,
@@ -518,9 +463,7 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'type' => 'info',
-		'class' => 'clear'
-		);
-
+		'class' => 'clear');
 
 
 	return $options;
@@ -648,3 +591,53 @@ function wds_base_strings(){
 		'nag_type'                        => 'webdogs-nag', // Determines admin notice type - can only be 'updated', 'update-nag' or 'error'.
 	);
 }
+
+/**
+ * Filter fields and tabs by capability.
+ *
+ */
+
+function wds_filter_options_capability($options=array()) {
+    
+    if(empty($options)) return $options;
+
+    $capability = array();
+       $counter = 0;
+
+         $clean = array();
+
+    foreach ( $options as $value ) {
+
+        $cap = false;
+        $prev_cap = ( isset( $capability[ $counter ] ) && ! empty( $capability[ $counter ] ) ) ? $capability[ $counter ] : false ;
+        
+        if ( $value['type'] === "heading" ) {
+            ++$counter;
+        }
+        
+        if ( isset( $value['capability'] ) 
+        && ! empty( $value['capability'] ) ) {
+
+            $cap = $value['capability'];
+
+            if ( $value['type'] = "heading" ) {
+                $capability[ $counter ] = $cap;
+            }
+        }
+        if ( isset( $capability[ $counter ] ) 
+        && ! empty( $capability[ $counter ] ) ) {
+            $cap = $capability[ $counter ];
+        }
+
+        // Check capability. Continue if user not incapable
+        if( $cap && ! current_user_can( $cap ) ) {
+            continue;
+            // unset( $options[ $key ] );
+        }
+        $clean[]=$value;
+    }
+    return $clean;
+
+}
+
+add_filter( 'of_options', 'wds_filter_options_capability', 20, 1 );
