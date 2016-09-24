@@ -1778,6 +1778,13 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		public function get_optionsframework_url() {
 			static $url;
 
+				$menu = $this->menu;
+			if( isset( $_GET['page'] ) 
+			&&in_array($_GET['page'], 
+			array( $this->menu, 'options-framework' ) ) ) {
+				$menu = $_GET['page'];
+			}
+
 			if ( ! isset( $url ) ) {
 				$parent = $this->parent_slug;
 				if ( false === strpos( $parent, '.php' ) ) {
@@ -1785,7 +1792,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 				}
 				$url = add_query_arg(
 					array(
-						'page' => urlencode( $this->menu ),
+						'page' => urlencode( $menu ),
 					),
 					self_admin_url( $parent )
 				);

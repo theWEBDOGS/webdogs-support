@@ -2,7 +2,7 @@
 
 #optionsframework {
     max-width:840px;
-    background:#fff;
+    background:#f1f1f1;
     padding-bottom: 20px;
 }
 #optionsframework form {
@@ -24,6 +24,7 @@
 }
 #optionsframework .group {
 	padding-bottom:43px;
+	background-color: #fff;
 }
 #optionsframework .group .section:first-of-type > .heading,
 #optionsframework .group .alignleft > .heading {
