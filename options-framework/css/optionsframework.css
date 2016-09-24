@@ -3,6 +3,7 @@
 #optionsframework {
     max-width:840px;
     background:#fff;
+    padding-bottom: 20px;
 }
 #optionsframework form {
 	margin: auto;
@@ -22,7 +23,7 @@
 	padding:10px 10px 0;
 }
 #optionsframework .group {
-	padding-bottom:40px;
+	padding-bottom:43px;
 }
 #optionsframework .group .section:first-of-type > .heading,
 #optionsframework .group .alignleft > .heading {
@@ -334,7 +335,10 @@
 #optionsframework-submit {
 	padding: 7px 10px;
 	border-top: 1px solid #ddd;
-	background-color: #f1f1f1;
+	background-color: #f1f1f1;    
+	position: absolute;
+    width: 820px;
+    bottom: 0;
 }
 #optionsframework .button-primary {
 	float:right;

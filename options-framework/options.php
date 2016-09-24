@@ -280,14 +280,30 @@ function optionsframework_options() {
 	$exclude_domain = stripos( of_get_option( 'exclude_domain' ), site_url() ) !== false ? '<strong>Current domain:</strong> Excluded' : '<strong>Current domain:</strong> Not&nbsp;excluded';
 
 
+	  $options = array();
+
+	
+	///////////////////////////
+	//				         //
+	// SETUP TABS AND FORM  //
+	//                       //
+	///////////////////////////
+
+	$options[] = array(
+		'type' => 'form',
+		'id' => 'options_framework_form',
+		'name' => 'options-framework',
+		'wrap' => array( 
+			'start' => true,),
+		'options' => array( 
+			'action' => 'options.php',
+			'method' => 'post'));
 
 	///////////////////////////
 	//				         //
 	// SETUP TABS AND FIELDS //
 	//                       //
 	///////////////////////////
-
-	  $options = array();
 
 	/*
 	 *  NOTIFICATIONS | TAB 1
@@ -296,6 +312,7 @@ function optionsframework_options() {
 	$options[] = array(
 		'name' => __('Notifications', 'options_check'),
 		'capability'   => 'manage_options',
+		'order' => 1,
 		'type' => 'heading');
 
 	$options[] = array(
@@ -361,8 +378,7 @@ function optionsframework_options() {
 	$options[] = array(
 		'type' => 'info',
 		'wrap' => array( 
-			'end' => true)
-		);
+			'end' => true));
 
 
 
@@ -373,6 +389,7 @@ function optionsframework_options() {
 	$options[] = array(
 		'name' => __('Settings', 'options_check'),
 		'capability'   => 'manage_options',
+		'order' => 2,
 		'type' => 'heading');
 
 	$options[] = array(
@@ -428,20 +445,6 @@ function optionsframework_options() {
 			'end' => true));
 
 
-
-	/*
-	 *  PLUGINS | TAB 3
-	 */
-
-	/*$options[] = array(
-		'name' => __('Plugins', 'options_check'),
-		'capability'  => 'manage_options',
-		'type' => 'heading',
-		'class' => 'inset bottom-pad',
-		'function' => 'Options_Framework_Install_Plugins_Page' );*/ 
-		
-
-
 	/*
 	 *  LOGO OPTIONS | TAB 3
 	 */
@@ -449,6 +452,7 @@ function optionsframework_options() {
 	$options[] = array(
 		'name' => __('Logo Options', 'options_check'),
 		'capability' => 'manage_options',
+		'order' => 4,
 		'type' => 'heading');
 
 	$background_defaults = array(
@@ -475,6 +479,30 @@ function optionsframework_options() {
 	$options[] = array(
 		'type' => 'info',
 		'class' => 'clear');
+
+	$options[] = array(
+		'type' => 'form',
+		'wrap' => array(
+			'end' => true));
+
+	$options[] = array(
+		'type' => 'form',
+		'wrap' => array( 
+			'end' => true));
+
+	/*
+	 *  PLUGINS | TAB 4
+	 */
+
+	$options[] = array(
+		'name' => __('Plugins', 'options_check'),
+		'capability'  => 'manage_options',
+		'order' => 3,
+		'type' => 'heading',
+		'class' => 'inset bottom-pad',
+		'function' => 'Options_Framework_Install_Plugins_Page' ); 
+		
+
 
 
 	return $options;

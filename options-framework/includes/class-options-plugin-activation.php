@@ -755,15 +755,15 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 
 				<?php $plugin_table->views(); ?>
 
-				<?php if( ! $included ) : ?>
-				<form id="optionsframework-plugins" action="" method="post">
-				<?php endif; ?>
+				<?php //if( ! $included ) : ?>
+				<form id="optionsframework-plugins" action="<?php echo $this->get_optionsframework_url(); ?>" method="post">
+				<?php// endif; ?>
 					<input type="hidden" name="optionsframework-page" value="<?php echo esc_attr( $this->menu ); ?>" />
 					<input type="hidden" name="plugin_status" value="<?php echo esc_attr( $plugin_table->view_context ); ?>" />
 					<?php $plugin_table->display(); ?>
-				<?php if( ! $included ) : ?>
+				<?php// if( ! $included ) : ?>
 				</form>
-				<?php endif; ?>
+				<?php //endif; ?>
 			<?php if( ! $included ) : ?>
 			</div>
 			<?php endif;
@@ -1809,8 +1809,8 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			return add_query_arg(
 				array(
 					'plugin_status' => urlencode( $status ),
-				),
-				$this->get_optionsframework_url()
+				)/*,
+				$this->get_optionsframework_url()*/
 			);
 		}
 

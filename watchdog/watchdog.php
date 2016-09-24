@@ -47,34 +47,34 @@ if( file_exists( WP_PLUGIN_DIR . '/webdogs-support-integration/webdogs-support-i
            ZZZZZZZ+...............$Z............ZZ...........ZZZZZZZZ           
          ZZZZZZZI.................ZZZ..........ZZZ,............ZZZZZZZ          
         ZZZZZZZ...................ZZZ?........=ZZZ=.............?ZZZZZZ         
-       ZZZZZZI....................~ZZZ,.......$ZZZ?...............ZZZZZZZ       
+       ZZZZZZI....................~ZZZ,.......$ZZZ?...............ZZZZZZ       
       ZZZZZZ.......................ZZZZ.......ZZZZZ................ZZZZZZ       
      ZZZZZZ........................,ZZZZ......ZZZZZ.................IZZZZZ      
     ZZZZZZ..........................ZZZZZ....,ZZZZZZ.................7ZZZZZ     
    ZZZZZZ...........................ZZZZZ$...ZZZZZZZZ.................IZZZZZ    
-   ZZZZZ,..........................:ZZZZZZI.~ZZZZZZZZZ.................ZZZZZZ   
+  ZZZZZZ,..........................:ZZZZZZI.~ZZZZZZZZZ.................ZZZZZZ   
   ZZZZZZ..........................$ZZZZZZZZZZZZZZZZZZZZ.................ZZZZZ   
  ZZZZZZ........................,ZZZZZ+ZZZZZZZZZZZZZZZZZ~................+ZZZZZ  
  ZZZZZ~.....................?ZZZZ7.$ZZZZZZZ=:ZZZZZZZZZZZ.................ZZZZZ  
- ZZZZZ...................+ZZZZZ~.ZZZZ+........ZZZZZZZZZZ.................7ZZZZZ 
+ZZZZZZ...................+ZZZZZ~.ZZZZ+........ZZZZZZZZZZ.................7ZZZZZ 
 ZZZZZ7..................ZZZZZ~..ZZZZZ.........=ZZZZZZZZ?..................ZZZZZ 
-ZZZZZ..................ZZZZZ..ZZZZZZZI.........$ZZZZZZZ:..................ZZZZZ 
+ZZZZZ..................ZZZZZ..ZZZZZZZI.........$ZZZZZZZ:..................ZZZZZZ
 ZZZZZ.................$ZZZZ..ZZZZZZZZZ7........ZZZZZZZZ~..................7ZZZZZ
 ZZZZZ.................$ZZZ.~ZZZZZZZZZZZZ......,ZZZZZZZZZ..................?ZZZZZ
 ZZZZZ.................+ZZ,ZZZZZZZZZZZZZZZ?.....ZZZZZZZZZ..................=ZZZZZ
 ZZZZZ............IZZZZZZZZZZZZZZZZZZZZZZZZ.....ZZZZZZZZZ..................=ZZZZZ
 ZZZZZ.........=ZZZZZZZ..ZZZZZZZZZZZZZZZZZZZZ?..=ZZZZZZZZZ.................+ZZZZZ
 ZZZZZ.........IZZZZZZZ:.ZZZZZZZZZZZZZZZZZ+ZZ...?ZZZZZZZZZ,................IZZZZZ
-ZZZZZ.........$ZZZZZZ,.~ZZZZZZZZZZZZZZZ..ZZ:Z.,ZZZZZZZZZZZ,...............ZZZZZ 
+ZZZZZ.........$ZZZZZZ,.~ZZZZZZZZZZZZZZZ..ZZ:Z.,ZZZZZZZZZZZ,...............ZZZZZZ
 ZZZZZ?........ZZZZZ~...ZZZZZZZZZZZZZZ~ . .7ZZZZZZZZZZZZZZZZ:..............ZZZZZ 
- ZZZZZ........ZZZZ ...+ZZZZZZZZZZZZZ7......ZZZZZZZZZZZZZZZZZ7............:ZZZZZ 
+ZZZZZZ........ZZZZ ...+ZZZZZZZZZZZZZ7......ZZZZZZZZZZZZZZZZZ7............:ZZZZZ 
  ZZZZZ,.......ZZZZ....,ZZZZZZZZZZZZZZZ~....ZZZZZZZZZZZZZZZZZZZ...........ZZZZZ  
  ZZZZZZ......=ZZZZZZZ77ZZZZZZZZZZZZZZZZ....ZZZZZZZZZZZZZZZZZZZZ~.........ZZZZZ  
   ZZZZZ?.....+ZZZZZZZZZZZZZZZZZZZZZZZZZ?...ZZZZZZZZZZZZZZZZZZZZZZ.......ZZZZZ   
-   ZZZZZ......ZZZZZZZZZZZZZZZZZZZZZZZZZ$...ZZZZZZZZZZZZZZZZZZZZZZZ+....?ZZZZZ   
+  ZZZZZZ......ZZZZZZZZZZZZZZZZZZZZZZZZZ$...ZZZZZZZZZZZZZZZZZZZZZZZ+....?ZZZZZ   
    ZZZZZZ.... ZZZZZZZZZZZZZZZZZZZZZZZZZ7...ZZZZZZZZZZZZZZZZZZZZZZZ:+7.:ZZZZZ    
-    ZZZZZZ.....ZZZZZZZZZZZZZZZZZZZZZZZZ,...~ZZZZZZZZZZZZZZZZZZZZZ...~.ZZZZZ     
-     ZZZZZZ.....$ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ..Z.?ZZZZZ      
+    ZZZZZZ.....ZZZZZZZZZZZZZZZZZZZZZZZZ,...~ZZZZZZZZZZZZZZZZZZZZZ...~.ZZZZZZ    
+     ZZZZZZ.....$ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ..Z.?ZZZZZZ     
       ZZZZZZ.......7ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ:~.~?ZZZZZZ      
        ZZZZZZ...................ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.=,ZZZZZZZZ       
         ZZZZZZI....................$ZZZZZZZZZZZZZZZZZZZZZZZ=.ZZZ.ZZZZZZZ        
@@ -87,5 +87,5 @@ ZZZZZ?........ZZZZZ~...ZZZZZZZZZZZZZZ~ . .7ZZZZZZZZZZZZZZZZ:..............ZZZZZ
                      ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ                     
                         ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ                         
                              ZZZZZZZZZZZZZZZZZZZZZZ                             
-                                   ZZZZZZZZZ                                    
+                                   ZZZZZZZZZZ                                   
 *///print(WEBDOGS_LATEST_VERSION());print(WEBDOGS_LATEST_VERSION);
