@@ -13,12 +13,57 @@ class Options_Framework_Interface {
 	 * Generates the tabs that are used in the options menu
 	 */
 	static function optionsframework_rule($rule=null, $id=null) {
-		if(is_null($rule)||is_null($id)) return;
+
+		if(is_null($rule)||is_null($id)){ return; }
 
 		$set = isset($rule['set'])?$rule['set']:"";
-		if(empty($set)||!is_array($set))return;
+		$exe = isset($rule['exe'])?$rule['exe']:"";
 
-		$format = array(
+		if((empty($set)||!is_array($set))&&(empty($exe)||!is_array($exe))){ return; }
+
+
+		// set
+
+		elseif(!empty($exe)&&is_array($exe)){
+
+			$format = array(
+			'script' => "
+<script type='text/javascript'>
+	jQuery('#%1\$s').on('%2\$s',function(){ 
+		var val    = jQuery('#%1\$s:input')%3\$s%4\$s.val(), 
+		    target = jQuery('#%5\$s'); 
+		%6\$s;
+	}).trigger('%2\$s');
+</script>",
+
+			'exec' => "
+				target.%s(%s);
+				",
+
+			'filter' => ".filter('%s')",
+
+			'not' => ".not('%s')"
+			);
+
+			// global $optionsframework_rules; // $optionsframework_rules = ( isset( $optionsframework_rules ) ) ? $optionsframework_rules : "" ;
+			$filter = isset($rule['filter'])? sprintf( $format['filter'], $rule['filter'] ):"";
+			$not    = isset($rule['not'])   ? sprintf( $format['not'],    $rule['not']    ):"";
+
+			$action ="";
+			foreach ( $exe as $method => $value ) {
+				$action .= sprintf( $format['exec'], $method, $value );
+			}
+			
+			$jrule = sprintf( $format['script'], $id, $rule['on'], $filter, $not, $rule['id'], $action );
+
+		}
+
+
+		//exe
+
+		elseif(!empty($exe)){
+
+			$format = array(
 			'script' => "
 <script type='text/javascript'>
 	jQuery('#%1\$s').on('%2\$s',function(){ 
@@ -39,18 +84,20 @@ class Options_Framework_Interface {
 			'filter' => ".filter('%s')",
 
 			'not' => ".not('%s')"
-		);
-				// global $optionsframework_rules; // $optionsframework_rules = ( isset( $optionsframework_rules ) ) ? $optionsframework_rules : "" ;
-		$filter = isset($rule['filter'])? sprintf( $format['filter'], $rule['filter'] ):"";
-		$not    = isset($rule['not'])   ? sprintf( $format['not'],    $rule['not']    ):"";
+			);
 
-		$cases ="";
-		foreach ( $set as $value => $method ) {
-			$cases .= sprintf( $format['case'], $method, $value );
+			// global $optionsframework_rules; // $optionsframework_rules = ( isset( $optionsframework_rules ) ) ? $optionsframework_rules : "" ;
+			$filter = isset($rule['filter'])? sprintf( $format['filter'], $rule['filter'] ):"";
+			$not    = isset($rule['not'])   ? sprintf( $format['not'],    $rule['not']    ):"";
+
+			$cases ="";
+			foreach ( $set as $value => $method ) {
+				$cases .= sprintf( $format['case'], $method, $value );
+			}
+			
+			$jrule = sprintf( $format['script'], $rule['id'], $rule['on'], $filter, $not, $id, $cases );
+
 		}
-		
-		$jrule = sprintf( $format['script'], $rule['id'], $rule['on'], $filter, $not, $id, $cases );
-
 		return $jrule;
 	}
 	/**

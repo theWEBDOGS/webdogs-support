@@ -5,6 +5,12 @@
     background:#f1f1f1;
     padding-bottom: 20px;
 }
+#optionsframework-metabox {
+    padding-top: 0 !important;
+}
+#optionsframework-wrap h2.nav-tab-wrapper {
+    max-width: 842px;
+}
 #optionsframework form {
 	margin: auto;
 }
@@ -263,6 +269,8 @@
 	position:relative;
 	width:300px;
 	margin-top:-36px;
+    background-size: contain;
+    overflow: hidden;
 }
 #optionsframework .screenshot img {
 	background:#fafafa;

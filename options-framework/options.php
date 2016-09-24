@@ -285,7 +285,7 @@ function optionsframework_options() {
 	
 	///////////////////////////
 	//				         //
-	// SETUP TABS AND FORM  //
+	//  SETUP TABS AND FORM  //
 	//                       //
 	///////////////////////////
 
@@ -474,7 +474,12 @@ function optionsframework_options() {
 		'std' => '100',
 		'type' => 'select',
 		'class' => 'mini alignright inline', 
-		'options' => $login_logo_height_array);
+		'options' => $login_logo_height_array,
+		'rule' => array(
+			'id' => 'login_logo_css-image',
+			'on' => 'change',
+			'exe' => array(
+				'height' => 'val')));
 
 	$options[] = array(
 		'type' => 'info',
@@ -485,10 +490,6 @@ function optionsframework_options() {
 		'wrap' => array(
 			'end' => true));
 
-	$options[] = array(
-		'type' => 'form',
-		'wrap' => array( 
-			'end' => true));
 
 	/*
 	 *  PLUGINS | TAB 4

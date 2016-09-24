@@ -65,10 +65,11 @@ jQuery(document).ready(function($){
 		    "background-attachment": selector.find('.of-background-attachment:input').val()
 		};
 		if( screenshot_background["background-repeat"] === "no-repeat" ) {
-			$('html').attr('style', null );
+			$('body').attr('style', null );
+			$('body').css( {'background-color': screenshot_background['background-color'] } );
 			selector.find('.screenshot').css( screenshot_background ).slideDown().find('img').css({'opacity':"0"});
 		} else {
-			$('html').css( screenshot_background );
+			$('body').css( screenshot_background );
 			selector.find('.screenshot').css({'opacity':"0"});
 		}
 	}
