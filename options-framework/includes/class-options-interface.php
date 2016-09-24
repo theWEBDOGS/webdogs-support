@@ -567,9 +567,8 @@ class Options_Framework_Interface {
 					$properties = "";
 
 					if ( isset( $value['options'] ) && is_array( $value['options'] ) ) {
-							$properties .= implode(" ", array_map( 
-								function( $prop, $val ){ 
-									return sprintf('%s="%s"', sanitize_key( $prop ), esc_attr( $val ) ); }, $value['options'] ) );
+						foreach ($value['options'] as $prop => $val)
+							$properties .= sprintf('%s="%s"', sanitize_key( $prop ), esc_attr( $val ) );
 					}
 					if ( isset( $value['wrap'] ) && is_array( $value['wrap'] ) ) {
 						
