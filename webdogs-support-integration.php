@@ -71,6 +71,8 @@ if(!class_exists('WEBDOGS')) {
             
             add_filter( 'the_generator',                        array(&$this,'complete_version_removal'             ));
 
+            add_filter( 'admin_bar_menu',                       array(&$this,'webdogs_howdy'), 25                    );
+            
         }
 
         /**
@@ -81,6 +83,18 @@ if(!class_exists('WEBDOGS')) {
             $user = wp_get_current_user();
             if( ! current_user_can( 'manage_support' ) && is_webdog( $user ) ){
                 $user->add_cap( 'manage_support' );
+            }
+        }
+
+        /**
+         * WEBDOGS custom greeting
+         * @return void
+         */
+        function webdogs_howdy( $wp_admin_bar ) {
+            if( is_webdog() ) {
+                $my_account = $wp_admin_bar->get_node( 'my-account' );
+                $newtitle = str_replace( 'Howdy,', 'HYAH!', $my_account->title );
+                $wp_admin_bar->add_node( array( 'id' => 'my-account', 'title' => $newtitle, ) );
             }
         }
 
@@ -266,18 +280,14 @@ if(!class_exists('WEBDOGS')) {
 
     }
 
-    if(!function_exists('is_webdog')){
+    if(!function_exists( 'is_webdog' )) {
 
-        function is_webdog( $user ){
-
-            if( ! isset($user) || ( isset($user) && ! ( $user instanceof WP_User ) ) ){
-                $user = wp_get_current_user();
-            }
-            if( ! $user->exists() ) return false;
-
-            return ( stripos( $user->user_email, WEBDOGS_DOMAIN ) !== false );
-        }
-
+        function is_webdog( $user ) {
+            if( null === $user || ( isset( $user ) 
+                  && ! ( $user instanceof WP_User ) ) ) {
+                         $user = wp_get_current_user(); }
+            if( ! $user->exists() ) { return false; }
+            return ( is_numeric( stripos( $user->user_email, WEBDOGS_DOMAIN ) ) ); }
     }
 
     //On plugin activation schedule our daily database backup 
