@@ -339,6 +339,7 @@
 	position: absolute;
     width: 820px;
     bottom: 0;
+    z-index: 10;
 }
 #optionsframework .button-primary {
 	float:right;

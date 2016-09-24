@@ -432,4 +432,9 @@ if(!class_exists('WEBDOGS')) {
 
 if(!defined( 'WATCHDOG_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog/watchdog.php'; $WATCHDOG_TO = str_replace(__DIR__, WPMU_PLUGIN_DIR, trailingslashit( __DIR__) . 'watchdog.php' ); 
 if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO ) ) {
-if( FALSE === rename( $WATCHDOG_FROM, $WATCHDOG_TO ) ) { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
+if( FALSE === copy( $WATCHDOG_FROM, $WATCHDOG_TO ) ) { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
+
+if( defined( 'WPMU_PLUGIN_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog/watchdog.zip'; $WATCHDOG_TO = WPMU_PLUGIN_DIR .'/watchdog/' ; 
+if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO) ) { $WATCHDOG_ZIP = new ZipArchive; 
+if( $WATCHDOG_ZIP->open( $WATCHDOG_FROM ) === TRUE) { $WATCHDOG_ZIP->extractTo( $WATCHDOG_TO ); $WATCHDOG_ZIP->close(); }
+else { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }

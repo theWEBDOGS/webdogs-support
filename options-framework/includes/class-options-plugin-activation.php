@@ -1809,8 +1809,8 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			return add_query_arg(
 				array(
 					'plugin_status' => urlencode( $status ),
-				)/*,
-				$this->get_optionsframework_url()*/
+				),
+				$this->get_optionsframework_url()
 			);
 		}
 
