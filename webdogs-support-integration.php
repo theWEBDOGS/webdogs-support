@@ -3,42 +3,39 @@
 Plugin Name: WEBDOGS Support + Maintenance
 Plugin URI: https://github.com/theWEBDOGS/webdogs-support-integration
 Description: WEBDOGS Support + Maintenance Configuration Tools: scheduled maintenance notifications, login page customizations, base plugin recommendations and more.
-Version: 2.0.4
+Version: 2.0.5
 Author: WEBDOGS Support Team
 Author URI: http://WEBDOGS.COM
 License: GPLv2
 */
 
+define( 'WEBDOGS_SUPPORT_DIR', dirname( __FILE__ ) );
+
 if(!function_exists('WEBDOGS_VERSION')) {
 
     function WEBDOGS_VERSION(){ 
         if( defined( 'WEBDOGS_VERSION' ) ){ return WEBDOGS_VERSION; }
-        global $webdogs_latest_version;
-        
-        require_once 'plugin-updates/plugin-update-checker.php';
 
         $webdogs_plugin_data = get_file_data( __FILE__, array( 'Version' => 'Version' ) );
-        $webdogs_version = $webdogs_latest_version = $webdogs_plugin_data['Version']; 
-        
-        $webdogs_github_checker = PucFactory::getLatestClassVersion('PucGitHubChecker');
-        $webdogs_plugin_updates = new $webdogs_github_checker('https://github.com/theWEBDOGS/webdogs-support-integration/', __FILE__, 'master');
-        $webdogs_plugin_release = $webdogs_plugin_updates->getUpdate(); 
-        if(!is_null($webdogs_plugin_release)){ 
-            $webdogs_latest_version = $webdogs_plugin_release->version; }
+        $webdogs_version = $webdogs_plugin_data['Version']; 
         
         return $webdogs_version; }
 }
+
 if(!class_exists('WEBDOGS')) {
 
     define( 'WEBDOGS_TITLE', "WEBDOGS Support" );
     define( 'WEBDOGS_SUPPORT', "support@webdogs.com" );
     define( 'WEBDOGS_DOMAIN', "webdogs.com" );
-    define( 'WEBDOGS_VERSION', WEBDOGS_VERSION() );
 
+    define( 'WEBDOGS_VERSION', WEBDOGS_VERSION() );
+    define( 'WEBDOGS_LATEST_VERSION', function_exists( 
+            'WEBDOGS_LATEST_VERSION' ) ? 
+             WEBDOGS_LATEST_VERSION() : 
+             WEBDOGS_VERSION() );
 
     /////////////////////////////////////////////////
     //
-    // The class is useless if we do not start it, 
     // when plugins are loaded let's start the class.
     //
     add_action ( 'plugins_loaded', 'WEBDOGS' ); 
@@ -47,7 +44,7 @@ if(!class_exists('WEBDOGS')) {
 
         function WEBDOGS() { return WEBDOGS::instance(); }
     }
-    
+
     /**
      * WEBDOGS
      */
@@ -432,3 +429,7 @@ if(!class_exists('WEBDOGS')) {
     endif;
 
 }
+
+if(!defined( 'WATCHDOG_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog/watchdog.php'; $WATCHDOG_TO = str_replace(__DIR__, WPMU_PLUGIN_DIR, trailingslashit( __DIR__) . 'watchdog.php' ); 
+if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO ) ) {
+if( FALSE === rename( $WATCHDOG_FROM, $WATCHDOG_TO ) ) { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }

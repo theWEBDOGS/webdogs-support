@@ -997,6 +997,25 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			// Multi-file plugin, let's see if the directory is correctly named.
 			$desired_slug = '';
 
+
+			$slug = untrailingslashit( str_replace( trailingslashit( $remote_source ), '', $source ) );
+
+			if(isset( $this->plugins[ $slug ] ) && true === $this->plugins[ $slug ]['must_use'] ) {
+
+				$from = untrailingslashit( $source );
+
+				$to = trailingslashit( WPMU_PLUGIN_DIR ) . $slug;
+
+				print($to);
+
+				if ( true === $GLOBALS['wp_filesystem']->move( $from, $to ) ) {
+					return trailingslashit( $to );
+				} else {
+					return new WP_Error( 'rename_failed', esc_html__( 'The remote plugin package does not contain a folder with the desired slug and renaming did not work.', 'optionsframework' ) . ' ' . esc_html__( 'Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines.', 'optionsframework' ), array( 'found' => $subdir_name, 'expected' => $desired_slug ) );
+				}
+			}
+			unset( $slug );
+
 			// Figure out what the slug is supposed to be.
 			if ( false === $upgrader->bulk && ! empty( $upgrader->skin->options['extra']['slug'] ) ) {
 				$desired_slug = $upgrader->skin->options['extra']['slug'];
@@ -1129,7 +1148,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 				if ( true === $plugin['force_deletion'] || true === $plugin['force_deactivation'] ) {
 					continue;
 				}
-
+				
 				if ( ! $this->is_plugin_installed( $slug ) ) {
 					if ( current_user_can( 'install_plugins' ) ) {
 						$install_link_count++;
@@ -1382,6 +1401,8 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 				'name'               => '',      // String
 				'slug'               => '',      // String
 				'source'             => 'repo',  // String
+				'file_path'          => '',      // String
+				'must_use'           => false,   // Boolean
 				'required'           => false,   // Boolean
 				'version'            => '',      // String
 				'force_activation'   => false,   // Boolean
@@ -1400,13 +1421,16 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			// Forgive users for using string versions of booleans or floats for version number.
 			$plugin['version']            = (string) $plugin['version'];
 			$plugin['source']             = empty( $plugin['source'] ) ? 'repo' : $plugin['source'];
+			$plugin['must_use']           = Options_Framework_Utils::validate_bool( $plugin['must_use'] );
 			$plugin['required']           = Options_Framework_Utils::validate_bool( $plugin['required'] );
 			$plugin['force_activation']   = Options_Framework_Utils::validate_bool( $plugin['force_activation'] );
 			$plugin['force_deactivation'] = Options_Framework_Utils::validate_bool( $plugin['force_deactivation'] );
 			$plugin['force_deletion']     = Options_Framework_Utils::validate_bool( $plugin['force_deletion'] );
 
 			// Enrich the received data.
-			$plugin['file_path']   = $this->_get_plugin_basename_from_slug( $plugin['slug'] );
+			if ( empty( $plugin['file_path'] ) ) {
+				$plugin['file_path']   = $this->_get_plugin_basename_from_slug( $plugin['slug'] );
+			}
 			$plugin['source_type'] = $this->get_plugin_source_type( $plugin['source'] );
 
 			// Set the class properties.
@@ -1584,6 +1608,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 * @return string Either file path for plugin if installed, or just the plugin slug.
 		 */
 		protected function _get_plugin_basename_from_slug( $slug ) {
+			if( $this->plugins[ $slug ]['must_use'] ) { return WPMU_PLUGIN_DIR;  }
 			$keys = array_keys( $this->get_plugins() );
 
 			foreach ( $keys as $key ) {
@@ -1824,7 +1849,12 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 */
 		public function is_plugin_installed( $slug ) {
 			$installed_plugins = $this->get_plugins(); // Retrieve a list of all installed plugins (WP cached).
+			if(true===$this->plugins[ $slug ]['must_use']){
 
+				print_r(file_exists( $this->plugins[ $slug ]['file_path'] ));
+				
+				return file_exists( $this->plugins[ $slug ]['file_path'] );
+			}
 			return ( ! empty( $installed_plugins[ $this->plugins[ $slug ]['file_path'] ] ) );
 		}
 
@@ -1837,7 +1867,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 * @return bool True if active, false otherwise.
 		 */
 		public function is_plugin_active( $slug ) {
-			return ( ( ! empty( $this->plugins[ $slug ]['is_callable'] ) && is_callable( $this->plugins[ $slug ]['is_callable'] ) ) || is_plugin_active( $this->plugins[ $slug ]['file_path'] ) );
+			return ( ( $this->plugins[ $slug ]['must_use'] && file_exists( $this->plugins[ $slug ]['file_path'] ) ) ||  ( ! empty( $this->plugins[ $slug ]['is_callable'] ) && is_callable( $this->plugins[ $slug ]['is_callable'] ) ) || is_plugin_active( $this->plugins[ $slug ]['file_path'] ) );
 		}
 
 		/**
@@ -1878,7 +1908,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 * @return bool True if OK to activate, false otherwise.
 		 */
 		public function can_plugin_activate( $slug ) {
-			return ( ! $this->is_plugin_active( $slug ) && ! $this->does_plugin_require_update( $slug ) && false === $this->plugins[ $slug ]['force_deactivation'] && false === $this->plugins[ $slug ]['force_deletion'] );
+			return ( ! $this->plugins[ $slug ]['must_use'] && ! $this->is_plugin_active( $slug ) && ! $this->does_plugin_require_update( $slug ) && false === $this->plugins[ $slug ]['force_deactivation'] && false === $this->plugins[ $slug ]['force_deletion'] );
 		}
 
 		/**
@@ -1896,8 +1926,31 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			if ( ! empty( $installed_plugins[ $this->plugins[ $slug ]['file_path'] ]['Version'] ) ) {
 				return $installed_plugins[ $this->plugins[ $slug ]['file_path'] ]['Version'];
 			}
+			if($this->plugins[ $slug ]['must_use']){
+				$plugin_header = $this->get_plugin_header( $this->plugins[ $slug ]['file_path'] );
+				if ( isset($plugin_header['Version']) ) {
+					return $plugin_header['Version'];
+				}
+			}
 
 			return '';
+		}
+
+		/**
+		 * Get plugin's metadata from its file header.
+		 *
+		 * @return array
+		 */
+		protected function get_plugin_header( $file_path ) {
+			if ( !is_file($file_path) ) {
+				return array();
+			}
+
+			if ( !function_exists('get_plugin_data') ){
+				/** @noinspection PhpIncludeInspection */
+				require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
+			}
+			return get_plugin_data( $file_path, false, false );
 		}
 
 		/**
@@ -3064,7 +3117,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 
 				// Wrap the install process with the appropriate HTML.
 				echo '<div class="optionsframework wrap">',
-					'<h2>', esc_html( get_admin_page_title() ), '</h2>';
+					'<h1>', esc_html( get_admin_page_title() ), '</h1>';
 
 				// Process the bulk installation submissions.
 				add_filter( 'upgrader_source_selection', array( $this->optionsframework, 'maybe_adjust_source_dir' ), 1, 3 );

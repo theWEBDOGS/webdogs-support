@@ -77,7 +77,6 @@ add_action( 'optionsframework_register', 'wds_register_base_activation', 10 );
  *
  */
 function wds_base_plugins(){
-	global $webdogs_latest_version;
 
 	return array(
 
@@ -86,10 +85,21 @@ function wds_base_plugins(){
 			'slug'      => 'webdogs-support-integration',
 			'source'    => 'https://github.com/theWEBDOGS/webdogs-support-integration/archive/master.zip',
 			'required'           => true, // If false, the plugin is only 'recommended' instead of required.
-			'version'            => $webdogs_latest_version, // E.g. 1.0.0. If set, the active plugin must be this version or higher. If the plugin version is higher than the plugin version installed, the user will be notified to update the plugin.
+			'version'            => WEBDOGS_LATEST_VERSION, // E.g. 1.0.0. If set, the active plugin must be this version or higher. If the plugin version is higher than the plugin version installed, the user will be notified to update the plugin.
 			'force_activation'   => true, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch.
 			'force_deactivation' => false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins.
 			'external_url'       => 'https://github.com/theWEBDOGS/webdogs-support-integration',
+		),
+		array(
+			'name'      => 'WATCHDOG',
+			'slug'      => 'watchdog',
+			'source'    => WEBDOGS_SUPPORT_DIR. '/watchdog/watchdog.zip',
+			'file_path' => WPMU_PLUGIN_DIR . '/watchdog',
+			'must_use'           => true, // If false, the plugin is only 'recommended' instead of required.
+			'required'           => true, // If false, the plugin is only 'recommended' instead of required.
+			'force_activation'   => false, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch.
+			'force_deactivation' => false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins.
+			'external_url'       => 'https://github.com/theWEBDOGS/watchdog',
 		),
 		array(
 			'name'      => 'Simple History',
