@@ -306,6 +306,10 @@
 	cursor:pointer;
 }
 
+#optionsframework #section-login_logo_height {
+    clear: left;
+}
+
 #maintenance_notes {
     width: 584px !important;
 }

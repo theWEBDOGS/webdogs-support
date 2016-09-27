@@ -209,7 +209,7 @@ function optionsframework_options() {
 
 	$frequency_array = array(
 		'1' => __('Monthly', 'options_check'),
-		'4' => __('Quarterly', 'options_check'),
+		'3' => __('Quarterly', 'options_check'),
 		'6' => __('Biannually', 'options_check'),
 	);
 	
@@ -473,7 +473,7 @@ function optionsframework_options() {
 		'id' => 'login_logo_height',
 		'std' => '100',
 		'type' => 'select',
-		'class' => 'mini alignright inline', 
+		'class' => 'mini inline clear', 
 		'options' => $login_logo_height_array,
 		'rule' => array(
 			'id' => 'login_logo_css-image',
@@ -483,7 +483,46 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'type' => 'info',
-		'class' => 'clear');
+		'wrap' => array( 
+			'start' => true, 
+			'class' => 'clear top-border inset bottom-pad',));
+
+	$options[] = array(
+		'name' => __('Base Color', 'options_check'),
+		'desc' => '',
+		'id' => 'base-color',
+		'std' => '#2c3e50',
+		'class' => 'alignleft mini', 
+		'type' => 'color');
+
+	$options[] = array(
+		'name' => __('Highlight Color', 'options_check'),
+		'desc' => '',
+		'id' => 'highlight-color',
+		'std' => '#1abc9c',
+		'class' => 'alignleft mini', 
+		'type' => 'color');
+
+	$options[] = array(
+		'name' => __('Notification Color', 'options_check'),
+		'desc' => '',
+		'id' => 'notification-color',
+		'std' => '#d35401',
+		'class' => 'alignleft mini', 
+		'type' => 'color');
+
+	$options[] = array(
+		'name' => __('Action Color', 'options_check'),
+		'desc' => '',
+		'id' => 'action-color',
+		'std' => '#f39c12',
+		'class' => 'alignleft mini', 
+		'type' => 'color');
+
+	$options[] = array(
+		'type' => 'info',
+		'wrap' => array( 
+			'end' => true));
 
 	$options[] = array(
 		'type' => 'form',
@@ -543,9 +582,9 @@ function wds_bundled_themes(){
  * installed and mMark them for deletion.
  *
  */
-function wds_base_strings(){
+function wds_base_strings( $key = null ){
 
-	return  array(
+	$strings = array(
 		'page_title'                      => __( 'Install Recommended Plugins', 'webdogs-support' ),
 		'menu_title'                      => __( 'Install Plugins', 'webdogs-support' ),
 		'installing'                      => __( 'Installing Plugin: %s', 'webdogs-support' ), // %s = plugin name.
@@ -615,11 +654,25 @@ function wds_base_strings(){
 			'The following plugins have been removed: %1$s.', 
 			'webdogs-support' 
 		),
-		'theme_deletion'      => _n_noop( 
+		'theme_deletion'      			  => _n_noop( 
 			'The following theme has been removed: %s1$.', 
 			'The following themes have been removed: %1$s.', 
 			'webdogs-support' 
 		),
+
+		'active_maintainance_notification' => 
+        array( 
+            'subject' => "Scheduled Maintenance for %s | %s", // site_name, $site_url
+            'message' => "The following updates are available for %s website: \n\r%s
+
+ "), // $site_name, $updates
+		'on_demand_maintainance_notification' => 
+        array(
+            'subject' => "WordPress Updates are Available for %s | %s", // site_name, $site_url
+            'message' => "The following updates are available for %s website. \n\rIf you would like WEBDOGS to install these updates, please reply to this email. \n\r%s \n\rIf you would like WEBDOGS to install these updates, please reply to this email.
+
+ "), // $site_name, $updates
+
 		'return'                          => __( 'Go back to Base Plugins Installer', 'webdogs-support' ),
 		'plugin_activated'                => __( 'Plugin activated successfully.', 'webdogs-support' ),
 		'activated_successfully'          => __( 'The following plugin was activated successfully:', 'webdogs-support' ),
@@ -630,6 +683,12 @@ function wds_base_strings(){
 
 		'nag_type'                        => 'webdogs-nag', // Determines admin notice type - can only be 'updated', 'update-nag' or 'error'.
 	);
+
+    if( isset($key) && array_key_exists( $key, $strings ) ){
+    	return $strings[$key];
+    } else {
+    	return $strings;
+    }
 }
 
 /**

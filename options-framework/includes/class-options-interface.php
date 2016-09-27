@@ -157,11 +157,15 @@ class Options_Framework_Interface {
 					<?php $prev_proof = get_option( 'wd_maintenance_notification_proof' ); ?>
 					<?php $next_notice = wd_create_daily_notification_schedule(); ?>
 					<?php if($prev_proof) : ?>
-						<p class="wd_last_notification_sent">
-						<?php printf(__('Last notification: %s'), date(' F j, Y' , $prev_proof ) ); ?> | 
-						<?php printf(__('Next notification: %s'), date(' F j, Y H:i' , $next_notice ) ); ?></p>
+						<p class="wd_notification_events">
+							<span class="wd_last_notification_sent" data-prev-notice="<?php echo $prev_proof; ?>">
+								<?php printf(__('Last notification: %s'), date(' F j, Y' , $prev_proof ) ); ?>	
+							</span>
+							<span class="wd_notification_scheduled" data-next-notice="">
+							</span>	
+						</p>
 					<?php elseif( wd_create_daily_notification_schedule() ): ?>
-						<p class="wd_notification_scheduled"><?php print( __('Maintanace notifications are scheduled.') ); ?></p>
+						<p class="wd_notification_events"><span class="wd_notification_scheduled" data-next-notice="<?php echo $next_proof; ?>"><?php print( __('Maintanace notifications are scheduled.') ); ?></span></p>
 					<?php endif; ?>
 					<input type="submit" class="reset-button button-secondary hide" name="reset" value="<?php esc_attr_e( 'Restore Defaults', 'options-framework' ); ?>" onclick="return confirm( '<?php print esc_js( __( 'Click OK to reset. Any theme settings will be lost!', 'options-framework' ) ); ?>' );" />
 					<div class="clear"></div>

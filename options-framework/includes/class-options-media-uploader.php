@@ -16,6 +16,8 @@ class Options_Framework_Media_Uploader {
 	 */
 	public function init() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'optionsframework_media_scripts' ) );
+
+		add_filter( 'upload_mimes',  array( $this, 'optionsframework_svgs_upload_mimes' ) );
 	}
 
 	/**
@@ -119,5 +121,23 @@ class Options_Framework_Media_Uploader {
 			'upload' => __( 'Upload', 'options-framework' ),
 			'remove' => __( 'Remove', 'options-framework' )
 		) );
+	}
+
+	/**
+	 * Add SVG support
+	 */
+	function optionsframework_svgs_upload_mimes($mimes = array()) {
+		// support for bodhi plugin.
+		global $bodhi_svgs_options;
+
+		if( empty( $bodhi_svgs_options['restrict'] ) || current_user_can( 'administrator' ) ) {
+			// allow SVG file upload
+			$mimes['svg'] = 'image/svg+xml';
+			$mimes['svgz'] = 'image/svg+xml';
+			return $mimes;
+		} else {
+			return $mimes;
+		}
+
 	}
 }

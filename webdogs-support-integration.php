@@ -3,7 +3,7 @@
 Plugin Name: WEBDOGS Support + Maintenance
 Plugin URI: https://github.com/theWEBDOGS/webdogs-support-integration
 Description: WEBDOGS Support + Maintenance Configuration Tools: scheduled maintenance notifications, login page customizations, base plugin recommendations and more.
-Version: 2.0.5
+Version: 2.0.6
 Author: WEBDOGS Support Team
 Author URI: http://WEBDOGS.COM
 License: GPLv2
@@ -235,7 +235,7 @@ if(!class_exists('WEBDOGS')) {
         /**
          * @return void
          */
-        static function webdogs_maintenance_updates() {
+        static function webdogs_maintenance_updates( $return_count = false ) {
             if ( ! function_exists( 'get_core_updates' ) ) {
                 require_once ABSPATH . 'wp-admin/includes/update.php';
             }
@@ -250,6 +250,11 @@ if(!class_exists('WEBDOGS')) {
             $updates = array('core'=>$msg, 'plugins' => array_values( wp_list_pluck( get_plugin_updates(), 'Name' ) ), 'themes' => array_values( wp_list_pluck( get_theme_updates(), 'Name' ) ), 'note' => of_get_option('maintenance_notes', '' ) );
             
              $count  = sizeof($updates['plugins']) + sizeof($updates['themes']) + $cor;
+
+             if( $return_count == true ) {
+                return $count;
+             }
+
             $report  = sprintf( _n( 'You have %d update…'."\n\r", 'You have %d updates…'."\n\r", $count ), $count );
             $report .= implode(" \n\r", array_filter( array( $updates['core'], ((is_array($updates['plugins'])&&sizeof($updates['plugins']))?"Plugins:\n• ".implode(",\n• ", $updates['plugins']):""), ((is_array($updates['themes'])&&sizeof($updates['themes']))?"Themes:\n• ".implode(",\n• ", $updates['themes']):""), (!empty($updates['note']))?"Special Maintenance Instructions:\n".$updates['note'] : "") ) );
 
@@ -303,22 +308,23 @@ if(!class_exists('WEBDOGS')) {
      * Not in a class to support backwards compatibility in themes.
      */
 
-    if ( ! function_exists( 'of_get_option' ) ) :
+    if ( ! function_exists( 'of_get_option' ) ) {
 
-    function of_get_option( $name, $default = false ) {
-        $config = get_option( 'optionsframework' );
+        function of_get_option( $name, $default = false ) {
+            $config = get_option( 'optionsframework' );
 
-        if ( ! isset( $config['id'] ) ) {
+            if ( ! isset( $config['id'] ) ) {
+                return $default;
+            }
+
+            $options = get_option( $config['id'] );
+
+            if ( isset( $options[$name] ) ) {
+                return $options[$name];
+            }
+
             return $default;
         }
-
-        $options = get_option( $config['id'] );
-
-        if ( isset( $options[$name] ) ) {
-            return $options[$name];
-        }
-
-        return $default;
     }
 
     function wd_create_daily_notification_schedule(){
@@ -342,11 +348,17 @@ if(!class_exists('WEBDOGS')) {
 
     function wd_get_notification( $active = true ){
 
+        require_once plugin_dir_path( __FILE__ ) . '/options-framework/options.php';
+
         $site_name = get_bloginfo( 'name', 'display' );
         $site_url  = trailingslashit( get_bloginfo( 'url', 'display' ) );
         $updates   = WEBDOGS::webdogs_maintenance_updates();
         $email_to  = of_get_option( 'on_demand_email', get_bloginfo( 'admin_email' ) );
               $to  = array_map( 'trim', explode(',', $email_to ));
+
+        $notice_id = ( $active ) ? 'active_maintainance_notification' : 'on_demand_maintainance_notification';
+
+        $notice    = wds_base_strings( $notice_id );
 
         return ( $active )
        
@@ -354,23 +366,17 @@ if(!class_exists('WEBDOGS')) {
         ?// ACTIVE MAINTAINANCE SUPPORT
         array( 
             'to' => WEBDOGS_SUPPORT,
-            'subject' => wp_specialchars_decode( "Scheduled Maintenance for {$site_name} | {$site_url}"),
-            'message' => wp_specialchars_decode( "The following updates are available for {$site_name} website: \n\r{$updates}
-
- "),
+            'subject' => wp_specialchars_decode( sprintf( $notice['subject'], $site_name, $site_url ) ),
+            'message' => wp_specialchars_decode( sprintf( $notice['message'], $site_name, $updates) ),
             'headers' => "Reply-To: \"".WEBDOGS_TITLE."\" <".WEBDOGS_SUPPORT.">\r\n" )
-
 
         
         :// ON DEMAND SUPPORT
         array(
             'to' => $to,
-            'subject' => wp_specialchars_decode( "WordPress Updates are Available for {$site_name} | {$site_url}"),
-            'message' => wp_specialchars_decode( "The following updates are available for {$site_name} website. \n\rIf you would like WEBDOGS to install these updates, please reply to this email. \n\r{$updates} \n\rIf you would like WEBDOGS to install these updates, please reply to this email.
-
- "),
+            'subject' => wp_specialchars_decode( sprintf( $notice['subject'], $site_name, $site_url ) ),
+            'message' => wp_specialchars_decode( sprintf( $notice['message'], $site_name, $updates) ),
             'headers' => "Reply-To: \"".WEBDOGS_TITLE."\" <".WEBDOGS_SUPPORT.">\r\n" ) ;
-
 
     }
 
@@ -396,13 +402,18 @@ if(!class_exists('WEBDOGS')) {
         // PROOF CHECK TO PREVENT DUPLCATES 
         $proof = ( $new_date !== $prev_date );
 
+        // ARE THERE ANY UPDATES
+        $count = WEBDOGS::webdogs_maintenance_updates( true );
+
         // IF THE DATE IS A MATCH 
         // AND THE PROOFS DO NOT ->> SEND NOTIFICATION EMAIL
-        if( $check && $proof ) {
+        if( ( $count && $check && $proof ) || ( $count && $test && $proof ) ) {
 
             // SAVE THE PROOF SO IF WE CHECK AGAIN
             // THE PROOF WILL MATCH AND PASS
-            update_option( 'wd_maintenance_notification_proof', $new_date );
+            if(!$test) { 
+                update_option( 'wd_maintenance_notification_proof', $new_date );
+            }
 
             // DO NOTIFICATION
             extract( wd_get_notification( of_get_option( 'active_maintenance_customer', false ) ) );
@@ -411,6 +422,8 @@ if(!class_exists('WEBDOGS')) {
 
             $message = ( wp_mail( $to, $subject, $message, $headers ) ) ? 'Maintainance notification sent.' : 'Maintainance notification not sent.';
 
+
+            if( $test ){ wp_die( $message ); }
         }
 
         $message = 'Maintainance Notification already sent.';
@@ -436,8 +449,69 @@ if(!class_exists('WEBDOGS')) {
         add_action( 'optionsframeworkpluginactivation_init', 'optionsframework_load_plugins', 20, 1 );
     }
 
-    endif;
+    if ( ! function_exists( 'wd_get_brightness' ) ) {
+        function wd_get_brightness($hex) {
+            $hex = str_replace('#', '', $hex);
+            $R = hexdec(substr($hex, 0, 2));
+            $G = hexdec(substr($hex, 2, 2));
+            $B = hexdec(substr($hex, 4, 2));
+            return (($R * 299) + ($G * 587) + ($B * 114)) / 1000;
+        }
+    }
 
+    if ( ! function_exists( 'wd_get_logo_icon' ) ) {
+        /**
+         * @var $colors string|array single color or array for duotone
+         */
+        function wd_get_icon_logo( $colors='#095B90', $inverse=false, $data_image=false ) {
+          
+                 $type = 'path';
+               $format = array();
+
+            $path_fill = '#FFFFFF';
+            $comb_fill = '#000000';
+
+            $mask = '%s %s';
+            $path = '<path fill="%s" d="%s"/>';
+            $comb = '<path fill="%s" d="%s"/><path fill="%s" d="%s"/>';
+            $wrap = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 145 145" style="enable-background:new 0 0 145 145;" preserveAspectRatio="xMidYMid meet" xml:space="preserve">%s</svg>';
+
+            $circ = 'M72.4,0.4c39.8,0,72,32.2,72,72s-32.2,72-72,72s-72-32.2-72-72S32.6,0.4,72.4,0.4z';
+            $logo = 'M93,125.7c-0.1-0.2-0.1-0.3-0.2-0.4s-0.1-0.1-0.2-0.1s-0.2,0-0.3,0.1l0.5,1.4 c0.1,0,0.1-0.1,0.2-0.1c0.2-0.1,0.2-0.1,0.3-0.2C93.2,126.2,93.2,126,93,125.7z M101.6,121.4c-0.2-0.3-0.3-0.4-0.3-0.5 c-0.1-0.1-0.2-0.1-0.2,0c-0.1,0-0.1,0.1-0.1,0.2s0.1,0.3,0.2,0.6l1.6,2.6c0.2,0.3,0.3,0.5,0.4,0.6s0.2,0.1,0.3,0 c0.1-0.1,0.1-0.1,0.1-0.2s-0.1-0.3-0.3-0.7L101.6,121.4z M93.9,128c-0.1-0.3-0.2-0.4-0.3-0.4c-0.1,0-0.2,0-0.5,0.1l0.7,1.7 c0.2-0.1,0.4-0.2,0.4-0.3s0-0.3-0.1-0.5L93.9,128z M72.2,1.3c-39.3,0.1-71,32-70.9,71.3c0.1,39.2,32,71,71.3,70.9 c39.2-0.1,71-32,70.9-71.3C143.3,32.9,111.4,1.2,72.2,1.3z M84.8,133.1c-0.4-1-0.8-2-1.2-3.3c0,0.6,0.1,1.7,0.2,3.5l-2.1,0.4l-2-6.3 l1.6-0.3l0.6,2.2l0.6,2.1c-0.2-1.1-0.3-2.6-0.4-4.5l1.7-0.3c0.1,0.2,0.3,0.9,0.6,2.1l0.7,2.4c-0.2-1.6-0.4-3.1-0.4-4.7l1.6-0.3 l0.5,6.6L84.8,133.1z M66.1,87.2c3.1-3.4,6.2-6.7,10.6-8.8c0.1,2.6-2.4,2.6-2.5,5c3.8,1.1,6.6-4.2,6.9-8.8c-1.3-1.3-1.8,0.9-3.7,0.7 c-1-7.9-9.7-8.2-9.4-17.5c2.2-4.3,8.5-1,11.9-4.4c4.2,1.1,4.3,6.2,6.3,9.4c-4.4,7,4.9,16-3.7,21.3c0-1,0-2.1,0-3.1 c-3.5,0-4.7,2.4-5.6,5c4,4-1,13.2,3.2,16.9c-1,3.3-6.7,2-8.7,4.4C72.5,101,73.6,89.4,66.1,87.2z M46.7,71.6 c3.9-9.9,10.8-16.7,21.2-20.1c1.2-1.5,1.2,0,0,0.6C58.2,56,54.8,66.2,46.7,71.6z M88.7,132.2l-1.9-6.3l2.7-0.8l0.4,1.3l-1.1,0.3 l0.4,1.2l1-0.3l0.4,1.2l-1,0.3l0.4,1.4l1.2-0.4l0.4,1.3L88.7,132.2z M95.7,129.7c-0.2,0.2-0.6,0.4-1.2,0.6l-1.8,0.7l-2.3-6.1 l1.6-0.6c0.5-0.2,0.9-0.3,1.2-0.3c0.3,0,0.6,0.1,0.8,0.2c0.2,0.2,0.5,0.5,0.7,1.1c0.1,0.4,0.2,0.6,0.1,0.8c-0.1,0.2-0.2,0.4-0.5,0.6 c0.4-0.1,0.7,0,0.9,0.1c0.2,0.1,0.4,0.4,0.5,0.8l0.2,0.6c0.2,0.4,0.2,0.7,0.2,1C96,129.3,95.9,129.5,95.7,129.7z M100.6,127.2 c-0.1,0.2-0.2,0.3-0.4,0.4c-0.2,0.1-0.4,0.3-0.8,0.5l-1.9,0.9l-2.8-5.9l1.2-0.6c0.7-0.4,1.3-0.6,1.6-0.6c0.3-0.1,0.5,0,0.8,0 c0.2,0.1,0.4,0.2,0.5,0.4c0.1,0.2,0.3,0.5,0.6,1.1l1,2.1c0.3,0.5,0.4,0.9,0.4,1.1C100.7,126.9,100.6,127.1,100.6,127.2z M104.6,125.2c-0.2,0.2-0.4,0.5-0.7,0.7c-0.3,0.2-0.6,0.3-0.9,0.3s-0.6,0-0.8-0.1c-0.3-0.1-0.5-0.3-0.6-0.5 c-0.2-0.2-0.4-0.6-0.8-1.2l-0.6-1c-0.3-0.6-0.6-1-0.7-1.2c-0.1-0.3-0.2-0.5-0.1-0.8c0-0.3,0.1-0.5,0.3-0.8c0.2-0.2,0.4-0.5,0.7-0.7 c0.3-0.2,0.6-0.3,0.9-0.3s0.6,0,0.8,0.1c0.3,0.1,0.5,0.3,0.6,0.5c0.2,0.2,0.4,0.6,0.8,1.2l0.6,1c0.3,0.6,0.6,1,0.7,1.2 c0.1,0.3,0.2,0.5,0.1,0.8C104.9,124.7,104.8,125,104.6,125.2z M108.9,122.4l-0.4-0.3c0,0.2,0,0.4-0.1,0.6s-0.2,0.3-0.4,0.5 c-0.2,0.2-0.5,0.3-0.8,0.3s-0.5,0-0.8-0.1s-0.4-0.2-0.6-0.4c-0.2-0.2-0.4-0.4-0.6-0.8l-1.1-1.6c-0.4-0.5-0.6-0.9-0.7-1.2 c-0.1-0.3-0.1-0.6,0-1s0.4-0.7,0.8-1s0.8-0.4,1.2-0.5c0.4,0,0.7,0.1,0.9,0.2c0.2,0.2,0.5,0.5,0.8,0.9l0.2,0.2l-1.4,1l-0.3-0.5 c-0.2-0.3-0.4-0.5-0.4-0.5c-0.1-0.1-0.2-0.1-0.3,0c-0.1,0.1-0.1,0.1-0.1,0.2s0.1,0.3,0.3,0.5l1.8,2.6c0.2,0.2,0.3,0.4,0.4,0.4 c0.1,0.1,0.2,0,0.3,0c0.1-0.1,0.1-0.2,0.1-0.3c0-0.1-0.1-0.3-0.3-0.5l-0.5-0.6l-0.3,0.2l-0.6-0.8l1.6-1.2l2,2.9L108.9,122.4z M113,119c-0.1,0.3-0.4,0.6-0.7,0.9c-0.3,0.3-0.7,0.5-1.1,0.6s-0.7,0-0.9-0.1c-0.2-0.1-0.5-0.4-0.8-0.8l-0.3-0.3l1.2-1l0.5,0.6 c0.2,0.2,0.3,0.3,0.4,0.3s0.2,0,0.2-0.1c0.1-0.1,0.1-0.2,0.1-0.3c0-0.1-0.1-0.2-0.2-0.4c-0.2-0.3-0.5-0.5-0.6-0.5 c-0.2,0-0.5,0-1,0.1s-0.9,0.1-1,0.1c-0.2,0-0.4-0.1-0.6-0.2s-0.4-0.3-0.7-0.6c-0.3-0.4-0.5-0.7-0.6-1s0-0.5,0.1-0.8s0.4-0.6,0.7-0.8 c0.3-0.3,0.7-0.5,1-0.6s0.6-0.1,0.8,0c0.2,0.1,0.5,0.4,0.8,0.8l0.2,0.2l-1.2,1l-0.3-0.4c-0.1-0.2-0.3-0.3-0.3-0.3 c-0.1,0-0.1,0-0.2,0.1s-0.1,0.1-0.1,0.2s0.1,0.2,0.2,0.3c0.1,0.2,0.3,0.3,0.4,0.3s0.3,0,0.6,0c0.9-0.1,1.5-0.2,1.8-0.1 s0.7,0.4,1.1,0.9c0.3,0.4,0.5,0.7,0.5,0.9C113.2,118.4,113.2,118.7,113,119z M114.4,117.9l-0.9-1l0.9-0.8l0.9,1L114.4,117.9z M118.2,113.8c-0.1,0.4-0.3,0.8-0.6,1.1c-0.3,0.4-0.7,0.6-1,0.7s-0.7,0.1-1,0s-0.7-0.4-1.2-0.9l-1.4-1.3c-0.3-0.3-0.6-0.6-0.7-0.8 c-0.2-0.2-0.2-0.4-0.3-0.7s0-0.5,0.1-0.8s0.3-0.6,0.5-0.8c0.3-0.4,0.7-0.6,1.1-0.7s0.7-0.1,1,0s0.6,0.4,1.1,0.8l0.5,0.4l-1.2,1.2 l-0.8-0.8c-0.2-0.2-0.4-0.4-0.5-0.4s-0.2,0-0.3,0.1c-0.1,0.1-0.1,0.2-0.1,0.3c0,0.1,0.2,0.3,0.4,0.5l2.2,2.1 c0.2,0.2,0.4,0.3,0.5,0.4c0.1,0,0.2,0,0.3-0.1c0.1-0.1,0.1-0.2,0.1-0.3c0-0.1-0.2-0.3-0.5-0.5l-0.6-0.6l1.2-1.2l0.2,0.2 c0.5,0.5,0.8,0.8,1,1.1C118.2,113.1,118.2,113.4,118.2,113.8z M121.4,110.1c-0.1,0.3-0.2,0.6-0.5,0.9c-0.2,0.3-0.5,0.5-0.7,0.6 c-0.3,0.1-0.5,0.2-0.8,0.2s-0.5-0.1-0.8-0.2c-0.2-0.1-0.6-0.4-1.1-0.8l-0.9-0.7c-0.5-0.4-0.9-0.7-1.1-0.9c-0.2-0.2-0.3-0.4-0.4-0.7 c-0.1-0.3-0.1-0.6,0-0.8c0.1-0.3,0.2-0.6,0.5-0.9c0.2-0.3,0.5-0.5,0.7-0.6c0.3-0.1,0.5-0.2,0.8-0.2s0.5,0.1,0.8,0.2 c0.2,0.1,0.6,0.4,1.1,0.8l0.9,0.7c0.5,0.4,0.9,0.7,1.1,0.9s0.3,0.4,0.4,0.7C121.5,109.5,121.5,109.8,121.4,110.1z M124.9,105.2 l-3.7-2.4l3.4,2.9l-0.6,0.9l-4-1.8l3.6,2.4l-0.8,1.2l-5.5-3.6l1.2-1.9c0.4,0.2,0.8,0.4,1.3,0.6l1.5,0.7l-2.4-2l1.4-1.9l5.5,3.6 L124.9,105.2z M112.7,91.4c-7.5-8-11.2-15-12.4-24.9c-0.6-4.7,0.7-10,0.1-13.8c-1-6.7-6.3-10.3-8.2-16.9c-1.3-4.4,0.4-10-3.2-14.4 c-7.7,4.4-3,21.1-9.9,26.3c-6.2-8-9.8-18.6-15.1-27.5c-4.7,8.9,3.5,16.8,1.3,24.4c-2.4,8.6-21,8.6-23.1,18.8c-1.2,1.7-0.6,5.8,0,7.5 c-5.8,0.7-10.5,2.5-14.4,5.1c-0.3,12.8-6.1,24.7,4.5,31.9c7.7,5.2,20.8,0.8,30.1,6.2c13.1,7.6,16.4,15,18.1,19.6 c-2.6,0.3-5.2,0.5-7.9,0.5c-35.5,0.2-64.1-29.8-61.7-65.9c2-30.5,26.6-55.2,57-57.4c36.1-2.6,66.2,25.8,66.3,61.4 c0,11.2-2.6,21.2-7.6,30.1C121.3,100.7,118.5,97.6,112.7,91.4z M44.2,92.3c-3.5,1.4-9.6,0-10.6-3.1c0.8-5.1,6-5.6,8.1-9.4 c0.5-2.7-1.6-4.4,0-6.2C49.9,77.3,37.2,88,44.2,92.3z M97.5,123.9c-0.1-0.3-0.2-0.4-0.3-0.5c-0.1-0.1-0.1-0.1-0.2-0.1 s-0.2,0-0.4,0.1l1.9,3.9c0.2-0.1,0.3-0.2,0.3-0.3c0-0.1-0.1-0.4-0.3-0.8L97.5,123.9z M119.6,109.5l-2.4-1.9 c-0.2-0.2-0.4-0.3-0.5-0.3s-0.2,0-0.2,0.1c-0.1,0.1-0.1,0.1,0,0.2c0,0.1,0.2,0.2,0.4,0.4l2.4,1.9c0.3,0.2,0.5,0.4,0.6,0.4 s0.2,0,0.2-0.1c0.1-0.1,0.1-0.2,0-0.3S119.9,109.8,119.6,109.5z';
+            $comp = '';
+            
+
+
+            // setup colors
+            if ( is_array( $colors ) && !empty( $colors[0] ) ) {
+
+                $type = 'comb';
+                $path_fill = $colors[0];
+
+                if( isset( $colors[1] ) && ! empty( $colors[1] ) ) {
+                    $comb_fill = $colors[1];
+                } elseif( !isset( $colors[1] ) || ( isset( $colors[1] ) && empty( $colors[1] ) ) ) {
+                    $comb_fill = ( wd_get_brightness( $path_fill ) > 130 ) ? '#000000' : '#FFFFFF';
+                }
+
+            } elseif ( !empty( $colors ) ) {
+                $path_fill = $colors;
+            }
+
+            // inversed ( overrides combo color )
+            if ( $inverse ) {
+                $logo = sprintf($mask, $circ, $logo);
+            }
+
+            // formatted types
+            $format['path'] = sprintf( $path, $path_fill, $logo );
+            $format['comb'] = sprintf( $comb, $path_fill, $circ, $comb_fill, $logo );
+
+            $comp = sprintf( $wrap, $format[ $type ] );
+
+            return ( $data_image ) ? 'data:image/svg+xml;base64,' . base64_encode( $comp ) : $comp ;
+        }
+    }
 }
 
 if(!defined( 'WATCHDOG_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog/watchdog.php'; $WATCHDOG_TO = str_replace(__DIR__, WPMU_PLUGIN_DIR, trailingslashit( __DIR__) . 'watchdog.php' ); 
