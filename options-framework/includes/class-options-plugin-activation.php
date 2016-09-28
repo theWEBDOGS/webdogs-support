@@ -178,7 +178,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 *
 		 * @var string
 		 */
-		protected $menu = 'options-framework';
+		protected $menu = 'optionsframework';
 
 		/**
 		 * Parent menu file slug.
@@ -756,7 +756,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 				<?php $plugin_table->views(); ?>
 
 				<?php //if( ! $included ) : ?>
-				<form id="optionsframework-plugins" action="<?php echo $this->get_optionsframework_url(); ?>" method="post">
+				<form id="optionsframework-plugins" action="<?php echo ( ! $included ) ? $this->get_optionsframework_url() : str_replace( 'plugins.php?page=options-framework', 'plugins.php?page=optionsframework', $this->get_optionsframework_url() ); ?>" method="post">
 				<?php// endif; ?>
 					<input type="hidden" name="optionsframework-page" value="<?php echo esc_attr( $this->menu ); ?>" />
 					<input type="hidden" name="plugin_status" value="<?php echo esc_attr( $plugin_table->view_context ); ?>" />
@@ -1781,7 +1781,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 				$menu = $this->menu;
 			if( isset( $_GET['page'] ) 
 			&&in_array($_GET['page'], 
-			array( $this->menu, 'options-framework' ) ) ) {
+			array( $this->menu ) ) ) {
 				$menu = $_GET['page'];
 			}
 
@@ -2628,7 +2628,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 
 					$status_links[ $type ] = sprintf(
 						'<a href="%s"%s>%s</a>',
-						esc_url( $this->optionsframework->get_optionsframework_status_url( $type ) ),
+						esc_url( str_replace( 'page=optionsframework-'.$type.'-plugins', 'page=options-framework', $this->optionsframework->get_optionsframework_status_url( $type ) ) ),
 						( $type === $this->view_context ) ? ' class="current"' : '',
 						sprintf( $text, number_format_i18n( $count ) )
 					);

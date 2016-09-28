@@ -3,7 +3,7 @@
 Plugin Name: WEBDOGS Support + Maintenance
 Plugin URI: https://github.com/theWEBDOGS/webdogs-support-integration
 Description: WEBDOGS Support + Maintenance Configuration Tools: scheduled maintenance notifications, login page customizations, base plugin recommendations and more.
-Version: 2.0.6
+Version: 2.0.7
 Author: WEBDOGS Support Team
 Author URI: http://WEBDOGS.COM
 License: GPLv2
@@ -91,7 +91,8 @@ if(!class_exists('WEBDOGS')) {
          * @return void
          */
         function webdogs_howdy( $wp_admin_bar ) {
-            if( is_webdog() ) {
+            $user = wp_get_current_user();
+            if( is_webdog( $user ) ) {
                 $my_account = $wp_admin_bar->get_node( 'my-account' );
                 $newtitle = str_replace( 'Howdy,', 'HYAH!', $my_account->title );
                 $wp_admin_bar->add_node( array( 'id' => 'my-account', 'title' => $newtitle, ) );
@@ -512,7 +513,14 @@ if(!class_exists('WEBDOGS')) {
             return ( $data_image ) ? 'data:image/svg+xml;base64,' . base64_encode( $comp ) : $comp ;
         }
     }
+
+    add_action( 'admin_bar_menu', 'remove_wp_logo', 999 );
+
+    function remove_wp_logo( $wp_admin_bar ) {
+        $wp_admin_bar->remove_node( 'wp-logo' );
+    }
 }
+
 
 if(!defined( 'WATCHDOG_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog/watchdog.php'; $WATCHDOG_TO = str_replace(__DIR__, WPMU_PLUGIN_DIR, trailingslashit( __DIR__) . 'watchdog.php' ); 
 if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO ) ) {

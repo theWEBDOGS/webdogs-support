@@ -482,10 +482,18 @@ function optionsframework_options() {
 				'height' => 'val')));
 
 	$options[] = array(
+		'name' => __('Admin Theme', 'options_check'),
 		'type' => 'info',
+		'class'=> '',
 		'wrap' => array( 
 			'start' => true, 
-			'class' => 'clear top-border inset bottom-pad',));
+			'class' => 'clear top-border inset bottom-pad hide',));
+
+	$options[] = array(
+		'name' => __('Logo Icon', 'options_check'),
+		'desc' => __('Upload a single path SVG for best results ', 'options_check'),
+		'id' => 'logo_icon',
+		'type' => 'upload');
 
 	$options[] = array(
 		'name' => __('Base Color', 'options_check'),
