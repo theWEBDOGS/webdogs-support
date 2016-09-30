@@ -4,6 +4,7 @@
     max-width:840px;
     background:#f1f1f1;
     padding-bottom: 20px;
+    position: relative;
 }
 #optionsframework-metabox {
     padding-top: 0 !important;
@@ -13,7 +14,6 @@
 }
 #optionsframework form {
 	margin: auto;
-    position: relative;
 }
 #optionsframework h3 {
 	cursor: default;
@@ -316,11 +316,6 @@
     background-size: contain;
     overflow: hidden;
 }
-#optionsframework #logo_icon-image.screenshot {
-    width: 32px;
-    display: inline-block;
-    margin: 0 auto;
-}
 #optionsframework .screenshot img {
 	background:#fafafa;
 	border-color:#ccc #eee #eee #ccc;
@@ -330,6 +325,17 @@
 	max-width:300px;
 	padding:0px;
 	margin-bottom:10px;
+}
+#optionsframework #logo_icon-image.screenshot, 
+#optionsframework #logo_icon-image.screenshot img {
+    width: 32px;
+    display: inline-block;
+    margin: auto;
+    float: left;
+    border: none !important;
+    padding: 0 5px 0 5px;
+    position: static;
+    margin-right: 10px;
 }
 #optionsframework .screenshot .remove-image {
 	background:url("../images/ico-delete.png") no-repeat;
@@ -359,6 +365,21 @@
     clear: left;
 }
 
+
+#optionsframework #section-logo_icon {
+	position: relative;
+}
+
+#optionsframework #section-logo_icon #wpadminbar {
+    position: relative;
+    overflow: hidden;
+    width: auto;
+    min-width: 300px;
+    display: inline-block;
+    float: right;
+}
+
+#maintenance_message,
 #maintenance_notes {
     width: 584px !important;
 }
@@ -399,10 +420,20 @@
     border-top: 1px solid #ddd;
     background-color: #f1f1f1;
     position: absolute;
-    bottom: auto;
+    top:auto;
+    bottom: 0;
     left: 0;
     right: 0;
     z-index: 10;
+    width: auto;
+}
+#optionsframework #optionsframework-submit p.wd_notification_events {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: absolute;
+    overflow: hidden;
+    left: 1em;
+    right: 9em;
     width: auto;
 }
 #optionsframework .button-primary {

@@ -32,6 +32,9 @@ jQuery(document).ready(function($) {
 			$('.wd_notification_events > .wd_notification_scheduled').text( get_next_schedule() );
 		});
 	}
+	$('#wpadminbar').clone().appendTo('#section-logo_icon').css({position:'relative'});
+	$('#section-logo_icon #wpadminbar').on('click', function(e){e.preventDefault();e.stopPropagation();return false;}).css({position:'static',overflow:'hidden'}).find('#wp-admin-bar-menu-toggle,#wp-admin-bar-comments,#wp-admin-bar-new-content,#wp-admin-bar-of_theme_options,#wp-admin-bar-top-secondary').remove();
+
 
 	function get_active_dates( freq, day, month, year ) {
 

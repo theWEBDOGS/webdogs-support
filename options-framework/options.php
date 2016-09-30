@@ -383,70 +383,6 @@ function optionsframework_options() {
 			'end' => true));
 
 
-
-	/*
-	 *  SETTINGS | TAB 2
-	 */
-
-	$options[] = array(
-		'name' => __('Settings', 'options_check'),
-		'capability'   => 'manage_options',
-		'order' => 2,
-		'type' => 'heading');
-
-	$options[] = array(
-		'name' => 'Recommended Plugins',
-		'desc' => implode(', ', $recommend_plugins ),
-		'type' => 'info',
-		'class' => 'small alignleft bottom-pad');
-
-	$options[] = array(
-		'name' => __('Display Plugin Recommendation Notice', 'options_check'),
-		'id' => 'has_plugin_notices',
-		'type' => 'radio',
-		'std' => 'yes',
-		'class' => 'inline alignleft',
-		'options' => $boolean_active);
-
-	$options[] = array(
-		'name' => __('Automatically Activate Plugin After Installation', 'options_check'),
-		'id' => 'has_forced_activation',
-		'type' => 'radio',
-		'std' => 'yes',
-		'class' => 'alignleft inline',
-		'options' => $boolean_radio);
-	
-	$options[] = array(
-		'name' => 'Cleanup Core Bundles',
-		'type' => 'info',		
-		'desc' => $delete_base,
-		'class' => 'alignleft small',
-		'wrap' => array( 
-			'start' => true, 
-			'class' => 'clear top-border inset bottom-pad',));
-
-	$options[] = array(
-		'name' => __('Remove Bundled Plugins', 'options_check'),
-		'id' => 'has_forced_deletion',
-		'type' => 'radio',
-		'std' => 'no',
-		'class' => 'alignleft small inline',
-		'options' => $boolean_radio);
-
-	$options[] = array(
-		'name' => __('Remove Bundled Themes', 'options_check'),
-		'id' => 'has_theme_deletion',
-		'type' => 'radio',
-		'std' => 'no',
-		'class' => 'alignleft small inline',
-		'options' => $boolean_radio);
-
-	$options[] = array(
-		'type' => 'info',
-		'wrap' => array( 
-			'end' => true));
-
-
 	/*
 	 *  META OPTIONS | TAB 3
 	 */
@@ -454,7 +390,7 @@ function optionsframework_options() {
 	$options[] = array(
 		'name' => __('Access', 'options_check'),
 		'capability' => 'manage_options',
-		'order' => 4,
+		'order' => 2,
 		'type' => 'heading');
 
 	$options[] = array(
@@ -491,7 +427,7 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'name' => 'Remove Meta Tags',
-		'desc' => 'Control syndication and feed accessibility meta tags.',
+		'desc' => 'Control syndication and feed accessibility by removing meta tags from the document head.',
 		'type' => 'info',
 		'class' => 'small alignleft');
 
@@ -557,6 +493,70 @@ function optionsframework_options() {
 
 	
 
+
+	/*
+	 *  SETTINGS | TAB 3
+	 */
+
+	$options[] = array(
+		'name' => __('Settings', 'options_check'),
+		'capability'   => 'manage_options',
+		'order' => 3,
+		'type' => 'heading');
+
+	$options[] = array(
+		'name' => 'Recommended Plugins',
+		'desc' => implode(', ', $recommend_plugins ),
+		'type' => 'info',
+		'class' => 'small alignleft bottom-pad');
+
+	$options[] = array(
+		'name' => __('Display Plugin Recommendation Notice', 'options_check'),
+		'id' => 'has_plugin_notices',
+		'type' => 'radio',
+		'std' => 'yes',
+		'class' => 'inline alignleft',
+		'options' => $boolean_active);
+
+	$options[] = array(
+		'name' => __('Automatically Activate Plugin After Installation', 'options_check'),
+		'id' => 'has_forced_activation',
+		'type' => 'radio',
+		'std' => 'yes',
+		'class' => 'alignleft inline',
+		'options' => $boolean_radio);
+	
+	$options[] = array(
+		'name' => 'Cleanup Core Bundles',
+		'type' => 'info',		
+		'desc' => $delete_base,
+		'class' => 'alignleft small',
+		'wrap' => array( 
+			'start' => true, 
+			'class' => 'clear top-border inset bottom-pad',));
+
+	$options[] = array(
+		'name' => __('Remove Bundled Plugins', 'options_check'),
+		'id' => 'has_forced_deletion',
+		'type' => 'radio',
+		'std' => 'no',
+		'class' => 'alignleft small inline',
+		'options' => $boolean_radio);
+
+	$options[] = array(
+		'name' => __('Remove Bundled Themes', 'options_check'),
+		'id' => 'has_theme_deletion',
+		'type' => 'radio',
+		'std' => 'no',
+		'class' => 'alignleft small inline',
+		'options' => $boolean_radio);
+
+	$options[] = array(
+		'type' => 'info',
+		'wrap' => array( 
+			'end' => true));
+
+
 	/*
 	 *  LOGO OPTIONS | TAB 4
 	 */
@@ -594,8 +594,8 @@ function optionsframework_options() {
 				'height' => 'val')));
 
 	$options[] = array(
-		'name' => __('Logo Icon', 'options_check'),
-		'desc' => __('Upload a single path SVG for best results.', 'options_check'),
+		'name' => __('Toolbar Logo-icon', 'options_check'),
+		// 'desc' => __('Upload a single path SVG for best results.', 'options_check'),
 		'id' => 'logo_icon',
 		'class' => 'top-border bottom-pad',
 		'type' => 'upload');
@@ -669,7 +669,7 @@ function optionsframework_options() {
 	$options[] = array(
 		'name' => __('Plugins', 'options_check'),
 		'capability'  => 'manage_options',
-		'order' => 3,
+		'order' => 4,
 		'type' => 'heading',
 		'class' => 'inset bottom-pad',
 		'function' => 'Options_Framework_Install_Plugins_Page' ); 
