@@ -7,18 +7,6 @@
  * @license   GPL-2.0+
  * @link      http://wptheming.com
  * @copyright 2010-2016 WP Theming
- *
- * @wordpress-plugin
- * Plugin Name: Options Framework
- * Plugin URI:  http://wptheming.com
- * Description: A framework for building theme options.
- * Version:     1.8.5
- * Author:      Devin Price
- * Author URI:  http://wptheming.com
- * License:     GPL-2.0+
- * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain: options-framework
- * Domain Path: /languages
  */
 
 // If this file is called directly, abort.
@@ -42,16 +30,6 @@ function optionsframework_init() {
 
 	//  If user can't edit theme options, exit
 	if ( ! current_user_can( 'manage_options' ) ) return;
-
-
-	if(!function_exists('is_plugin_active')) include_once( ABSPATH . 'wp-admin/includes/plugin.php');
-
-	if(!function_exists('wp_prepare_themes_for_js')) include_once( ABSPATH . 'wp-admin/includes/theme.php');
-
-    if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');
-
-	// Load translation files
-	load_plugin_textdomain( 'options-framework', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 
 	// Loads the required Options Framework classes.
 	require plugin_dir_path( __FILE__ ) . 'options.php';
@@ -79,6 +57,12 @@ function optionsframework_init() {
 	// Instantiate the media uploader class
 	$options_framework_media_uploader = new Options_Framework_Media_Uploader;
 	$options_framework_media_uploader->init();
+
+	add_action( 'init', function(){
+		// Load translation files
+		load_plugin_textdomain( 'options-framework', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+
+	} );
 
 }
 

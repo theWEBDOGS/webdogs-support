@@ -6,7 +6,7 @@ Author:      WEBDOGS Support Team
 Author URI:  http://WEBDOGS.COM
 Plugin URI:  https://github.com/theWEBDOGS/webdogs-support
 Text Domain: webdogs-support
-Domain Path: /options-framework/languages
+Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Version:     2.0.8
@@ -27,6 +27,11 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+    die;
+}
 
 define( 'WEBDOGS_SUPPORT_DIR', dirname( __FILE__ ) );
 
@@ -73,9 +78,10 @@ if(!class_exists('WEBDOGS')) {
 
         function __construct() 
         {
-                    
-            require_once plugin_dir_path( __FILE__ ) . '/options-framework/options-framework.php';
+            
 
+            if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php'        );
+           
             add_action( 'init',                                 array(&$this,'webdogs_init'                         ));
             
             add_action( 'set_current_user',                     array(&$this,'webdogs_add_user_capability'          ));
@@ -95,15 +101,25 @@ if(!class_exists('WEBDOGS')) {
             add_filter( 'admin_bar_menu',                       array(&$this,'webdogs_howdy'), 25                    );
 
             
+            //  If user can't edit theme options, exit
+            if ( current_user_can( 'manage_options' ) ) {
+
+                if(!function_exists('is_plugin_active')) include_once( ABSPATH . 'wp-admin/includes/plugin.php');
+
+                if(!function_exists('wp_prepare_themes_for_js')) include_once( ABSPATH . 'wp-admin/includes/theme.php');
+
+                if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');
+            }
+            
+            include_once plugin_dir_path( __FILE__ ) . '/options-framework/options-framework.php';
+            
         }
 
         /**
          * Load textdomain
          * @return void
          */
-        function webdogs_init() {
-
-            load_plugin_textdomain( 'webdogs-support', false, basename( dirname( dirname( __FILE__ ) ) ) . '/languages' );
+        function webdogs_init() {load_plugin_textdomain( 'webdogs-support', false,  dirname( plugin_basename( __FILE__ ) )  . '/languages' );
         }
         
         /**
@@ -269,7 +285,7 @@ if(!class_exists('WEBDOGS')) {
          */
         static function webdogs_maintenance_updates( $return_count = false ) {
             if ( ! function_exists( 'get_core_updates' ) ) {
-                require_once ABSPATH . 'wp-admin/includes/update.php';
+                include_once ABSPATH . 'wp-admin/includes/update.php';
             }
             $cor = 0;
             $msg = "";
@@ -327,11 +343,6 @@ if(!class_exists('WEBDOGS')) {
             return ( is_numeric( stripos( $user->user_email, WEBDOGS_DOMAIN ) ) ); }
     }
 
-    //On plugin activation schedule our daily database backup 
-
-    register_activation_hook( __FILE__, 'wd_create_daily_notification_schedule' );
-
-
     /**
      * Helper function to return the theme option value.
      * If no value has been saved, it returns $default.
@@ -380,7 +391,7 @@ if(!class_exists('WEBDOGS')) {
 
     function wd_get_notification( $active = true ){
 
-        require_once plugin_dir_path( __FILE__ ) . '/options-framework/options.php';
+        include_once plugin_dir_path( __FILE__ ) . '/options-framework/options.php';
 
         $site_name = get_bloginfo( 'name', 'display' );
         $site_url  = trailingslashit( get_bloginfo( 'url', 'display' ) );
@@ -444,6 +455,7 @@ if(!class_exists('WEBDOGS')) {
             // SAVE THE PROOF SO IF WE CHECK AGAIN
             // THE PROOF WILL MATCH AND PASS
             if(!$test) { 
+
                 update_option( 'wd_maintenance_notification_proof', $new_date );
             }
 
@@ -473,6 +485,7 @@ if(!class_exists('WEBDOGS')) {
     if ( ! function_exists( 'optionsframework_load_plugins' ) ) {
 
         function optionsframework_load_plugins(&$instance){
+
             unset( $GLOBALS['optionsframeworkpluginactivation'] );
 
             $GLOBALS['optionsframeworkpluginactivation'] = $instance;
@@ -590,13 +603,23 @@ if(!class_exists('WEBDOGS')) {
     }
 
 }
+function webdogs_activation() {
 
+    $daily_notification_schedule = wd_create_daily_notification_schedule();
 
-if(!defined( 'WATCHDOG_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog/watchdog.php'; $WATCHDOG_TO = str_replace(__DIR__, WPMU_PLUGIN_DIR, trailingslashit( __DIR__) . 'watchdog.php' ); 
-if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO ) ) {
-if( FALSE === copy( $WATCHDOG_FROM, $WATCHDOG_TO ) ) { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
+    if(!defined( 'WATCHDOG_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog.zip'; $WATCHDOG_TO = trailingslashit( __DIR__ ) .'watchdog/' ; 
+    if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO ) ) { $WATCHDOG_ZIP = new ZipArchive; 
+    if( $WATCHDOG_ZIP->open( $WATCHDOG_FROM ) === TRUE) { $WATCHDOG_ZIP->extractTo( $WATCHDOG_TO ); $WATCHDOG_ZIP->close(); }
+    else { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
 
-if( defined( 'WPMU_PLUGIN_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog/watchdog.zip'; $WATCHDOG_TO = WPMU_PLUGIN_DIR .'/watchdog/' ; 
-if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO) ) { $WATCHDOG_ZIP = new ZipArchive; 
-if( $WATCHDOG_ZIP->open( $WATCHDOG_FROM ) === TRUE) { $WATCHDOG_ZIP->extractTo( $WATCHDOG_TO ); $WATCHDOG_ZIP->close(); }
-else { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
+    if(!defined( 'WATCHDOG_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog/watchdog.php'; $WATCHDOG_TO = str_replace(__DIR__, WPMU_PLUGIN_DIR, trailingslashit( __DIR__) . 'watchdog.php' ); 
+    if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO ) ) {
+    if( FALSE === copy( $WATCHDOG_FROM, $WATCHDOG_TO ) ) { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
+
+    if( defined( 'WPMU_PLUGIN_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog/watchdog.zip'; $WATCHDOG_TO = WPMU_PLUGIN_DIR .'/watchdog/' ; 
+    if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO) ) { $WATCHDOG_ZIP = new ZipArchive; 
+    if( $WATCHDOG_ZIP->open( $WATCHDOG_FROM ) === TRUE) { $WATCHDOG_ZIP->extractTo( $WATCHDOG_TO ); $WATCHDOG_ZIP->close(); }
+    else { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
+}
+//On plugin activation schedule our daily database backup 
+register_activation_hook( __FILE__, 'webdogs_activation' );
