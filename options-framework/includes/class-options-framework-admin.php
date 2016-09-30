@@ -43,6 +43,8 @@ class Options_Framework_Admin {
 			// Adds options menu to the admin bar
 			add_action( 'wp_before_admin_bar_render', array( $this, 'optionsframework_admin_bar' ) );
 
+			add_action( 'wp_before_admin_bar_render', array( $this, 'add_adminbar_sitename_logo' ) );
+
 		} else {
 			// Display a notice if options aren't present in the theme
 			add_action( 'admin_notices', array( $this, 'options_notice' ) );
@@ -170,22 +172,138 @@ class Options_Framework_Admin {
         }
 	}
 
+	public function get_custom_logo_icon() {
+
+	    $custom_logo_icon = of_get_option( 'logo_icon', false );
+	    // return $custom_logo_icon;
+
+	    if( $custom_logo_icon ) {
+
+	    	$data = file_get_contents( $custom_logo_icon );
+	    	return $data;
+
+	    	if( ! $data ) { return false; }
+
+            $data_image = 'data:image/svg+xml;base64,' . base64_encode( $data );
+
+	    	// $custom_image = "<img src=\"{$data_image}\" height=\"26\" width=\"20\">";
+	    	// $custom_image = "<span class=\"ab-icon\" style=\"background-image:url({$data_image}) !important; width:20px; background-repeat:no-repeat; height:26px; background-position:center !important;\"></span>";
+	    	$custom_image = "<div class='wp-menu-image svg' style=\"background-image:url({$data_image}) !important; width:20px; background-repeat:no-repeat; height:26px; background-position:center !important;\"></div>";
+
+	    	return $custom_image;
+	    }
+	    return false;
+	}
+	/*
+	 * Change the WP Logo Icon within the My Sites Menu to any icon you want
+	 * Update the NEW-ICON-HERE.png name to match the proper file name.
+	 */
+	public function add_adminbar_sitename_logo() {
+
+		global $wp_admin_bar;
+
+		// $wp_admin_bar->remove_menu('site-name');
+
+	    // Don't show for logged out users.
+	    if ( ! is_user_logged_in() )
+	        return;
+	 
+	    // Show only when the user is a member of this site, or they're a super admin.
+	    if ( ! is_user_member_of_blog() && ! is_super_admin() )
+	        return;
+	 
+	    $blogname = get_bloginfo('name');
+	 
+	    if ( ! $blogname ) {
+	        $blogname = preg_replace( '#^(https?://)?(www.)?#', '', get_home_url() );
+	    }
+	 
+	    if ( is_network_admin() ) {
+	        $blogname = sprintf( __('Network Admin: %s'), esc_html( get_current_site()->site_name ) );
+	    } elseif ( is_user_admin() ) {
+	        $blogname = sprintf( __('User Dashboard: %s'), esc_html( get_current_site()->site_name ) );
+	    }
+	 
+	    $title = "";
+
+	    $custom_logo_icon = $this->get_custom_logo_icon();
+
+	    if( $custom_logo_icon ) {
+
+	    	$title .= $custom_logo_icon;
+	    }
+
+	    
+	    $title .= wp_html_excerpt( $blogname, 40, '&hellip;' );
+	 
+	    $wp_admin_bar->add_menu( array(
+	        'id'    => 'site-name',
+	        'title' => $title,
+	        'href'  => ( is_admin() || ! current_user_can( 'read' ) ) ? home_url( '/' ) : admin_url(),
+	    ) );
+	 
+	    // Create submenu items.
+	 
+	    if ( is_admin() ) {
+	        // Add an option to visit the site.
+	        $wp_admin_bar->add_menu( array(
+	            'parent' => 'site-name',
+	            'id'     => 'view-site',
+	            'title'  => __( 'Visit Site' ),
+	            'href'   => home_url( '/' ),
+	        ) );
+	 
+	        if ( is_blog_admin() && is_multisite() && current_user_can( 'manage_sites' ) ) {
+	            $wp_admin_bar->add_menu( array(
+	                'parent' => 'site-name',
+	                'id'     => 'edit-site',
+	                'title'  => __( 'Edit Site' ),
+	                'href'   => network_admin_url( 'site-info.php?id=' . get_current_blog_id() ),
+	            ) );
+	        }
+	 
+	    } else if ( current_user_can( 'read' ) ) {
+	        // We're on the front end, link to the Dashboard.
+	        $wp_admin_bar->add_menu( array(
+	            'parent' => 'site-name',
+	            'id'     => 'dashboard',
+	            'title'  => __( 'Dashboard' ),
+	            'href'   => admin_url(),
+	        ) );
+	 
+	        // Add the appearance submenu items.
+	        wp_admin_bar_appearance_menu( $wp_admin_bar );
+	    }
+	}
+
+
 	/**
      * Loads the required stylesheets
      *
      * @since 1.7.0
      */
-	function enqueue_admin_styles( $hook ) { ?>
+	function enqueue_admin_styles( $hook ) {  ?>
 <style type="text/css">
 	#adminmenu #toplevel_page_options-framework div.wp-menu-image.svg {
-	    -webkit-background-size: 26px auto;
-	    background-size: 26px auto;
+	    -webkit-background-size: 26px 26px;
+	    background-size: 26px 26px;
 	}
 	#toplevel_page_options-framework .wp-menu-image.dashicons-before img {
 		height: 28px;
 	    width: 28px;
 	    padding-top: 2px;
 	    margin-left: -3px;
+	}
+	#wpadminbar #wp-admin-bar-site-name a.ab-item svg {
+	    padding-bottom: 2px;
+	    width: 26px;
+	    height: 20px;
+	    vertical-align: middle;
+	}
+
+	#wpadminbar #wp-admin-bar-site-name a.ab-item:before {
+	    content: none !important;
+	    display: none;
 	}
 
 	.webdogs-nag, 
@@ -212,6 +330,7 @@ class Options_Framework_Admin {
 	    padding-bottom: 2px;
 	    border-right: 1px solid #bbb;
 	    margin-top: 18px;
+	    margin-bottom: 16px;
 	    margin-right: 20px;
 	    height: 100% !important;
 	    line-height: 42px !important;
@@ -276,6 +395,7 @@ class Options_Framework_Admin {
 		// Enqueue custom option panel JS
 		wp_enqueue_script( 'options-custom', plugin_dir_url( dirname(__FILE__) ) . 'js/options-custom.js', array( 'jquery','wp-color-picker' ), Options_Framework::VERSION );
 
+		wp_enqueue_script( 'admin-color-schemes', plugin_dir_url( dirname(__FILE__) ) . 'js/admin-color-schemes.js', array( 'jquery', 'wp-color-picker' ), false, Options_Framework::VERSION );
 		// Inline scripts from options-interface.php
 		add_action( 'admin_head', array( $this, 'of_admin_head' ) );
 	}

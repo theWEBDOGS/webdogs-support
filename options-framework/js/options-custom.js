@@ -60,11 +60,20 @@ jQuery(document).ready(function($) {
 
 
 	    var prev_sent = new Date( Number( $('.wd_notification_events > .wd_last_notification_sent').attr('data-prev-notice') )*1000 );
+		var next_send = "";
+		var next_date = "";
+
+	 	if ( String( prev_sent ) === String( new Date(0) ) ) {
+			prev_sent = date;
+		 	next_send = "Next notification: ";
+		} else {
+		 	next_send = "| Next notification: ";
+		}
+
 	 	var prev_month = prev_sent.getMonth()+1;
 	 	var prev_year = prev_sent.getFullYear();
-	 	var next_send = "| Next notification: ";
-	 	var next_date = "";
-
+	 	
+	 	
 	 	month = ( year === prev_year && month === prev_month && day >= offset ) ? ++month : month ;
 
 	 	var active_this_year = get_active_dates( freq, offset, month, year   );

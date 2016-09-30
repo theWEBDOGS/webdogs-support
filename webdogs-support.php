@@ -1,12 +1,31 @@
 <?php
 /*
 Plugin Name: WEBDOGS Support + Maintenance
-Plugin URI: https://github.com/theWEBDOGS/webdogs-support-integration
-Description: WEBDOGS Support + Maintenance Configuration Tools: scheduled maintenance notifications, login page customizations, base plugin recommendations and more.
-Version: 2.0.7
-Author: WEBDOGS Support Team
-Author URI: http://WEBDOGS.COM
-License: GPLv2
+Description: Support + Maintenance Configuration Tools: scheduled maintenance notifications, login page customizations, base plugin recommendations and more.
+Author:      WEBDOGS Support Team
+Author URI:  http://WEBDOGS.COM
+Plugin URI:  https://github.com/theWEBDOGS/webdogs-support
+Text Domain: webdogs-support
+Domain Path: /options-framework/languages
+License:     GPLv2
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Version:     2.0.8
+*/
+
+/*
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
 define( 'WEBDOGS_SUPPORT_DIR', dirname( __FILE__ ) );
@@ -57,6 +76,8 @@ if(!class_exists('WEBDOGS')) {
                     
             require_once plugin_dir_path( __FILE__ ) . '/options-framework/options-framework.php';
 
+            add_action( 'init',                                 array(&$this,'webdogs_init'                         ));
+            
             add_action( 'set_current_user',                     array(&$this,'webdogs_add_user_capability'          ));
 
             add_action( 'wp_dashboard_setup',                   array(&$this,'webdogs_add_dashboard_widget'         ));
@@ -72,9 +93,19 @@ if(!class_exists('WEBDOGS')) {
             add_filter( 'the_generator',                        array(&$this,'complete_version_removal'             ));
 
             add_filter( 'admin_bar_menu',                       array(&$this,'webdogs_howdy'), 25                    );
+
             
         }
 
+        /**
+         * Load textdomain
+         * @return void
+         */
+        function webdogs_init() {
+
+            load_plugin_textdomain( 'webdogs-support', false, basename( dirname( dirname( __FILE__ ) ) ) . '/languages' );
+        }
+        
         /**
          * Register user capability
          * @return void
@@ -469,7 +500,7 @@ if(!class_exists('WEBDOGS')) {
                  $type = 'path';
                $format = array();
 
-            $path_fill = '#FFFFFF';
+            $path_fill = 'currentColor';
             $comb_fill = '#000000';
 
             $mask = '%s %s';
@@ -519,6 +550,45 @@ if(!class_exists('WEBDOGS')) {
     function remove_wp_logo( $wp_admin_bar ) {
         $wp_admin_bar->remove_node( 'wp-logo' );
     }
+
+    
+    // PUT SITE IN MAINENANCE MODE
+    function webdogs_maintenace_mode() {
+        if ('yes' === of_get_option('maintenance_mode', 'no')){
+            if (!current_user_can('administrator')) {
+                wp_die( of_get_option('maintenance_mode', 'Maintenance Mode') );
+            }
+        }
+    }
+
+    add_action('get_header', 'webdogs_maintenace_mode');
+
+
+    // REMOVE HEADER META TAGS
+    if ( 'yes' === of_get_option('remove_rsd_link', 'no')){
+        remove_action('wp_head', 'rsd_link');
+    }
+
+    if ( 'yes' === of_get_option('remove_wp_generator', 'no')){
+        remove_action('wp_head', 'wp_generator');
+    }
+
+    if ( 'yes' === of_get_option('remove_site_feed_links', 'no')){
+        remove_action('wp_head', 'feed_links', 2);
+    }
+
+    if ( 'yes' === of_get_option('remove_comments_feed_links', 'no')){
+        remove_action('wp_head', 'automatic_feed_links', 3);
+    }
+
+    if ( 'yes' === of_get_option('remove_wlwmanifest_link', 'no')){
+        remove_action('wp_head', 'wlwmanifest_link');
+    }
+
+    if ( 'yes' === of_get_option('remove_feed_links_extra', 'no')){
+        remove_action('wp_head', 'feed_links_extra', 3);
+    }
+
 }
 
 

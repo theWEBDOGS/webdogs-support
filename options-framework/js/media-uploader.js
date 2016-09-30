@@ -36,10 +36,14 @@ jQuery(document).ready(function($){
 				var attachment = optionsframework_upload.state().get('selection').first();
 				optionsframework_upload.close();
 				optionsframework_selector.find('.upload').val(attachment.attributes.url);
-				optionsframework_show_preveiw( optionsframework_selector );
+				
+
 				if ( attachment.attributes.type == 'image' ) {
 					optionsframework_selector.find('.screenshot').empty().hide().append('<img src="' + attachment.attributes.url + '"><a class="remove-image">Remove</a>');
-					optionsframework_selector.find('.screenshot').appendTo( optionsframework_selector.closest('.option') ).slideDown('fast');
+					optionsframework_selector.find('.screenshot').appendTo( optionsframework_selector.closest('.option').slideDown('fast') ).slideDown('fast');
+					optionsframework_selector.find('.screenshot').slideDown('fast');
+				} else {
+					optionsframework_show_preveiw( optionsframework_selector );
 				}
 				optionsframework_selector.find('.upload-button').unbind().addClass('remove-file').removeClass('upload-button').val(optionsframework_l10n.remove);
 				optionsframework_selector.find('.of-background-properties').slideDown();
@@ -107,7 +111,7 @@ jQuery(document).ready(function($){
     	}
     });
 	
-	$('.has-file:input').each( function() {
+	$('.section-background .has-file:input').each( function() {
 		optionsframework_show_preveiw( $(this).parents('.section') );
 	});
 

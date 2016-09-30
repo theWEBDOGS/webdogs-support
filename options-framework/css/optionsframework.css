@@ -13,6 +13,7 @@
 }
 #optionsframework form {
 	margin: auto;
+    position: relative;
 }
 #optionsframework h3 {
 	cursor: default;
@@ -28,10 +29,16 @@
 #optionsframework .section {
 	padding:10px 10px 0;
 }
+#optionsframework .section .section {
+    margin: auto -10px;
+}
 #optionsframework .group {
 	padding-bottom:43px;
 	background-color: #fff;
 }
+
+#optionsframework .group .section.top-border .heading,
+#optionsframework .group .section.inset .heading,
 #optionsframework .group .section:first-of-type > .heading,
 #optionsframework .group .alignleft > .heading {
     margin-top: 0.66em;
@@ -96,6 +103,10 @@
 #optionsframework .controls input[type=text].wp-color-picker {
     width: 65px;
 }
+#optionsframework .controls .wp-picker-holder {
+    position: absolute;
+    z-index: 100;
+}
 #optionsframework .controls select, #optionsframework .controls textarea {
 	margin-bottom:10px;
 	width:100%;
@@ -127,6 +138,7 @@
 	float:none;
 	width:auto;
 }
+#optionsframework .section-scheme .explain,
 #optionsframework .section-typography .explain {
 	float:none;
 	width:auto;
@@ -155,8 +167,13 @@
 	margin-top:2px;
 }
 #optionsframework .section-text .explain, 
+#optionsframework .section-scheme .explain,
 #optionsframework .section-textarea .explain {
     margin-top: 5px;
+}
+#optionsframework .section-scheme .explain {
+	max-width:initial;
+	padding-bottom: 20px;
 }
 #optionsframework .of-background-properties {
 	float: left;
@@ -191,6 +208,33 @@
     float: none;
     min-width: 390px;
     display: inline;
+}
+#optionsframework .section-scheme {
+	padding-top: 1.33em;
+}
+#optionsframework .section-scheme.inset,
+#optionsframework .section-scheme.top-border {
+	padding-top: 10px;
+}
+#optionsframework .section-scheme .controls .of-scheme-properties .color-scheme-picker {
+    width: 280px;
+    width: 175px;
+    float: left;
+}
+#optionsframework .section-scheme .controls .of-scheme-properties label {
+    display: block;
+}
+#optionsframework .section-scheme .controls {
+    max-width: initial;
+    width: 100%;
+    padding-right: 0;
+}
+#optionsframework .group .section-scheme .heading {
+    display: inline-block;
+    margin-top: 0.66em;
+}
+#optionsframework .section-scheme .controls input[type=button].wp-picker-clear {
+    min-width: 52px;
 }
 #optionsframework .controls .of-radio-img-img {
 	border:3px solid #f9f9f9;
@@ -272,6 +316,11 @@
     background-size: contain;
     overflow: hidden;
 }
+#optionsframework #logo_icon-image.screenshot {
+    width: 32px;
+    display: inline-block;
+    margin: 0 auto;
+}
 #optionsframework .screenshot img {
 	background:#fafafa;
 	border-color:#ccc #eee #eee #ccc;
@@ -347,12 +396,14 @@
 
 #optionsframework-submit {
 	padding: 7px 10px;
-	border-top: 1px solid #ddd;
-	background-color: #f1f1f1;    
-	position: absolute;
-    width: 820px;
-    bottom: 0;
+    border-top: 1px solid #ddd;
+    background-color: #f1f1f1;
+    position: absolute;
+    bottom: auto;
+    left: 0;
+    right: 0;
     z-index: 10;
+    width: auto;
 }
 #optionsframework .button-primary {
 	float:right;

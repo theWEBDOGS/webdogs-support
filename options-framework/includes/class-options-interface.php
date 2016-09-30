@@ -22,15 +22,15 @@ class Options_Framework_Interface {
 		if((empty($set)||!is_array($set))&&(empty($exe)||!is_array($exe))){ return; }
 
 
-		// set
+		// exe
 
 		elseif(!empty($exe)&&is_array($exe)){
 
 			$format = array(
 			'script' => "
 <script type='text/javascript'>
-	jQuery('#%1\$s').on('%2\$s',function(){ 
-		var val    = jQuery('#%1\$s:input')%3\$s%4\$s.val(), 
+	jQuery('#section-%1\$s :input').on('%2\$s',function(){ 
+		var val    = jQuery('#section-%1\$s :input')%3\$s%4\$s.val(), 
 		    target = jQuery('#%5\$s'); 
 		%6\$s;
 	}).trigger('%2\$s');
@@ -59,15 +59,15 @@ class Options_Framework_Interface {
 		}
 
 
-		//exe
+		//set
 
-		elseif(!empty($exe)){
+		elseif(!empty($set)&&is_array($set)){
 
 			$format = array(
 			'script' => "
 <script type='text/javascript'>
-	jQuery('#%1\$s').on('%2\$s',function(){ 
-		var val   = jQuery('#%1\$s:input')%3\$s%4\$s.val(), 
+	jQuery('#section-%1\$s :input').on('%2\$s',function(){ 
+		var val   = jQuery('#section-%1\$s :input')%3\$s%4\$s.val(), 
 		    field = jQuery('#%5\$s').closest('.section'); 
 		switch (val) {
 			%6\$s
@@ -225,6 +225,9 @@ class Options_Framework_Interface {
 				$output .= '<div id="' . esc_attr( $id ) .'" class="' . esc_attr( $class ) . '">'."\n";
 				if ( isset( $value['name'] ) ) {
 					$output .= '<h4 class="heading">' . esc_html( $value['name'] ) . '</h4>' . "\n";
+				}
+				if ( $value['type'] == 'scheme' ) {
+					$output .= '<p class="button-group button-small alignright"><button class="button show-basic-scheme hide-if-no-js active button-secondary">Basic</button><button class="button show-advanced-scheme hide-if-no-js button-secondary">Advanced</button></p>';
 				}
 				if ( $value['type'] != 'editor' ) {
 					$output .= '<div class="option">' . "\n" . '<div class="controls">' . "\n";
@@ -491,6 +494,73 @@ class Options_Framework_Interface {
 
 					break;
 
+				// Admin color scheme
+				case 'scheme':
+
+					$class = 'of-scheme-properties color-scheme-pickers';
+
+					$output .= '<div class="' . esc_attr( $class ) . '">';
+					
+					$output .= wp_nonce_field( Options_Framework_Admin_Color_Schemes::NONCE, '_acs_ofnonce', null, false );
+
+					$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][name]' ) . '" id="' . esc_attr( $value['id'] . '_name' ) . '" class="of-hidden of-scheme"  type="hidden" value="' . esc_attr( get_bloginfo( 'name' ) ) . '" />';
+						
+					
+					$default = array();
+
+					$admin_schemes = Options_Framework_Admin_Color_Schemes::get_instance();
+
+					$scheme = $admin_schemes->get_color_scheme();
+
+					$loops = $admin_schemes->get_colors( 'basic' );
+
+					foreach ( $loops as $handle => $nicename ):
+
+						//  Color
+						$default[$handle] = '';
+
+						if ( isset( $value['std'][$handle] ) && isset( $scheme->{$handle} ) ) {
+							if ( $scheme->{$handle} !=  $value['std'][$handle] )
+								$default[$handle] = ' data-default-color="' . $value['std'][$handle] . '" ';
+						}
+
+						$output .= '<div class="color-scheme-picker">';
+						$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][' . $handle . ']' ) . '" id="' . esc_attr( $value['id'] . '_'. $handle ) . '" class="of-color of-scheme"  type="text" value="' . esc_attr( $scheme->{$handle} ) . '"' . $default[ $handle ] .' />';
+						$output .= '<p class="explain">' . esc_html( $nicename ) . '</p>';
+						$output .= '</div>';
+					endforeach;
+
+					$output .= get_submit_button( __( 'Preview', 'admin-color-schemes' ), 'secondary preview-scheme hide-if-no-js alignright', 'preview', false );
+					// $output .= '<button id="preview" class="button small-button preview-scheme hide-if-no-js" data-nonce="'. wp_create_nonce( 'admin-color-schemes-save' ) .'">Preview</button>';
+
+					$loops = $admin_schemes->get_colors( 'advanced' );
+
+
+					$output .= '<div class="advanced-color-scheme-pickers section inset clear top-border bottom-pad hide-if-js">';
+
+					foreach ( $loops as $handle => $nicename ):
+
+						//  Color
+						$default[$handle] = '';
+
+						if ( isset( $value['std'][$handle] ) && isset( $scheme->{$handle} ) ) {
+							if ( $scheme->{$handle} !=  $value['std'][$handle] )
+								$default[$handle] = ' data-default-color="' . $value['std'][$handle] . '" ';
+						}
+
+						$output .= '<div class="color-scheme-picker">';
+						$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][' . $handle . ']' ) . '" id="' . esc_attr( $value['id'] . '_'. $handle ) . '" class="of-color of-scheme"  type="text" value="' . esc_attr( $scheme->{$handle} ) . '"' . $default[ $handle ] .' />';
+						$output .= '<p class="explain">' . esc_html( $nicename ) . '</p>';
+						$output .= '</div>';
+					endforeach;
+
+
+					$output .= '</div>';
+
+					$output .= '</div>';
+
+					break;
+
 				// Editor
 				case 'editor':
 					$output .= '<p class="explain">' . wp_kses( $explain_value, $allowedtags ) . '</p>'."\n";
@@ -544,20 +614,40 @@ class Options_Framework_Interface {
 						$wrap_class = $value['wrap']['class'];
 					}
 					
-					if( $wrap['start'] ) { 
-						$output .= '<div ' . $id . 'class="' . esc_attr( $wrap_class ) . '">' . "\n";
-						$output .= '<div class="' . esc_attr( $class ) . '">' . "\n";
-					} else {
+					if( ! isset( $value['wrap'] ) ) {
+
 						$output .= '<div ' . $id . 'class="' . esc_attr( $class ) . '">' . "\n";
-					}
-					if ( isset($value['name']) ) {
-						$output .= '<h4 class="heading">' . esc_html( $value['name'] ) . '</h4>' . "\n";
-					}
-					if ( isset( $value['desc'] ) ) {
-						$output .= '<p class="explain">' . $value['desc'] . '</p>' . "\n";
-					}
-					if( $wrap['start'] || $wrap['end'] ) { 
-						$output .= '</div>' . "\n";
+
+						if( isset($value['name']) || isset( $value['desc'] ) ){
+
+							if ( isset($value['name']) ) {
+								$output .= '<h4 class="heading">' . esc_html( $value['name'] ) . '</h4>' . "\n";
+							}
+							if ( isset( $value['desc'] ) ) {
+								$output .= '<p class="explain">' . $value['desc'] . '</p>' . "\n";
+							}
+						}
+						// $output .= '</div>' . "\n";
+
+					} else {
+
+						if( $wrap['start'] ) { 
+							$output .= '<div ' . $id . 'class="' . esc_attr( $wrap_class ) . '">' . "\n";
+						}
+
+						if( isset($value['name']) || isset( $value['desc'] ) ){
+
+							$output .= '<div class="' . esc_attr( $class ) . '">' . "\n";
+
+							if ( isset($value['name']) ) {
+								$output .= '<h4 class="heading">' . esc_html( $value['name'] ) . '</h4>' . "\n";
+							}
+							if ( isset( $value['desc'] ) ) {
+								$output .= '<p class="explain">' . $value['desc'] . '</p>' . "\n";
+							}
+							$output .= '</div>' . "\n";
+						}
+
 					}
 					if( ! isset( $value['wrap'] ) || ( $wrap['end'] && 0 <= $wrapper ) ) {
 						if ( $wrap['end'] ) {

@@ -277,11 +277,13 @@ function optionsframework_options() {
 
 	$delete_base = empty($delete_base) ? "Nothing to cleanup." : $delete_base ;
 
-	$exclude_domain = stripos( of_get_option( 'exclude_domain' ), site_url() ) !== false ? '<strong>Current domain:</strong> Excluded' : '<strong>Current domain:</strong> Not&nbsp;excluded';
+	$domain_string = of_get_option( 'exclude_domain' );
+
+	$exclude_domain = is_numeric( stripos( site_url(), $domain_string ) ) ? '<strong>Current domain:</strong> Excluded' : '<strong>Current domain:</strong> Not&nbsp;excluded';
 
 
-	  $options = array();
 
+	$options = array();
 	
 	///////////////////////////
 	//				         //
@@ -446,13 +448,123 @@ function optionsframework_options() {
 
 
 	/*
-	 *  LOGO OPTIONS | TAB 3
+	 *  META OPTIONS | TAB 3
 	 */
 
 	$options[] = array(
-		'name' => __('Logo Options', 'options_check'),
+		'name' => __('Access', 'options_check'),
 		'capability' => 'manage_options',
 		'order' => 4,
+		'type' => 'heading');
+
+	$options[] = array(
+		'name' => 'Maintenance Mode',
+		'desc' => 'Temporarily put the site in maintenance mode with a custom message. The site will be visible to admins only.',
+		'type' => 'info',
+		'class' => 'small alignleft bottom-pad');
+
+	$options[] = array(
+		'name' => __('Restrict Site Access and Display Notice', 'options_check'),
+		'id' => 'maintenance_mode',
+		'type' => 'radio',
+		'std' => 'no',
+		'class' => 'alignleft inline',
+		'options' => $boolean_radio);
+
+	$options[] = array(
+		'name' => __('Maintenance Notice', 'options_check'),
+		'id' => 'maintenance_message',
+		'std' => '',
+		'class' => 'clear bottom-pad top-border inset',
+		'type' => 'textarea',
+		'rule' => array(
+			'id' => 'maintenance_mode',
+			'on' => 'change',
+			'filter' => ':checked',
+			'set' => array(
+				'slideDown' => 'yes',
+				'slideUp' => 'no')));
+
+	$options[] = array(
+		'type' => 'info',
+		'class' => 'clear top-border');
+
+	$options[] = array(
+		'name' => 'Remove Meta Tags',
+		'desc' => 'Control syndication and feed accessibility meta tags.',
+		'type' => 'info',
+		'class' => 'small alignleft');
+
+	$options[] = array(
+		'name' => __('Remove Site RSS Feeds', 'options_check'),
+		'id' => 'remove_site_feed_links',
+		'type' => 'radio',
+		'std' => 'no',
+		'class' => 'alignleft small inline',
+		'options' => $boolean_radio);
+
+	$options[] = array(
+		'name' => __('Remove Comments Feeds', 'options_check'),
+		'id' => 'remove_comments_feed_links',
+		'type' => 'radio',
+		'std' => 'no',
+		'class' => 'alignleft mini inline',
+		'options' => $boolean_radio);
+
+	$options[] = array(
+		'type' => 'info',
+		'class' => 'clear small alignleft');
+
+	$options[] = array(
+		'name' => __('Remove Extra Feed Links', 'options_check'),
+		'id' => 'remove_feed_links_extra',
+		'type' => 'radio',
+		'std' => 'no',
+		'class' => 'alignleft small inline',
+		'options' => $boolean_radio);
+
+	$options[] = array(
+		'name' => __('Remove RSD Link', 'options_check'),
+		'id' => 'remove_rsd_link',
+		'type' => 'radio',
+		'std' => 'no',
+		'class' => 'alignleft small inline',
+		'options' => $boolean_radio);
+
+	$options[] = array(
+		'type' => 'info',
+		'class' => 'clear small alignleft');
+
+	$options[] = array(
+		'name' => __('Remove WP Generator Tag', 'options_check'),
+		'id' => 'remove_wp_generator',
+		'type' => 'radio',
+		'std' => 'no',
+		'class' => 'alignleft small inline',
+		'options' => $boolean_radio);
+
+	$options[] = array(
+		'name' => __('Remove WLW Tag', 'options_check'),
+		'id' => 'remove_wlwmanifest_link',
+		'type' => 'radio',
+		'std' => 'no',
+		'class' => 'alignleft small inline',
+		'options' => $boolean_radio);
+
+	$options[] = array(
+		'type' => 'info',
+		'class' => 'clear');
+
+	
+
+	/*
+	 *  LOGO OPTIONS | TAB 4
+	 */
+
+	$options[] = array(
+		'name' => __('Options', 'options_check'),
+		'capability' => 'manage_options',
+		'order' => 5,
 		'type' => 'heading');
 
 	$background_defaults = array(
@@ -473,7 +585,7 @@ function optionsframework_options() {
 		'id' => 'login_logo_height',
 		'std' => '100',
 		'type' => 'select',
-		'class' => 'mini inline clear', 
+		'class' => 'mini inline clear bottom-pad', 
 		'options' => $login_logo_height_array,
 		'rule' => array(
 			'id' => 'login_logo_css-image',
@@ -482,19 +594,31 @@ function optionsframework_options() {
 				'height' => 'val')));
 
 	$options[] = array(
-		'name' => __('Admin Theme', 'options_check'),
-		'type' => 'info',
-		'class'=> '',
-		'wrap' => array( 
-			'start' => true, 
-			'class' => 'clear top-border inset bottom-pad hide',));
-
-	$options[] = array(
 		'name' => __('Logo Icon', 'options_check'),
-		'desc' => __('Upload a single path SVG for best results ', 'options_check'),
+		'desc' => __('Upload a single path SVG for best results.', 'options_check'),
 		'id' => 'logo_icon',
+		'class' => 'top-border bottom-pad',
 		'type' => 'upload');
 
+
+
+	// $options[] = array(
+	// 	// 'name' => __('Admin Theme', 'options_check'),
+	// 	'type' => 'info',
+	// 	// 'class'=> '',
+	// 	'wrap' => array( 
+	// 		'start' => true, 
+	// 		'class' => 'clear top-border inset bottom-pad',));
+
+	$options[] = array(
+		'name' => __('Admin Color Scheme', 'options_check'),
+		'desc' => '',
+		'id' => 'admin_color_scheme',
+		// 'std' => '#2c3e50',
+		'class' => 'clear', 
+		'type' => 'scheme');
+
+/*
 	$options[] = array(
 		'name' => __('Base Color', 'options_check'),
 		'desc' => '',
@@ -526,11 +650,11 @@ function optionsframework_options() {
 		'std' => '#f39c12',
 		'class' => 'alignleft mini', 
 		'type' => 'color');
-
-	$options[] = array(
-		'type' => 'info',
-		'wrap' => array( 
-			'end' => true));
+// */
+// 	$options[] = array(
+// 		'type' => 'info',
+// 		'wrap' => array( 
+// 			'end' => true));
 
 	$options[] = array(
 		'type' => 'form',

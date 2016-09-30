@@ -28,10 +28,17 @@ if ( ! defined( 'WPINC' ) ) {
 function optionsframework_init() {
 
 	// Instantiate the login logo plugin class.
-	require plugin_dir_path( __FILE__ ) . 'includes/class-options-framework-login-logo.php';
+	require plugin_dir_path( __FILE__ ) . 'includes/class-options-login-logo.php';
+	require plugin_dir_path( __FILE__ ) . 'includes/class-options-admin-color-schemes.php';
 
 	$options_framework_login_logo = new Options_Framework_Login_Logo;
 	$options_framework_login_logo->init();
+
+	// Pull in the plugin classes and initialize
+	$options_framework_admin_color_schemes = Options_Framework_Admin_Color_Schemes::get_instance();
+
+	// Pull in the version checker and initialize
+	$options_framework_admin_color_schemes_version_check = Options_Framework_Admin_Color_Schemes_Version_Check::get_instance();
 
 	//  If user can't edit theme options, exit
 	if ( ! current_user_can( 'manage_options' ) ) return;

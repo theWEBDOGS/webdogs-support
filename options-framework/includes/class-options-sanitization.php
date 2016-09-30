@@ -200,6 +200,35 @@ function of_sanitize_background( $input ) {
 add_filter( 'of_sanitize_background', 'of_sanitize_background' );
 
 /**
+ * Sanitization for scheme option.
+ *
+ * @returns array $output
+ */
+function of_sanitize_scheme( $input ) {
+
+	$admin_schemes = Options_Framework_Admin_Color_Schemes::get_instance();
+
+	$output = array();
+
+	$loops = $admin_schemes->get_colors( 'basic' );
+	foreach ( $loops as $handle => $nicename ):
+
+		$output[$handle] = apply_filters( 'of_sanitize_hex', $input[ $handle ] );
+
+	endforeach;
+
+	$loops = $admin_schemes->get_colors( 'advanced' );
+	foreach ( $loops as $handle => $nicename ):
+
+		$output[$handle] = apply_filters( 'of_sanitize_hex', $input[ $handle ] );
+
+	endforeach;
+
+	return $output;
+}
+add_filter( 'of_sanitize_scheme', 'of_sanitize_scheme' );
+
+/**
  * Sanitization for background repeat
  *
  * @returns string $value if it is valid
