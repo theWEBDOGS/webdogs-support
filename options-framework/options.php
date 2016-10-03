@@ -213,7 +213,7 @@ function optionsframework_options() {
 
 	$delete_base = empty($delete_base) ? "Nothing to cleanup." : $delete_base ;
 
-	$domain_string = of_get_option( 'exclude_domain' );
+	$domain_string = of_get_option( 'exclude_domain', 'staging' );
 
 	$exclude_domain = is_numeric( stripos( site_url(), $domain_string ) ) ? '<strong>Current domain:</strong> Excluded' : '<strong>Current domain:</strong> Not&nbsp;excluded';
 

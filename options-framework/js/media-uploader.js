@@ -117,6 +117,7 @@ jQuery(document).ready(function($){
 		      "background-position": selector.find('.of-background-position:input').val(),
 		    "background-attachment": selector.find('.of-background-attachment:input').val()
 		};
+		selector.find('#login_logo_css-image_wrap').css( "background-color", screenshot_background["background-color"] );
 		selector.find('.screenshot').css( screenshot_background ).slideDown().find('img').css({'opacity':"0"});
 	}
 

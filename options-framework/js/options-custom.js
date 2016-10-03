@@ -64,11 +64,11 @@ jQuery(document).ready(function($) {
 	         day = date.getDate();
 
 
-	    var prev_sent = new Date( Number( $('.wd_notification_events > .wd_last_notification_sent').attr('data-prev-notice') )*1000 );
+	    var prev_sent = ( $('.wd_notification_events > .wd_last_notification_sent').length > 0 ) ? new Date( Number( $('.wd_notification_events > .wd_last_notification_sent').attr('data-prev-notice') )*1000 ) : new Date(0);
 		var next_send = "";
 		var next_date = "";
 
-	 	if ( String( prev_sent ) === String( new Date(0) ) ) {
+	 	if ( String( prev_sent ) === String( new Date(0) )  ) {
 			prev_sent = date;
 		 	next_send = "Next notification: ";
 		} else {

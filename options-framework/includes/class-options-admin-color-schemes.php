@@ -142,10 +142,11 @@ class Options_Framework_Admin_Color_Schemes {
 
 	public function get_Sass_JS() {
 		if( ! is_admin() || ! current_user_can('manage_options' ) ) return;
-
+/*
 		$wp_upload_dir = wp_upload_dir();
 
-		$upload_url = $wp_upload_dir['baseurl'] . '/admin-color-scheme';
+		$upload_url = $wp_upload_dir['baseurl'] . '/admin-color-scheme';*/
+		$upload_url = ABSPATH . '/wp-admin/css/colors/';
 	 ?>
 <script type="text/javascript">
 

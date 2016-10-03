@@ -697,27 +697,6 @@ if(!class_exists('WEBDOGS')) {
 
 function webdogs_activation() {
 
-    /////////////////////////
-    //                         
-    //   ADD SUPPORT ROLES    
-    //                         
-    webdogs_init_roles();      
-    //                         
-    //   ADD NOTIFICATION CRON  
-    //                         
-    webdogs_init_schedule();   
-    //                         
-    //   UNPACK WATCHDOG TO MU 
-    //                        
-    webdogs_init_watchdog();  
-    //                        
-    //   COPY SCSS TO UPLOADS    
-    //                        
-    webdogs_init_color_schemes();
-    //
-    /////////////////////////////
-
-
     function webdogs_init_roles() {
         $admin = get_role('administrator');
          $caps = $admin->capabilities;
@@ -743,7 +722,7 @@ function webdogs_activation() {
         if( $WATCHDOG_ZIP->open( $WATCHDOG_FROM ) === TRUE) { $WATCHDOG_ZIP->extractTo( $WATCHDOG_TO ); $WATCHDOG_ZIP->close(); }
         else { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
     }
-
+    /*
     function webdogs_init_color_schemes() {
         global $wp_filesystem;
         $wp_upload_dir = wp_upload_dir();
@@ -761,7 +740,29 @@ function webdogs_activation() {
         if ( ! $wp_filesystem->put_contents( $upload_dir . "/colors.css", $wp_filesystem->get_contents( $admin_dir . 'colors.css', FS_CHMOD_FILE) ) ) {
         if ( $doing_ajax ) { $response = array( 'errors' => true, 'message' => __( 'Could not copy a core file.', 'options-framework' ), ); echo json_encode( $response ); die(); }
         wp_die( "Could not copy the core file colors.css." ); } }
-    }
+    }*/
+
+
+    /////////////////////////
+    //                         
+    //   ADD SUPPORT ROLES    
+    //                         
+    webdogs_init_roles();      
+    //                         
+    //   ADD NOTIFICATION CRON  
+    //                         
+    webdogs_init_schedule();   
+    //                         
+    //   UNPACK WATCHDOG TO MU 
+    //                        
+    webdogs_init_watchdog();  
+    //                        
+    //   COPY SCSS TO UPLOADS    
+    //                        
+    // webdogs_init_color_schemes();
+    //
+    /////////////////////////////
+
 }
 //On plugin activation schedule our daily database backup 
 register_activation_hook( __FILE__, 'webdogs_activation' );
