@@ -144,20 +144,22 @@ class Options_Framework_Login_Logo {
 		'color' => '',
 		'image' => $this->get_location('url'),
 		'repeat' => 'no-repeat',
-		'position' => 'top center',
+		'position' => 'bottom center',
 		'attachment'=>'scroll' );
 
 		$format = array(
 			'image' => "background:url(%s) %s %s %s;%s",
 			'color' => "background-color:%s;",
 			'none' => "background:none;",
-			'height' => "height:%dpx;"
+			'height' => "height:%dpx;",
+			'margin-bottom' => "margin:-10px 10px %spx;"
 		);
 
-		$login_background = $body_background = "";
+		$login_background  = $body_background = "";
 
-		$background        = of_get_option('login_logo_css', array( 'color' => '', 'image' => '', 'repeat' => 'no-repeat', 'position' => 'top center', 'attachment' => 'scroll' ) );
+		$background        = of_get_option('login_logo_css', array( 'color' => '', 'image' => '', 'repeat' => 'no-repeat', 'position' => 'bottom center', 'attachment' => 'scroll' ) );
 		$background_height = of_get_option('login_logo_height', 100 );
+		$margin_bottom     = of_get_option('login_logo_bottom_margin', '10' );
 
         if ($background) :
 	    	$background = wp_parse_args( $background, $background_defaults );
@@ -165,7 +167,9 @@ class Options_Framework_Login_Logo {
 			$background_color  = empty($background['color']) ? "" : sprintf( $format['color'], esc_attr( $background['color' ] ) );
 			$background_repeat = empty($background['repeat']) ? "" : $background['repeat'];
 
-			switch ($background_repeat) {
+			$login_background = sprintf( $format['image'], esc_url_raw( $this->get_location('url') ), esc_attr( $background_defaults['repeat'] ), esc_attr( $background_defaults['position'] ), esc_attr( $background_defaults['attachment'] ), "" );
+	        $body_background  = esc_attr( $background_color );
+			/*switch ($background_repeat) {
 				case 'no-repeat':
 					$login_background = sprintf( $format['image'], esc_url_raw( $this->get_location('url') ), esc_attr( $background['repeat'] ), esc_attr( $background['position'] ), esc_attr( $background['attachment'] ), "" );
 			        $body_background  = esc_attr( $background_color );
@@ -178,8 +182,9 @@ class Options_Framework_Login_Logo {
 			        $body_background  = sprintf( $format['image'], esc_url_raw( $this->get_location('url') ), esc_attr( $background['repeat'] ), esc_attr( $background['position'] ), esc_attr( $background['attachment'] ), esc_attr( $background_color ) );
 	        
 					break;
-			}
+			}*/
 	        $background_height = sprintf( $format['height'], esc_attr( $background_height ) ); 
+	        $margin_bottom = sprintf( $format['margin-bottom'], esc_attr( $margin_bottom ) ); 
 	?>
 	<!-- Login Logo plugin for WordPress: http://txfx.net/wordpress-plugins/login-logo/ -->
 	<style type="text/css">
@@ -189,8 +194,8 @@ class Options_Framework_Login_Logo {
 		.login h1 a {
 			<?php echo $login_background; ?> 
 			width: 300px;
+			<?php echo $margin_bottom; ?> 
 			<?php echo $background_height; ?> 
-			margin: -10px 10px 10px;
 			background-size: contain;
 		}
 	</style>

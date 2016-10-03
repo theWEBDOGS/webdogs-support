@@ -9,97 +9,7 @@
 
 class Options_Framework_Interface {
 
-	/**
-	 * Generates the tabs that are used in the options menu
-	 */
-	static function optionsframework_rule($rule=null, $id=null) {
-
-		if(is_null($rule)||is_null($id)){ return; }
-
-		$set = isset($rule['set'])?$rule['set']:"";
-		$exe = isset($rule['exe'])?$rule['exe']:"";
-
-		if((empty($set)||!is_array($set))&&(empty($exe)||!is_array($exe))){ return; }
-
-
-		// exe
-
-		elseif(!empty($exe)&&is_array($exe)){
-
-			$format = array(
-			'script' => "
-<script type='text/javascript'>
-	jQuery('#section-%1\$s :input').on('%2\$s',function(){ 
-		var val    = jQuery('#section-%1\$s :input')%3\$s%4\$s.val(), 
-		    target = jQuery('#%5\$s'); 
-		%6\$s;
-	}).trigger('%2\$s');
-</script>",
-
-			'exec' => "
-				target.%s(%s);
-				",
-
-			'filter' => ".filter('%s')",
-
-			'not' => ".not('%s')"
-			);
-
-			// global $optionsframework_rules; // $optionsframework_rules = ( isset( $optionsframework_rules ) ) ? $optionsframework_rules : "" ;
-			$filter = isset($rule['filter'])? sprintf( $format['filter'], $rule['filter'] ):"";
-			$not    = isset($rule['not'])   ? sprintf( $format['not'],    $rule['not']    ):"";
-
-			$action ="";
-			foreach ( $exe as $method => $value ) {
-				$action .= sprintf( $format['exec'], $method, $value );
-			}
-			
-			$jrule = sprintf( $format['script'], $id, $rule['on'], $filter, $not, $rule['id'], $action );
-
-		}
-
-
-		//set
-
-		elseif(!empty($set)&&is_array($set)){
-
-			$format = array(
-			'script' => "
-<script type='text/javascript'>
-	jQuery('#section-%1\$s :input').on('%2\$s',function(){ 
-		var val   = jQuery('#section-%1\$s :input')%3\$s%4\$s.val(), 
-		    field = jQuery('#%5\$s').closest('.section'); 
-		switch (val) {
-			%6\$s
-		}
-	}).trigger('%2\$s');
-</script>",
-
-			'case' => "
-			case '%s':
-				field.%s();
-				break;
-				",
-
-			'filter' => ".filter('%s')",
-
-			'not' => ".not('%s')"
-			);
-
-			// global $optionsframework_rules; // $optionsframework_rules = ( isset( $optionsframework_rules ) ) ? $optionsframework_rules : "" ;
-			$filter = isset($rule['filter'])? sprintf( $format['filter'], $rule['filter'] ):"";
-			$not    = isset($rule['not'])   ? sprintf( $format['not'],    $rule['not']    ):"";
-
-			$cases ="";
-			foreach ( $set as $value => $method ) {
-				$cases .= sprintf( $format['case'], $method, $value );
-			}
-			
-			$jrule = sprintf( $format['script'], $rule['id'], $rule['on'], $filter, $not, $id, $cases );
-
-		}
-		return $jrule;
-	}
+	
 	/**
 	 * Generates the tabs that are used in the options menu
 	 */
@@ -523,10 +433,12 @@ class Options_Framework_Interface {
 							if ( $scheme->{$handle} !=  $value['std'][$handle] )
 								$default[$handle] = ' data-default-color="' . $value['std'][$handle] . '" ';
 						}
+						
+						$sass_handle = ' data-handle="$'.strtolower( str_replace( '_','-', $handle ) ).'"';
 
 						$output .= '<div class="color-scheme-picker">';
-						$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][' . $handle . ']' ) . '" id="' . esc_attr( $value['id'] . '_'. $handle ) . '" class="of-color of-scheme"  type="text" value="' . esc_attr( $scheme->{$handle} ) . '"' . $default[ $handle ] .' />';
 						$output .= '<p class="explain">' . esc_html( $nicename ) . '</p>';
+						$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][' . $handle . ']' ) . '" id="' . esc_attr( $value['id'] . '_'. $handle ) . '" class="of-color of-scheme"  type="text" value="' . esc_attr( $scheme->{$handle} ) . '"' . $default[ $handle ] . $sass_handle .' />';
 						$output .= '</div>';
 					endforeach;
 
@@ -547,10 +459,11 @@ class Options_Framework_Interface {
 							if ( $scheme->{$handle} !=  $value['std'][$handle] )
 								$default[$handle] = ' data-default-color="' . $value['std'][$handle] . '" ';
 						}
+						$sass_handle = ' data-handle="$'.strtolower( str_replace( '_','-', $handle ) ).'"';
 
 						$output .= '<div class="color-scheme-picker">';
-						$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][' . $handle . ']' ) . '" id="' . esc_attr( $value['id'] . '_'. $handle ) . '" class="of-color of-scheme"  type="text" value="' . esc_attr( $scheme->{$handle} ) . '"' . $default[ $handle ] .' />';
 						$output .= '<p class="explain">' . esc_html( $nicename ) . '</p>';
+						$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][' . $handle . ']' ) . '" id="' . esc_attr( $value['id'] . '_'. $handle ) . '" class="of-color of-scheme"  type="text" value="' . esc_attr( $scheme->{$handle} ) . '"' . $default[ $handle ] . $sass_handle .' />';
 						$output .= '</div>';
 					endforeach;
 
@@ -783,6 +696,98 @@ class Options_Framework_Interface {
 			echo '</div>';
 		}
 
+	}
+
+	/**
+	 * Generates the tabs that are used in the options menu
+	 */
+	static function optionsframework_rule($rule=null, $id=null) {
+
+		if(is_null($rule)||is_null($id)){ return; }
+
+		$set = isset($rule['set'])?$rule['set']:"";
+		$exe = isset($rule['exe'])?$rule['exe']:"";
+
+		if((empty($set)||!is_array($set))&&(empty($exe)||!is_array($exe))){ return; }
+
+
+		// exe
+
+		elseif(!empty($exe)&&is_array($exe)){
+
+			$format = array(
+			'script' => "
+<script type='text/javascript'>
+	jQuery('#section-%1\$s :input').on('%2\$s',function(){ 
+		var val    = jQuery('#section-%1\$s :input')%3\$s%4\$s.val(), 
+		    target = jQuery('#%5\$s'); 
+		%6\$s;
+	}).trigger('%2\$s');
+</script>",
+
+			'exec' => "
+				target.%s(%s);
+				",
+
+			'filter' => ".filter('%s')",
+
+			'not' => ".not('%s')"
+			);
+
+			// global $optionsframework_rules; // $optionsframework_rules = ( isset( $optionsframework_rules ) ) ? $optionsframework_rules : "" ;
+			$filter = isset($rule['filter'])? sprintf( $format['filter'], $rule['filter'] ):"";
+			$not    = isset($rule['not'])   ? sprintf( $format['not'],    $rule['not']    ):"";
+
+			$action ="";
+			foreach ( $exe as $method => $value ) {
+				$action .= sprintf( $format['exec'], $method, $value );
+			}
+			
+			$jrule = sprintf( $format['script'], $id, $rule['on'], $filter, $not, $rule['id'], $action );
+
+		}
+
+
+		//set
+
+		elseif(!empty($set)&&is_array($set)){
+
+			$format = array(
+			'script' => "
+<script type='text/javascript'>
+	jQuery('#section-%1\$s :input').on('%2\$s',function(){ 
+		var val   = jQuery('#section-%1\$s :input')%3\$s%4\$s.val(), 
+		    field = jQuery('#%5\$s').closest('.section'); 
+		switch (val) {
+			%6\$s
+		}
+	}).trigger('%2\$s');
+</script>",
+
+			'case' => "
+			case '%s':
+				field.%s();
+				break;
+				",
+
+			'filter' => ".filter('%s')",
+
+			'not' => ".not('%s')"
+			);
+
+			// global $optionsframework_rules; // $optionsframework_rules = ( isset( $optionsframework_rules ) ) ? $optionsframework_rules : "" ;
+			$filter = isset($rule['filter'])? sprintf( $format['filter'], $rule['filter'] ):"";
+			$not    = isset($rule['not'])   ? sprintf( $format['not'],    $rule['not']    ):"";
+
+			$cases ="";
+			foreach ( $set as $value => $method ) {
+				$cases .= sprintf( $format['case'], $method, $value );
+			}
+			
+			$jrule = sprintf( $format['script'], $rule['id'], $rule['on'], $filter, $not, $id, $cases );
+
+		}
+		return $jrule;
 	}
 
 }

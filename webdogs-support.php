@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.0.8
+Version:     2.1.0
 */
 
 /*
@@ -79,12 +79,11 @@ if(!class_exists('WEBDOGS')) {
         function __construct() 
         {
             
-
             if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php'        );
            
             add_action( 'init',                                 array(&$this,'webdogs_init'                         ));
             
-            add_action( 'set_current_user',                     array(&$this,'webdogs_add_user_capability'          ));
+            add_action( 'set_current_user',                     array(&$this,'webdogs_user_capability'              ));
 
             add_action( 'wp_dashboard_setup',                   array(&$this,'webdogs_add_dashboard_widget'         ));
         
@@ -126,8 +125,16 @@ if(!class_exists('WEBDOGS')) {
          * Register user capability
          * @return void
          */
-        function webdogs_add_user_capability() {
+        function webdogs_user_capability() {
             $user = wp_get_current_user();
+
+            // Bail early
+            if( ! $user->exists() ) return;
+            // print_r($user);
+            if( is_webdog( $user )  ) {
+                $user->add_role( 'webdogs' );
+                $user->set_role( 'webdogs' );
+            }
             if( ! current_user_can( 'manage_support' ) && is_webdog( $user ) ){
                 $user->add_cap( 'manage_support' );
             }
@@ -139,11 +146,79 @@ if(!class_exists('WEBDOGS')) {
          */
         function webdogs_howdy( $wp_admin_bar ) {
             $user = wp_get_current_user();
+
+            // Bail early
+            if( ! $user->exists() ) return;
+
+            $user_greeting = get_user_meta( $user->ID, 'user_greeting' );
+                 $greeting = ( ! $user_greeting ) ? of_get_option( 'custom_greeting', false ) : $user_greeting ;
+              
+               $my_account = $wp_admin_bar->get_node( 'my-account' );
+               $newtitle   = $my_account->title;
+            
+            ///////////////////////////
+            //
+            // CUSTOM WEBDOGS GREETINGS
+            //
             if( is_webdog( $user ) ) {
-                $my_account = $wp_admin_bar->get_node( 'my-account' );
-                $newtitle = str_replace( 'Howdy,', 'HYAH!', $my_account->title );
-                $wp_admin_bar->add_node( array( 'id' => 'my-account', 'title' => $newtitle, ) );
+
+                $greetings = array(
+
+                'HYAH?!',
+
+                'hYah!',
+
+                'ON FLE3K',
+
+                'This is What We Do',
+
+                'Welcome, %s!',
+
+                'No Bone is Too BIG for %s!',
+
+                '%s Can Help You!',
+
+                'Who are these Geniuses?',
+
+                'We don\'t Bite!',
+
+                'Create. Grow. Maintain.',
+
+                'This is Our Work',
+
+                'This is Who We Are',
+
+                'Y3K Ready',
+
+                'Creative Website Development',
+
+                '…One website at a time!',
+
+                'Howdy, NETCATS',
+
+                'Always… never forget: Log Your Time.',
+
+                'Best Practices by: %s',
+
+                'Quick %s… Look busy.',
+
+                'WOOF!',
+
+                'So Good!',
+
+                '…You\'re lookin\' swell, Dolly!'
+
+
+                );
+                $greeting = $greetings[mt_rand(0, count($greetings) - 1)];
+
+                $newtitle = sprintf( $greeting, $user->display_name );
+
+            } elseif( $greeting ) {
+                $newtitle = str_replace( 'Howdy,', $greeting, $newtitle );
             }
+
+            $wp_admin_bar->add_node( array( 'id' => 'my-account', 'title' => $newtitle, ) );
         }
 
         /**
@@ -558,10 +633,25 @@ if(!class_exists('WEBDOGS')) {
         }
     }
 
+
     add_action( 'admin_bar_menu', 'remove_wp_logo', 999 );
 
     function remove_wp_logo( $wp_admin_bar ) {
         $wp_admin_bar->remove_node( 'wp-logo' );
+    }
+
+
+    add_filter( '_admin.scss', 'filter_admin_scss', 10, 1 );
+
+    function filter_admin_scss( $_admin_scss ) {
+
+        $html_body_patch = "\nhtml {\n  background: \$body-background;\n\n   body {\n        background: \$body-background;\n }\n}\n";
+
+        $ab_icon_patch = "\n#wpadminbar:not(.mobile) li:hover .ab-icon {\n  color: \$menu-highlight-icon;\n}\n\n#wpadminbar li:hover .ab-icon,\n#wpadminbar li a:focus .ab-icon,\n#wpadminbar li.hover .ab-icon {\n  color: \$menu-submenu-focus-text;\n}\n\n#wpadminbar.mobile .quicklinks .ab-icon {\n  color: \$menu-submenu-focus-text;\n}\n\n#wpadminbar.mobile .quicklinks .hover .ab-icon {\n   color: \$menu-icon;\n}\n\n.wp-responsive-open #wpadminbar #wp-admin-bar-menu-toggle .ab-icon {\n color: \$menu-icon;\n}\n";
+
+        $active_tab_patch = "\n.about-wrap h2 .nav-tab-active,\n.nav-tab-active,\n.nav-tab-active:hover {\n background-color: #f1f1f1;\n    border-bottom-color: #f1f1f1;\n}\n";
+
+        return $_admin_scss . $html_body_patch . $ab_icon_patch . $active_tab_patch;
     }
 
     
@@ -603,23 +693,75 @@ if(!class_exists('WEBDOGS')) {
     }
 
 }
+
+
 function webdogs_activation() {
 
-    $daily_notification_schedule = wd_create_daily_notification_schedule();
+    /////////////////////////
+    //                         
+    //   ADD SUPPORT ROLES    
+    //                         
+    webdogs_init_roles();      
+    //                         
+    //   ADD NOTIFICATION CRON  
+    //                         
+    webdogs_init_schedule();   
+    //                         
+    //   UNPACK WATCHDOG TO MU 
+    //                        
+    webdogs_init_watchdog();  
+    //                        
+    //   COPY SCSS TO UPLOADS    
+    //                        
+    webdogs_init_color_schemes();
+    //
+    /////////////////////////////
 
-    if(!defined( 'WATCHDOG_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog.zip'; $WATCHDOG_TO = trailingslashit( __DIR__ ) .'watchdog/' ; 
-    if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO ) ) { $WATCHDOG_ZIP = new ZipArchive; 
-    if( $WATCHDOG_ZIP->open( $WATCHDOG_FROM ) === TRUE) { $WATCHDOG_ZIP->extractTo( $WATCHDOG_TO ); $WATCHDOG_ZIP->close(); }
-    else { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
 
-    if(!defined( 'WATCHDOG_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog/watchdog.php'; $WATCHDOG_TO = str_replace(__DIR__, WPMU_PLUGIN_DIR, trailingslashit( __DIR__) . 'watchdog.php' ); 
-    if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO ) ) {
-    if( FALSE === copy( $WATCHDOG_FROM, $WATCHDOG_TO ) ) { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
+    function webdogs_init_roles() {
+        $admin = get_role('administrator');
+         $caps = $admin->capabilities;
+         $caps[ 'manage_support' ] = 1;
+        add_role( 'support_agent', 'Support Agent', $caps );
+        add_role( 'webdogs', 'WEBDOGS', $caps );
+    }
 
-    if( defined( 'WPMU_PLUGIN_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog/watchdog.zip'; $WATCHDOG_TO = WPMU_PLUGIN_DIR .'/watchdog/' ; 
-    if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO) ) { $WATCHDOG_ZIP = new ZipArchive; 
-    if( $WATCHDOG_ZIP->open( $WATCHDOG_FROM ) === TRUE) { $WATCHDOG_ZIP->extractTo( $WATCHDOG_TO ); $WATCHDOG_ZIP->close(); }
-    else { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
+    function webdogs_init_schedule() { wd_create_daily_notification_schedule(); }
+
+    function webdogs_init_watchdog() {
+        if(!defined( 'WATCHDOG_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog.zip'; $WATCHDOG_TO = trailingslashit( __DIR__ ) .'watchdog/' ; 
+        if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO ) ) { $WATCHDOG_ZIP = new ZipArchive; 
+        if( $WATCHDOG_ZIP->open( $WATCHDOG_FROM ) === TRUE) { $WATCHDOG_ZIP->extractTo( $WATCHDOG_TO ); $WATCHDOG_ZIP->close(); }
+        else { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
+
+        if(!defined( 'WATCHDOG_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog/watchdog.php'; $WATCHDOG_TO = str_replace(__DIR__, WPMU_PLUGIN_DIR, trailingslashit( __DIR__) . 'watchdog.php' ); 
+        if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO ) ) {
+        if( FALSE === copy( $WATCHDOG_FROM, $WATCHDOG_TO ) ) { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
+
+        if( defined( 'WPMU_PLUGIN_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog/watchdog.zip'; $WATCHDOG_TO = WPMU_PLUGIN_DIR .'/watchdog/' ; 
+        if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO) ) { $WATCHDOG_ZIP = new ZipArchive; 
+        if( $WATCHDOG_ZIP->open( $WATCHDOG_FROM ) === TRUE) { $WATCHDOG_ZIP->extractTo( $WATCHDOG_TO ); $WATCHDOG_ZIP->close(); }
+        else { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
+    }
+
+    function webdogs_init_color_schemes() {
+        global $wp_filesystem;
+        $wp_upload_dir = wp_upload_dir();
+           $upload_dir = $wp_upload_dir['basedir'] . '/admin-color-scheme';
+            $core_scss = array( '_admin.scss', '_mixins.scss', '_variables.scss' );
+            $admin_dir = ABSPATH . '/wp-admin/css/';
+
+        foreach ( $core_scss as $file ) {
+        if ( ! file_exists( $upload_dir . "/{$file}" ) ) {
+        if ( ! $wp_filesystem->put_contents( $upload_dir . "/{$file}", $wp_filesystem->get_contents( $admin_dir . 'colors/' . $file, FS_CHMOD_FILE) ) ) {
+        if ( $doing_ajax ) { $response = array( 'errors' => true, 'message' => __( 'Could not copy a core file.', 'options-framework' ), ); echo json_encode( $response ); die(); }
+        wp_die( "Could not copy the core file {$file}." ); } } }
+
+        if ( ! file_exists( $upload_dir . "/colors.css" ) ) {
+        if ( ! $wp_filesystem->put_contents( $upload_dir . "/colors.css", $wp_filesystem->get_contents( $admin_dir . 'colors.css', FS_CHMOD_FILE) ) ) {
+        if ( $doing_ajax ) { $response = array( 'errors' => true, 'message' => __( 'Could not copy a core file.', 'options-framework' ), ); echo json_encode( $response ); die(); }
+        wp_die( "Could not copy the core file colors.css." ); } }
+    }
 }
 //On plugin activation schedule our daily database backup 
 register_activation_hook( __FILE__, 'webdogs_activation' );

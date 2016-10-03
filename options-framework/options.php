@@ -1,76 +1,5 @@
 <?php
 /**
- * A unique identifier is defined to store the options in the database.
- *
- */
-
-function optionsframework_option_name() {
-
-	$name = 'WEBDOGS';
-	$name = preg_replace("/\W/", "_", strtolower($name) );
-
-	$optionsframework_settings = get_option('optionsframework');
-	$optionsframework_settings['id'] = $name;
-	update_option('optionsframework', $optionsframework_settings);
-}
-
-
-/**
- * Register the required plugins for this theme.
- * This function is hooked into `tgmpa_register`, which is fired on the WP `init` action on priority 10.
- */
-function wds_register_base_activation() {
-
-	/* Array of plugin arrays. Required keys are name and slug.
-	 */
-	$plugins = wds_base_plugins();
-
-	/* Array of themes arrays. Required keys are name and slug.
-	 */
-	$themes = wds_bundled_themes();
-
-	/* Load has_plugin_notices option from framework.
-	 * Show admin notices or not.
-	 */
-	$has_notices = Options_Framework_Utils::validate_bool( of_get_option( 'has_plugin_notices', true));
-
-	/* Load has_forced_activation option from framework.
-	 * Automatically activate plugins after installation or not.
-	 */
-	$is_automatic = Options_Framework_Utils::validate_bool( of_get_option( 'has_forced_activation', true));
-
-	/* Array of strings used throughout the admin screens.
-	 */
-	$strings = wds_base_strings();
-
-	/* Array of configuration settings. Amend each line as needed.
-	 * TGMPA will start providing localized text strings soon. If you already have translations of our standard
-	 * strings available, please help us make TGMPA even better by giving us access to these translations or by
-	 * sending in a pull-request with .po file(s) with the translations.
-	 *
-	 */
-	$config = array(
-		'id'           => 'optionsframework',       // Unique ID for hashing notices for multiple instances of TGMPA.
-		'default_path' => '',                      // Default absolute path to bundled plugins.
-		'menu'         => 'optionsframework-install-plugins', // Menu slug.
-		'parent_slug'  => 'plugins.php',           // Parent menu slug.
-		'capability'   => 'manage_options',        // Capability needed to view plugin install page, should be a capability associated with the parent menu used.
-		'has_notices'  => $has_notices,            // Show admin notices or not.
-		'dismissable'  => true,                    // If false, a user cannot dismiss the nag message.
-		'dismiss_msg'  => '',                      // If 'dismissable' is false, this message will be output at top of nag.
-		'is_automatic' => $is_automatic,           // Automatically activate plugins after installation or not.
-		'message'      => '',                      // Message to output right before the plugins table.
-		'message'      => '',                      // Message to output right before the plugins table.
-		'strings'      => $strings                 // Array of strings used throughout the admin screens.
-	);
-
-	Options_Framework_Register_Plugins( $plugins, $themes, $config );
-}
-
-add_action( 'optionsframework_register', 'wds_register_base_activation', 10 );
-
-
-/**
  *
  * Return an array of recommended plugins
  * and plugins marked for deletion.
@@ -78,7 +7,7 @@ add_action( 'optionsframework_register', 'wds_register_base_activation', 10 );
  */
 function wds_base_plugins(){
 
-	return array(
+	return apply_filters( 'wds_base_plugins', array(
 
 		array(
 			'name'      => 'WEBDOGS Support + Maintenance',
@@ -168,7 +97,7 @@ function wds_base_plugins(){
 			'file_path' => 'hello.php',
 			'force_deletion' => true, 
 		)
-	);
+	) );
 }
 
 
@@ -198,9 +127,16 @@ function optionsframework_options() {
 	$login_logo = $image[0];
 
 	$login_logo_height_array = array(
-		'100' => __('100px', 'options_check'),
-		'200' => __('200px', 'options_check'),
-		'300' => __('300px', 'options_check'));
+	  '100' => __('100px', 'options_check'),
+	  '200' => __('200px', 'options_check'),
+	  '300' => __('300px', 'options_check'));
+
+	$login_logo_margin_bottom_array = array(
+	  '-20' => __('none', 'options_check'),
+	  '-10' => __('10px', 'options_check'),
+	    '0' => __('20px', 'options_check'),
+	   '10' => __('30px', 'options_check'),
+	   '20' => __('40px', 'options_check'));
 
 	$service_array = array(
 		'1' => __('Active', 'options_check'),
@@ -313,7 +249,7 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'name' => __('Notifications', 'options_check'),
-		'capability'   => 'manage_options',
+		'capability'   => 'manage_support',
 		'order' => 1,
 		'type' => 'heading');
 
@@ -389,7 +325,7 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'name' => __('Access', 'options_check'),
-		'capability' => 'manage_options',
+		'capability' => 'manage_support',
 		'order' => 2,
 		'type' => 'heading');
 
@@ -500,7 +436,7 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'name' => __('Settings', 'options_check'),
-		'capability'   => 'manage_options',
+		'capability'   => 'manage_support',
 		'order' => 3,
 		'type' => 'heading');
 
@@ -581,80 +517,44 @@ function optionsframework_options() {
 		'type' => 'background');
 
 	$options[] = array(
+		'desc' => __('Bottom Margin', 'options_check'),
+		'id' => 'login_logo_bottom_margin',
+		'std' => '0',
+		'type' => 'select',
+		'class' => 'mini inline alignright', 
+		'options' => $login_logo_margin_bottom_array,
+		'rule' => array(
+			'id' => 'login_logo_css-image',
+			'on' => 'change',
+			'exe' => array(
+				'css' => "'marginBottom', (20+Number(val)) + 'px'")));
+
+	$options[] = array(
 		'desc' => __('Logo Height', 'options_check'),
 		'id' => 'login_logo_height',
 		'std' => '100',
 		'type' => 'select',
-		'class' => 'mini inline clear bottom-pad', 
+		'class' => 'mini inline alignright', 
 		'options' => $login_logo_height_array,
 		'rule' => array(
 			'id' => 'login_logo_css-image',
 			'on' => 'change',
 			'exe' => array(
-				'height' => 'val')));
+				'height' => "val",
+				'css' => "'backgroundSize', val + 'px'")));
 
 	$options[] = array(
-		'name' => __('Toolbar Logo-icon', 'options_check'),
-		// 'desc' => __('Upload a single path SVG for best results.', 'options_check'),
+		'name' => __('Toolbar Logo-icon', 'options_check'),  	// 'desc' => __('Upload a single path SVG for best results.', 'options_check'),
 		'id' => 'logo_icon',
-		'class' => 'top-border bottom-pad',
+		'class' => 'top-border bottom-pad clear',
 		'type' => 'upload');
-
-
-
-	// $options[] = array(
-	// 	// 'name' => __('Admin Theme', 'options_check'),
-	// 	'type' => 'info',
-	// 	// 'class'=> '',
-	// 	'wrap' => array( 
-	// 		'start' => true, 
-	// 		'class' => 'clear top-border inset bottom-pad',));
 
 	$options[] = array(
 		'name' => __('Admin Color Scheme', 'options_check'),
 		'desc' => '',
 		'id' => 'admin_color_scheme',
-		// 'std' => '#2c3e50',
 		'class' => 'clear', 
 		'type' => 'scheme');
-
-/*
-	$options[] = array(
-		'name' => __('Base Color', 'options_check'),
-		'desc' => '',
-		'id' => 'base-color',
-		'std' => '#2c3e50',
-		'class' => 'alignleft mini', 
-		'type' => 'color');
-
-	$options[] = array(
-		'name' => __('Highlight Color', 'options_check'),
-		'desc' => '',
-		'id' => 'highlight-color',
-		'std' => '#1abc9c',
-		'class' => 'alignleft mini', 
-		'type' => 'color');
-
-	$options[] = array(
-		'name' => __('Notification Color', 'options_check'),
-		'desc' => '',
-		'id' => 'notification-color',
-		'std' => '#d35401',
-		'class' => 'alignleft mini', 
-		'type' => 'color');
-
-	$options[] = array(
-		'name' => __('Action Color', 'options_check'),
-		'desc' => '',
-		'id' => 'action-color',
-		'std' => '#f39c12',
-		'class' => 'alignleft mini', 
-		'type' => 'color');
-// */
-// 	$options[] = array(
-// 		'type' => 'info',
-// 		'wrap' => array( 
-// 			'end' => true));
 
 	$options[] = array(
 		'type' => 'form',
@@ -668,7 +568,7 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'name' => __('Plugins', 'options_check'),
-		'capability'  => 'manage_options',
+		'capability'  => 'manage_support',
 		'order' => 4,
 		'type' => 'heading',
 		'class' => 'inset bottom-pad',
@@ -872,3 +772,74 @@ function wds_filter_options_capability($options=array()) {
 }
 
 add_filter( 'of_options', 'wds_filter_options_capability', 20, 1 );
+
+/**
+ * A unique identifier is defined to store the options in the database.
+ *
+ */
+
+function optionsframework_option_name() {
+
+	$name = 'WEBDOGS';
+	$name = preg_replace("/\W/", "_", strtolower($name) );
+
+	$optionsframework_settings = get_option('optionsframework');
+	$optionsframework_settings['id'] = $name;
+	update_option('optionsframework', $optionsframework_settings);
+}
+
+
+/**
+ * Register the required plugins for this theme.
+ * This function is hooked into `tgmpa_register`, which is fired on the WP `init` action on priority 10.
+ */
+function wds_register_base_activation() {
+
+	/* Array of plugin arrays. Required keys are name and slug.
+	 */
+	$plugins = wds_base_plugins();
+
+	/* Array of themes arrays. Required keys are name and slug.
+	 */
+	$themes = wds_bundled_themes();
+
+	/* Load has_plugin_notices option from framework.
+	 * Show admin notices or not.
+	 */
+	$has_notices = Options_Framework_Utils::validate_bool( of_get_option( 'has_plugin_notices', true));
+
+	/* Load has_forced_activation option from framework.
+	 * Automatically activate plugins after installation or not.
+	 */
+	$is_automatic = Options_Framework_Utils::validate_bool( of_get_option( 'has_forced_activation', true));
+
+	/* Array of strings used throughout the admin screens.
+	 */
+	$strings = wds_base_strings();
+
+	/* Array of configuration settings. Amend each line as needed.
+	 * TGMPA will start providing localized text strings soon. If you already have translations of our standard
+	 * strings available, please help us make TGMPA even better by giving us access to these translations or by
+	 * sending in a pull-request with .po file(s) with the translations.
+	 *
+	 */
+	$config = array(
+		'id'           => 'optionsframework',       // Unique ID for hashing notices for multiple instances of TGMPA.
+		'default_path' => '',                      // Default absolute path to bundled plugins.
+		'menu'         => 'optionsframework-install-plugins', // Menu slug.
+		'parent_slug'  => 'plugins.php',           // Parent menu slug.
+		'capability'   => 'manage_options',        // Capability needed to view plugin install page, should be a capability associated with the parent menu used.
+		'has_notices'  => $has_notices,            // Show admin notices or not.
+		'dismissable'  => true,                    // If false, a user cannot dismiss the nag message.
+		'dismiss_msg'  => '',                      // If 'dismissable' is false, this message will be output at top of nag.
+		'is_automatic' => $is_automatic,           // Automatically activate plugins after installation or not.
+		'message'      => '',                      // Message to output right before the plugins table.
+		'message'      => '',                      // Message to output right before the plugins table.
+		'strings'      => $strings                 // Array of strings used throughout the admin screens.
+	);
+
+	Options_Framework_Register_Plugins( $plugins, $themes, $config );
+}
+
+add_action( 'optionsframework_register', 'wds_register_base_activation', 10 );
+

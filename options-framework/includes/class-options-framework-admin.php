@@ -172,23 +172,51 @@ class Options_Framework_Admin {
         }
 	}
 
-	public function get_custom_logo_icon() {
+
+	public function get_webdogs_logo_icon() {
 
 	    $custom_logo_icon = of_get_option( 'logo_icon', false );
+
 	    // return $custom_logo_icon;
+	    $color = 'currentColor';
 
 	    if( $custom_logo_icon ) {
+	    	// not an svg
+	    	// use image
+	    	if( stripos( $custom_logo_icon, '.svg') === false ) {
 
-	    	$data = file_get_contents( $custom_logo_icon );
-	    	return $data;
+	    		$image = $custom_logo_icon;
 
-	    	if( ! $data ) { return false; }
+    		//eles use SVG
+	    	} else {
 
-            $data_image = 'data:image/svg+xml;base64,' . base64_encode( $data );
+		    	$data = file_get_contents( $custom_logo_icon );
+		    	// return $data;`
+
+		    	if( ! $data ) { return false; }
+
+				// return $data;
+				// replace `fill` attributes
+				$data = preg_replace( '/fill=".+?"/', 'fill="' . $color . '"', $data );
+
+				// return $data;
+				// replace `style` attributes
+				$data = preg_replace( '/style=".+?"/', 'style="fill:' . $color . '"', $data );
+
+				// return $data;
+				// replace `fill` properties in `<style>` tags
+				$data = preg_replace( '/fill:.*?;/', 'fill: ' . $color . ';', $data );
+
+		    	// $custom_image = "<span class=\"ab-icon svg\">{$data}</span>";
+
+				// return $custom_image;
+
+	            $image = 'data:image/svg+xml;base64,' . base64_encode( $data );
+	        }
 
 	    	// $custom_image = "<img src=\"{$data_image}\" height=\"26\" width=\"20\">";
-	    	// $custom_image = "<span class=\"ab-icon\" style=\"background-image:url({$data_image}) !important; width:20px; background-repeat:no-repeat; height:26px; background-position:center !important;\"></span>";
-	    	$custom_image = "<div class='wp-menu-image svg' style=\"background-image:url({$data_image}) !important; width:20px; background-repeat:no-repeat; height:26px; background-position:center !important;\"></div>";
+	    	$custom_image = "<span class=\"ab-item ab-icon svg\" style=\"background-image:url({$image}) !important;\"></span>";
+	    	// $custom_image = "<div class='wp-menu-image svg' style=\"background-image:url({$data_image}) !important; width:20px; background-repeat:no-repeat; height:26px; background-position:center !important;\"></div>";
 
 	    	return $custom_image;
 	    }
@@ -226,7 +254,7 @@ class Options_Framework_Admin {
 	 
 	    $title = "";
 
-	    $custom_logo_icon = $this->get_custom_logo_icon();
+	    $custom_logo_icon = $this->get_webdogs_logo_icon();
 
 	    if( $custom_logo_icon ) {
 
@@ -284,6 +312,18 @@ class Options_Framework_Admin {
      */
 	function enqueue_admin_styles( $hook ) {  ?>
 <style type="text/css">
+
+	body, html {
+	    height: 100%;
+	    margin: 0;
+	    padding: 0;
+	    display: table;
+	    position: relative;
+	    width: 100%;
+	}
+	body {
+		background-color: transparent !important;
+	}
 	#adminmenu #toplevel_page_options-framework div.wp-menu-image.svg {
 	    -webkit-background-size: 26px 26px;
 	    background-size: 26px 26px;
@@ -294,6 +334,15 @@ class Options_Framework_Admin {
 	    padding-top: 2px;
 	    margin-left: -3px;
 	}
+	#wpadminbar #wp-admin-bar-site-name a.ab-item .ab-icon {
+	    /* padding-bottom: 2px; */
+	    width: 22px;
+	    height: 22px;
+	    vertical-align: middle;
+	    background-repeat:no-repeat; 
+	    background-position:center !important;
+	}
+
 	#wpadminbar #wp-admin-bar-site-name a.ab-item svg {
 	    padding-bottom: 2px;
 	    width: 26px;
@@ -305,7 +354,9 @@ class Options_Framework_Admin {
 	    content: none !important;
 	    display: none;
 	}
-
+	#wpadminbar #wp-admin-bar-site-name a.ab-item .ab-icon:not([src*=".svg"]) {
+	    background-size:contain;
+	}
 	.webdogs-nag, 
 	.webdogs-nag.notice {
 	    color: #FFFFFF;
@@ -392,6 +443,7 @@ class Options_Framework_Admin {
 		if ( $this->options_screen != $hook )
 	        return;
 
+		// wp_enqueue_script( 'wds_sass', plugin_dir_url( dirname(__FILE__) ) . 'js/sass.js', array(), false, Options_Framework::VERSION );
 		// Enqueue custom option panel JS
 		wp_enqueue_script( 'options-custom', plugin_dir_url( dirname(__FILE__) ) . 'js/options-custom.js', array( 'jquery','wp-color-picker' ), Options_Framework::VERSION );
 
@@ -420,8 +472,11 @@ class Options_Framework_Admin {
 	function options_page() { ?>
 
 	<div id="optionsframework-wrap" class="wrap">
+		
+		<?php Options_Framework_Admin_Color_Schemes::get_Sass_JS(); ?>
 
 		<?php $menu = Self::menu_settings(); ?>
+
 		<h1><?php echo esc_html( $menu['page_title'] ); ?> <span class="subtitle alignright">v<?php print WEBDOGS_VERSION; ?></span></h1>
 
 	    <?php settings_errors( 'options-framework' ); ?>

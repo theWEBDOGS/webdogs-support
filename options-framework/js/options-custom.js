@@ -14,8 +14,8 @@ jQuery(document).ready(function($) {
 		$(this).addClass('of-radio-img-selected');
 	});
 
-	$('.of-radio-img-label').hide();
 	$('.of-radio-img-img').show();
+	$('.of-radio-img-label').hide();
 	$('.of-radio-img-radio').hide();
 
 	// Loads tabbed sections if they exist
@@ -32,18 +32,20 @@ jQuery(document).ready(function($) {
 			$('.wd_notification_events > .wd_notification_scheduled').text( get_next_schedule() );
 		});
 	}
-	$('#wpadminbar').clone().appendTo('#section-logo_icon').css({position:'relative'});
-	$('#section-logo_icon #wpadminbar').on('click', function(e){e.preventDefault();e.stopPropagation();return false;}).css({position:'static',overflow:'hidden'}).find('#wp-admin-bar-menu-toggle,#wp-admin-bar-comments,#wp-admin-bar-new-content,#wp-admin-bar-of_theme_options,#wp-admin-bar-top-secondary').remove();
+
 
 
 	function get_active_dates( freq, day, month, year ) {
 
+		var date = Date.parse( String( new Date() ) );
 	 	var active = [];
 		var n = 0;
 	 	for (var i = month; i <= 12; i++) {
-			console.log(  )
-	 		if( i % freq === 0 )	{
-	 			active[n] = Date.parse( i+"-"+day+"-"+year  );
+
+	 		parsed = Date.parse( i+"-"+day+"-"+year  );
+
+	 		if( i % freq === 0 && parsed > date )	{
+	 			active[n] = parsed;
 	 			n++;
 		 	}
 
@@ -82,6 +84,7 @@ jQuery(document).ready(function($) {
 	 	var active_this_year = get_active_dates( freq, offset, month, year   );
 	 	var active_next_year = get_active_dates( freq, offset, 1    , 1 + year );
 
+	 	// console.log(active_this_year, Date.parse( String( date ) ));
 
 	 	if( active_this_year.length > 0 ) {
 	 		next_date = new Date( active_this_year[0] );

@@ -1,4 +1,91 @@
+var scss="";
+var pmap={};
+
 (function($){
+
+	var defaultMap = {
+	  '$text-color':		 '#ffffff',
+	  '$base-color':		 '#23282d',
+	  '$highlight-color': 	 '#0073aa',
+	  '$notification-color': '#d54e21',
+	  '$body-background':	 '#f1f1f1',
+	  '$link':				 '#0073aa'
+	  };
+
+
+    var previewAdminColorSchemeTimeout;
+
+	function delayedPreview() {
+	  $('#preview').hide();
+	  clearDelayedPreview();
+	  previewAdminColorSchemeTimeout = window.setTimeout( sync_scheme_preveiw, 30 );
+	}
+
+	function clearDelayedPreview() {
+	  window.clearTimeout( previewAdminColorSchemeTimeout );
+	}
+
+	function escapeRegExp(str) {
+	    return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+	}
+	function replaceAll(str, find, replace) {
+	  return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+	}
+
+	function addAdminColorStylesheet(body){
+
+        style = document.createElement('style');
+        style.id = 'adminColor';
+        style.type = 'text/css';
+        
+        body.appendChild(style);
+        return style;
+    }
+
+	function sass_admin_colors( scss ){
+
+	    SassWorker.compile( scss, function(result){
+	       
+	        var css = result.text,
+	        body = document.body || document.getElementsByTagName('body')[0],
+	        style = document.getElementById('adminColor');
+
+	        if( style === null ) {
+	          style = addAdminColorStylesheet(body);
+	        } else {
+	          document.getElementById('adminColor').innerHTML = null;
+	        }
+
+	        if (style.styleSheet){
+	          style.styleSheet.cssText = css;
+	        } else {
+	          style.appendChild(document.createTextNode(css));
+	        }
+
+	    });
+	    clearDelayedPreview();
+	}
+
+	function sync_scheme_preveiw(){
+
+		var $pickers = jQuery('.of-color.of-scheme');
+
+		pmap = $pickers.map( function($val){
+
+			var handle = jQuery(this).attr('data-handle');
+			var value  = jQuery(this).val();
+			var defval = ( defaultMap[handle] === undefined ) ? null : defaultMap[handle];
+
+			if( value === "" && defval === null ) { return; }
+
+			return handle + ': ' + (( value === "" ) ? defval : value ) + ";";
+		});
+		scss = pmap.toArray().join("\n") + "\n\n\n@import '_admin.scss';\n";
+		sass_admin_colors( scss );
+	}
+
+
+    $('.of-color.of-scheme').wpColorPicker({ change: delayedPreview });
 
 	$('#preview').on('click', function(e){
 		e.preventDefault();

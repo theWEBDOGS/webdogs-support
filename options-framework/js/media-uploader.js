@@ -1,9 +1,12 @@
+var optionsframework_upload,
+	optionsframework_selector,
+	optionsframework_adminbar;
+
 jQuery(document).ready(function($){
 
-	var optionsframework_upload;
-	var optionsframework_selector;
+	optionsframework_adminbar = $('#wpadminbar').clone()[0];
 
-	function optionsframework_add_file(event, selector) {
+	function optionsframework_add_file( event, selector) {
 
 		var upload = $(".uploaded-file"), frame;
 		var $el = $(this);
@@ -39,7 +42,53 @@ jQuery(document).ready(function($){
 				
 
 				if ( attachment.attributes.type == 'image' ) {
-					optionsframework_selector.find('.screenshot').empty().hide().append('<img src="' + attachment.attributes.url + '"><a class="remove-image">Remove</a>');
+
+					if( attachment.attributes.url.indexOf( '.svg' ) > -1 ) {
+						
+						var xml = "";
+						var url = "";
+						var svgObject = $('<object data="' + attachment.attributes.url + '" type="image/svg+xml" class="screenshot-svg" width="100%" height="100%"></object>')[0];
+						svgObject.addEventListener(
+
+							"load", function(){
+		                
+				                // get the inner DOM of alpha.svg
+				                xml = new XMLSerializer().serializeToString( svgObject.contentDocument );
+				                // console.log( xml );
+								if ( 'btoa' in window ) {
+									xml = window.btoa( xml );
+								} else {
+									xml = base64.btoa( xml );
+								}
+								url = 'data:image/svg+xml;base64,' + xml;
+
+								// IF this is the section-logo_icon
+								if ( optionsframework_selector.attr('id') === "section-logo_icon" ) {
+
+									optionsframework_adminbar_show_preview( url );
+								}
+								// console.log(url);
+								// console.log(xml,url,svgObject);
+								
+								optionsframework_show_preveiw( optionsframework_selector );
+								// optionsframework_selector.find('.screenshot').empty().hide().append('<img src="' + url + '"><a class="remove-image">Remove</a>');
+		            	});
+
+						optionsframework_selector.find('.screenshot').empty().hide().append( $(svgObject) );
+
+
+						optionsframework_selector.find('.screenshot').append( '<a class="remove-image">Remove</a>' );
+						
+
+					} else {
+						optionsframework_selector.find('.screenshot').empty().hide().append('<img src="' + attachment.attributes.url + '"><a class="remove-image">Remove</a>');
+
+						// IF this is the section-logo_icon
+						if ( optionsframework_selector.attr('id') === "section-logo_icon" ) {
+
+							optionsframework_adminbar_show_preview( attachment.attributes.url );
+						}
+					}
 					optionsframework_selector.find('.screenshot').appendTo( optionsframework_selector.closest('.option').slideDown('fast') ).slideDown('fast');
 					optionsframework_selector.find('.screenshot').slideDown('fast');
 				} else {
@@ -68,25 +117,59 @@ jQuery(document).ready(function($){
 		      "background-position": selector.find('.of-background-position:input').val(),
 		    "background-attachment": selector.find('.of-background-attachment:input').val()
 		};
-		if( screenshot_background["background-repeat"] === "no-repeat" ) {
-			$('body').attr('style', null );
-			$('body').css( {'background-color': screenshot_background['background-color'] } );
-			selector.find('.screenshot').css( screenshot_background ).slideDown().find('img').css({'opacity':"0"});
-		} else {
-			$('body').css( screenshot_background );
-			selector.find('.screenshot').css({'opacity':"0"});
-		}
+		selector.find('.screenshot').css( screenshot_background ).slideDown().find('img').css({'opacity':"0"});
 	}
+
+	function optionsframework_adminbar_show_preview( url ) {
+			
+        $preview_element = $( optionsframework_adminbar ).find('#wp-admin-bar-site-name .ab-icon.svg').attr( 'style', 'background-image: url("' + url + '") !important;' );
+
+        // get the inner element by id
+		wp.svgPainter.init();
+
+	}
+
+
+	function optionsframework_clone_adminbar(){
+
+		// adminbar preview clone. 
+		$(optionsframework_adminbar).remove();
+
+		optionsframework_adminbar = $('#wpadminbar').not('.adminbar-preview').clone()[0];
+		$(optionsframework_adminbar).appendTo('#section-logo_icon').css({position:'relative'});
+		$(optionsframework_adminbar).addClass('adminbar-preview')
+
+			.on('click', function(e){e.preventDefault();e.stopPropagation();return false;})
+			.css({position:'static',overflow:'hidden'})
+			
+			// remove all menus not #wp-admin-bar-site-name
+			.find('#wp-admin-bar-root-default > *, #wp-admin-bar-top-secondary')
+				.not('#wp-admin-bar-site-name')
+				.remove();
+	}
+	/*
+	if( screenshot_background["background-repeat"] === "no-repeat" ) {
+		$('body').attr('style', null );
+		// $('body').css( {'background-color': screenshot_background['background-color'] } );
+		selector.find('.screenshot').css( screenshot_background ).slideDown().find('img').css({'opacity':"0"});
+	} else {
+		// $('body').css( screenshot_background );
+		selector.find('.screenshot').css({'opacity':"0"});
+	} */	
 	function optionsframework_remove_file(selector) {
 		selector.find('.remove-image').hide();
 		selector.find('.upload').val('');
 		selector.find('.of-background-properties').hide();
 		selector.find('.screenshot').slideUp();
 		selector.find('.remove-file').unbind().addClass('upload-button').removeClass('remove-file').val(optionsframework_l10n.upload);
+		
 		// We don't display the upload button if .upload-notice is present
 		// This means the user doesn't have the WordPress 3.5 Media Library Support
 		if ( $('.section-upload .upload-notice').length > 0 ) {
 			$('.upload-button').remove();
+		}
+		if ( selector.attr('id') === "section-logo_icon" ) {
+			optionsframework_clone_adminbar();
 		}
 		selector.find('.upload-button').on('click', function(event) {
 			optionsframework_add_file(event, $(this).parents('.section'));
@@ -113,6 +196,17 @@ jQuery(document).ready(function($){
 	
 	$('.section-background .has-file:input').each( function() {
 		optionsframework_show_preveiw( $(this).parents('.section') );
+	});
+	
+	$('#login_logo_css-image').wrap('<div id="login_logo_css-image_wrap">');
+	$('#login_logo_css-image_wrap').append('<div id="login_logo_css-login_facade">').prependTo( $('#login_logo_css-image_wrap').parent() );
+	$('#login_logo_css_repeat, #login_logo_css_attachment, #login_logo_css_position').find('option').attr('disabled', 'disabled' ).closest('.of-background-properties').hide();
+
+	$('.section-upload .has-file:input').each( function() {
+
+		if ( $(this).parents('.section').attr('id') === "section-logo_icon" ) {
+			optionsframework_clone_adminbar();
+		}
 	});
 
 });
