@@ -280,7 +280,7 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'name' => __('Primary Customer Email Address', 'options_check'),
-		'desc' => __('Include multiple recipients, separeted by comma.', 'options_check'),
+		'desc' => __('Include multiple recipients, separated by commas.', 'options_check'),
 		'id' => 'on_demand_email',
 		'std' => '',
 		'class' => 'clear bottom-pad top-border inset',
