@@ -45,6 +45,12 @@ jQuery(document).ready(function($) {
 	 		parsed = Date.parse( i+"-"+day+"-"+year  );
 
 	 		if( i % freq === 0 && parsed > date )	{
+	 			var m = ( i < 12 ) ? i+1 : 1 ;
+	 			var y = ( i < 12 ) ? year : year + 1 ;
+
+
+	 			parsed = ( freq > 1 ) ? Date.parse( m+"-"+day+"-"+y ) : parsed;
+
 	 			active[n] = parsed;
 	 			n++;
 		 	}

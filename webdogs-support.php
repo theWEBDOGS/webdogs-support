@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.1.0
+Version:     2.1.1
 */
 
 /*
@@ -162,54 +162,7 @@ if(!class_exists('WEBDOGS')) {
             //
             if( is_webdog( $user ) ) {
 
-                $greetings = array(
-
-                'HYAH?!',
-
-                'hYah!',
-
-                'ON FLE3K',
-
-                'This is What We Do',
-
-                'Welcome, %s!',
-
-                'No Bone is Too BIG for %s!',
-
-                '%s Can Help You!',
-
-                'Who are these Geniuses?',
-
-                'We don\'t Bite!',
-
-                'Create. Grow. Maintain.',
-
-                'This is Our Work',
-
-                'This is Who We Are',
-
-                'Y3K Ready',
-
-                'Creative Website Development',
-
-                '…One website at a time!',
-
-                'Howdy, NETCATS',
-
-                'Always… never forget: Log Your Time.',
-
-                'Best Practices by: %s',
-
-                'Quick %s… Look busy.',
-
-                'WOOF!',
-
-                'So Good!',
-
-                '…You\'re lookin\' swell, Dolly!'
-
-
-                );
+                $greetings = wds_internal_greetings();
                 $greeting = $greetings[mt_rand(0, count($greetings) - 1)];
 
                 $newtitle = sprintf( $greeting, $user->display_name );
@@ -498,34 +451,97 @@ if(!class_exists('WEBDOGS')) {
 
     }
 
+    function wd_get_active_dates( $freq, $day, $month, $year ) {
+
+        
+        $date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
+
+        $active = array();
+
+        $n = 0;
+        for ($i = $month; $i <= 12; $i++) {
+
+            $parsed = mktime(0, 0, 0, $i, $day, $year  );
+
+            if( $i % $freq === 0 && $parsed > $date ) {
+                $m = ( $i < 12 ) ? $i+1 : 1 ;
+                $y = ( $i < 12 ) ? $year : $year + 1 ;
+
+
+                $parsed = ( $freq > 1 ) ? mktime(0, 0, 0, $m, $day, $y  ) : $parsed;
+
+                $active[$n] = $parsed;
+                $n++;
+            }
+
+        }
+        return $active;
+    }
+
+    function wd_get_next_schedule(){
+
+         $date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
+         
+         $prev_sent = get_option( 'wd_maintenance_notification_proof', $date );
+         
+         $freq   = of_get_option( 'maintenance_notification_frequency', 3  );
+         $offset = of_get_option( 'maintenance_notification_offset',   '1' );
+         
+          $year = date('Y');
+         $month = date('n');
+           $day = date('j');
+
+
+        $prev_month = date( 'n', $prev_sent );
+        $prev_year  = date( 'Y', $prev_sent );
+        $next_send  = "";
+        
+        $month = ( $year === $prev_year && $month === $prev_month && $day >= $offset ) ? ++$month : $month ;
+
+        $active_this_year = wd_get_active_dates( $freq, $offset, $month, $year );
+        $active_next_year = wd_get_active_dates( $freq, $offset, 1,  1 + $year );
+
+        // console.log(active_this_year, Date.parse( String( date ) ));
+
+        if( sizeof($active_this_year) > 0 ) {
+            $next_send = $active_this_year[0];
+        } elseif( sizeof($active_next_year) > 0 ){
+            $next_send = $active_next_year[0];
+        }
+
+        return array( $next_send, $prev_month, $prev_year, $offset, $freq, $active_this_year, $active_next_year );
+
+    }
 
     add_action( 'wd_create_daily_notification', 'wd_send_maintenance_notification' );
 
     function wd_send_maintenance_notification( $test = false ){
 
-        //bail is not a mantainance account
-        if( stripos( of_get_option( 'exclude_domain' ), site_url() ) !== false ) { return; }
+            $exclude_domain = of_get_option( 'exclude_domain', false );
+        if( $exclude_domain ) {
+            $exclude_domain = array_map( 'trim', explode(',', $exclude_domain ) ) ;
 
-        $prev_date = get_option( 'wd_maintenance_notification_proof' );
-             $freq = of_get_option( 'maintenance_notification_frequency', 4  );
-              $day = of_get_option( 'maintenance_notification_offset',   '1' );
+            //bail is not a mantainance account
+            foreach ($exclude_domain as $term) {
+                if ( stripos( site_url(), $term ) !== FALSE ) { return; }
+            }
+        }
         
-         $new_date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
-         $mon_date = date('n');
-         $day_date = date('j');
+          $new_date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
+         $next_send = wd_get_next_schedule();
 
         // MATCH THE RULE
-        $check = ( $mon_date % $freq === 0 && $day == $day_date );
+        // $check = ( $mon_date % $freq === 0 && $day == $day_date );
 
         // PROOF CHECK TO PREVENT DUPLCATES 
-        $proof = ( $new_date !== $prev_date );
+        $proof = ( $new_date !== $next_send[0] );
 
         // ARE THERE ANY UPDATES
         $count = WEBDOGS::webdogs_maintenance_updates( true );
 
         // IF THE DATE IS A MATCH 
         // AND THE PROOFS DO NOT ->> SEND NOTIFICATION EMAIL
-        if( ( $count && $check && $proof ) || ( $count && $test && $proof ) ) {
+        if( ( $count &&/* $check &&*/ $proof ) || ( $count && $test && $proof ) ) {
 
             // SAVE THE PROOF SO IF WE CHECK AGAIN
             // THE PROOF WILL MATCH AND PASS
@@ -541,8 +557,7 @@ if(!class_exists('WEBDOGS')) {
 
             $message = ( wp_mail( $to, $subject, $message, $headers ) ) ? 'Maintainance notification sent.' : 'Maintainance notification not sent.';
 
-
-            if( $test ){ wp_die( $message ); }
+            if( $test ){ wp_die( $message . ": ". date('F j, Y', $next_send[0]) . ": " . $next_send[1]. ": " . $next_send[2]. ": " . $next_send[3]. ": " . $next_send[4]. ": " . date('F j, Y', $new_date ). ": " . print_r($next_send[6], true). ": " . print_r($next_send[5], true) ) ; }
         }
 
         $message = 'Maintainance Notification already sent.';
@@ -722,7 +737,7 @@ function webdogs_activation() {
         if( $WATCHDOG_ZIP->open( $WATCHDOG_FROM ) === TRUE) { $WATCHDOG_ZIP->extractTo( $WATCHDOG_TO ); $WATCHDOG_ZIP->close(); }
         else { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
     }
-    /*
+
     function webdogs_init_color_schemes() {
         global $wp_filesystem;
         $wp_upload_dir = wp_upload_dir();
@@ -740,7 +755,7 @@ function webdogs_activation() {
         if ( ! $wp_filesystem->put_contents( $upload_dir . "/colors.css", $wp_filesystem->get_contents( $admin_dir . 'colors.css', FS_CHMOD_FILE) ) ) {
         if ( $doing_ajax ) { $response = array( 'errors' => true, 'message' => __( 'Could not copy a core file.', 'options-framework' ), ); echo json_encode( $response ); die(); }
         wp_die( "Could not copy the core file colors.css." ); } }
-    }*/
+    }
 
 
     /////////////////////////
@@ -759,7 +774,7 @@ function webdogs_activation() {
     //                        
     //   COPY SCSS TO UPLOADS    
     //                        
-    // webdogs_init_color_schemes();
+    webdogs_init_color_schemes();
     //
     /////////////////////////////
 

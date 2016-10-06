@@ -343,7 +343,10 @@
     border: none !important;
     padding: 0 5px 0 5px;
     position: static;
-    margin-right: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    min-height: 26px;
+    max-height: 32px;
 }
 #optionsframework .screenshot .remove-image {
 	background:url("../images/ico-delete.png") no-repeat;
@@ -371,7 +374,7 @@
 #optionsframework #section-login_logo_bottom_margin,
 #optionsframework #section-login_logo_height {
 	padding-top: 0;
-    margin-top: -38px;
+    margin-top: -33px;
     /* clear: left; */
 }
 
@@ -437,10 +440,34 @@
     background: #FFF;
     position: absolute;
 }
-#optionsframework #login_logo_css-image.screenshot img,
-#optionsframework #login_logo_css-image.screenshot object { 
+
+#optionsframework #login_logo_css-image.screenshot object {
+    opacity: 0 !important;
+}
+#optionsframework .screenshot {
+    background-repeat: no-repeat;
+}
+#optionsframework #login_logo_css-image.screenshot img { 
     display:none !important;
 }
+#login_logo_css_repeat,
+#login_logo_css_attachment {
+    display: none;
+}
+
+#optionsframework #section-login_logo_css .of-background-properties {
+    float: right;
+    clear: none;
+    margin-top: 0;
+}
+#optionsframework #section-login_logo_bottom_margin.mini .controls,
+#optionsframework #section-login_logo_bottom_margin.mini .controls select,
+#optionsframework #section-login_logo_height.mini .controls,
+#optionsframework #section-login_logo_height.mini .controls select {
+    width:100px !important;
+    min-width: 120px;
+}
+
 #maintenance_message,
 #maintenance_notes {
     width: 584px !important;

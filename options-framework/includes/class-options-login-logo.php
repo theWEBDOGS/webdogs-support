@@ -36,6 +36,7 @@ class Options_Framework_Login_Logo {
 	var $height = 0;
 	var $original_width;
 	var $original_height;
+	var $logo_types = array('.svg','.png');
 	var $logo_size;
 	var $logo_file_exists;
 
@@ -50,16 +51,16 @@ class Options_Framework_Login_Logo {
 		if ( is_multisite() && function_exists( 'get_current_site' ) ) {
 			// First, see if there is one for this specific site (blog)
 			$this->logo_locations['site'] = array(
-				'path' => WP_CONTENT_DIR . '/login-logo-site-' . $blog_id . '.png',
-				'url' => $this->maybe_ssl( content_url( 'login-logo-site-' . $blog_id . '.png' ) )
+				'path' => WP_CONTENT_DIR . '/login-logo-site-' . $blog_id,
+				'url' => $this->maybe_ssl( content_url( 'login-logo-site-' . $blog_id ) )
 			);
 
 			// Next, we see if there is one for this specific network
 			$site = get_current_site(); // Site = Network? Ugh.
 			if ( $site && isset( $site->id ) ) {
 				$this->logo_locations['network'] = array(
-					'path' => WP_CONTENT_DIR . '/login-logo-network-' . $site->id . '.png',
-					'url' => $this->maybe_ssl( content_url( 'login-logo-network-' . $site->id . '.png' ) )
+					'path' => WP_CONTENT_DIR . '/login-logo-network-' . $site->id,
+					'url' => $this->maybe_ssl( content_url( 'login-logo-network-' . $site->id ) )
 					);
 			}
 		} elseif( ! is_null( of_get_option('login_logo_css', null ) ) && is_array( of_get_option('login_logo_css', null ) ) ) {
@@ -67,6 +68,9 @@ class Options_Framework_Login_Logo {
 			$background = of_get_option('login_logo_css', null );
 			$image = (isset($background['image'])) ? $background['image'] : "";
 			$uploads = wp_upload_dir();
+
+			$image = str_replace('.png', '', str_replace('.svg', '', $image ) );
+
 			$path = (isset($image)) ? str_replace( $this->maybe_ssl( WP_CONTENT_URL ), WP_CONTENT_DIR, $this->maybe_ssl( $image ) ) : "";
 			
 			$this->logo_locations['option'] =  array(
@@ -78,8 +82,8 @@ class Options_Framework_Login_Logo {
 
 		// Finally, we do a global lookup
 		$this->logo_locations['global'] =  array(
-			'path' => WP_CONTENT_DIR . '/login-logo.svg',
-			'url' => $this->maybe_ssl( content_url( 'login-logo.svg' ) )
+			'path' => WP_CONTENT_DIR . '/login-logo',
+			'url' => $this->maybe_ssl( content_url( 'login-logo' ) )
 		);
 
 	}
@@ -93,19 +97,25 @@ class Options_Framework_Login_Logo {
 	private function logo_file_exists() {
 		if ( ! isset( $this->logo_file_exists ) ) {
 			foreach ( $this->logo_locations as $location ) {
-				if ( file_exists( $location['path'] ) ) {
-					$this->logo_file_exists = true;
-					$this->logo_location = $location;
-					break;
-				} else {
-					$this->logo_file_exists = false;
+				foreach ($this->logo_types as $type ) {
+					if ( file_exists( str_replace( $type, '', $location['path'] ) . $type ) ) {
+						$this->logo_file_exists = true;
+						$this->logo_location = 
+							array( 'path' => $location['path'].$type, 
+								   'url'  => $location['url'] .$type
+							  ); 
+						break;
+					} else {
+						$this->logo_file_exists = false;
+					}
 				}
+				if ( $this->logo_file_exists ) break;
 			}
 		}
 		return !! $this->logo_file_exists;
 	}
 
-	private function get_location( $what = '' ) {
+	public function get_location( $what = '' ) {
 		if ( $this->logo_file_exists() ) {
 			if ( 'path' == $what )
 				return $this->logo_location[$what];
@@ -190,6 +200,9 @@ class Options_Framework_Login_Logo {
 	<style type="text/css">
 		body, html {
 			<?php echo $body_background; ?>
+		}
+		.login form {
+			margin-top: 0 !important;
 		}
 		.login h1 a {
 			<?php echo $login_background; ?> 

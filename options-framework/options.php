@@ -22,7 +22,7 @@ function wds_base_plugins(){
 		array(
 			'name'      => 'WATCHDOG',
 			'slug'      => 'watchdog',
-			'source'    => WEBDOGS_SUPPORT_DIR. '/watchdog/watchdog.zip',
+			'source'    => WEBDOGS_SUPPORT_DIR. '/watchdog.zip',
 			'file_path' => WPMU_PLUGIN_DIR . '/watchdog',
 			'must_use'           => true, // If false, the plugin is only 'recommended' instead of required.
 			'required'           => true, // If false, the plugin is only 'recommended' instead of required.
@@ -86,6 +86,13 @@ function wds_base_plugins(){
 			'force_deletion' => true,
 		),
 		array(
+			'name'      => 'Login Logo - SVG',
+			'slug'      => 'login-logo-svg',
+			'file_path' => 'login-logo-svg/login-logo.php',
+			'force_deactivation' => false, 
+			'force_deletion'     => true,
+		),
+		array(
 			'name'      => 'Akismet',
 			'slug'      => 'akismet',
 			'file_path' => 'akismet/akismet.php',
@@ -122,9 +129,18 @@ function optionsframework_options() {
 	$plugins = wds_base_plugins();
 	 $themes = wds_bundled_themes(); 
 
+	// Custom Logo
+	// check if set in cutomizer
 	$custom_logo_id = get_theme_mod( 'custom_logo' );
 	$image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
-	$login_logo = $image[0];
+	$login_logo = ( !empty($image[0] ) ) ? $image[0] : Options_Framework_Login_Logo::$instance->get_location('url');
+
+	$background_defaults = array(
+		'color' => '',
+		'image' => $login_logo,
+		'repeat' => 'no-repeat',
+		'position' => 'bottom center',
+		'attachment' => 'scroll' );
 
 	$login_logo_height_array = array(
 	  '100' => __('100px', 'options_check'),
@@ -132,11 +148,11 @@ function optionsframework_options() {
 	  '300' => __('300px', 'options_check'));
 
 	$login_logo_margin_bottom_array = array(
-	  '-20' => __('none', 'options_check'),
-	  '-10' => __('10px', 'options_check'),
-	    '0' => __('20px', 'options_check'),
-	   '10' => __('30px', 'options_check'),
-	   '20' => __('40px', 'options_check'));
+	    '0' => __('none', 'options_check'),
+	   '10' => __('10px', 'options_check'),
+	   '20' => __('20px', 'options_check'),
+	   '30' => __('30px', 'options_check'),
+	   '40' => __('40px', 'options_check'));
 
 	$service_array = array(
 		'1' => __('Active', 'options_check'),
@@ -213,9 +229,20 @@ function optionsframework_options() {
 
 	$delete_base = empty($delete_base) ? "Nothing to cleanup." : $delete_base ;
 
-	$domain_string = of_get_option( 'exclude_domain', 'staging' );
 
-	$exclude_domain = is_numeric( stripos( site_url(), $domain_string ) ) ? '<strong>Current domain:</strong> Excluded' : '<strong>Current domain:</strong> Not&nbsp;excluded';
+	$exclude = false;
+	$domain_string = of_get_option( 'exclude_domain', false );
+    
+    if( $domain_string ) {
+        $domain_string = array_map( 'trim', explode(',', $domain_string ) ) ;
+
+        //bail is not a mantainance account
+        foreach ($domain_string as $term) {
+            if ( stripos( site_url(), $term ) !== FALSE ) { $exclude = true; break; }
+        }
+    }
+
+	$exclude_domain = $exclude ? '<strong>Current domain:</strong> Excluded' : '<strong>Current domain:</strong> Not&nbsp;excluded';
 
 
 
@@ -306,7 +333,7 @@ function optionsframework_options() {
 		'type' => 'textarea');
 
 	$options[] = array(
-		'name' => __('Exclusionary Keyword', 'options_check'),
+		'name' => __('Exclusionary Keywords', 'options_check'),
 		'desc' => $exclude_domain,
 		'id' => 'exclude_domain',
 		'std' => 'staging',
@@ -503,13 +530,6 @@ function optionsframework_options() {
 		'order' => 5,
 		'type' => 'heading');
 
-	$background_defaults = array(
-		'color' => '',
-		'image' => $login_logo,
-		'repeat' => 'no-repeat',
-		'position' => 'bottom center',
-		'attachment' => 'scroll' );
-
 	$options[] = array(
 		'name' => __('Login Logo and Background', 'options_check'),
 		'id' => 'login_logo_css',
@@ -527,7 +547,7 @@ function optionsframework_options() {
 			'id' => 'login_logo_css-image',
 			'on' => 'change',
 			'exe' => array(
-				'css' => "'marginBottom', (20+Number(val)) + 'px'")));
+				'css' => "'marginBottom', (Number(val)) + 'px'")));
 
 	$options[] = array(
 		'desc' => __('Logo Height', 'options_check'),
@@ -546,14 +566,14 @@ function optionsframework_options() {
 	$options[] = array(
 		'name' => __('Toolbar Logo-icon', 'options_check'),  	// 'desc' => __('Upload a single path SVG for best results.', 'options_check'),
 		'id' => 'logo_icon',
-		'class' => 'top-border bottom-pad clear',
+		'class' => 'top-border bottom-pad clear inset',
 		'type' => 'upload');
 
 	$options[] = array(
 		'name' => __('Admin Color Scheme', 'options_check'),
 		'desc' => '',
 		'id' => 'admin_color_scheme',
-		'class' => 'clear', 
+		'class' => 'clear top-border', 
 		'type' => 'scheme');
 
 	$options[] = array(
@@ -585,8 +605,65 @@ add_filter( 'of_options', 'optionsframework_options');
 
 /**
  *
+
+ *
+ */
+function wds_internal_greetings(){
+	return apply_filters( 'wds_internal_greetings',
+
+	array(
+
+        'HYAH?!',
+
+        'hYah!',
+
+        'ON FLE3K',
+
+        'This is What We Do',
+
+        'Welcome, %s!',
+
+        'No Bone is Too BIG for %s!',
+
+        '%s Can Help You!',
+
+        'Who are these Geniuses?',
+
+        'We don\'t Bite!',
+
+        'Create. Grow. Maintain.',
+
+        'This is Our Work',
+
+        'This is Who We Are',
+
+        'Y3K Ready',
+
+        'Creative Website Development',
+
+        '…One website at a time!',
+
+        'Howdy, NETCATS',
+
+        'Always… never forget: Log Your Time.',
+
+        'Best Practices by: %s',
+
+        'Quick %s… Look busy.',
+
+        'WOOF!',
+
+        'So Good!',
+
+        '…You\'re lookin\' swell, Dolly!'
+
+    ) );
+}
+
+/**
+ *
  * Determine which bundled themes are 
- * installed and mMark them for deletion.
+ * installed and mark them for deletion.
  *
  */
 function wds_bundled_themes(){

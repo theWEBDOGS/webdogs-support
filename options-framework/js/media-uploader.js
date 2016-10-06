@@ -6,6 +6,12 @@ jQuery(document).ready(function($){
 
 	optionsframework_adminbar = $('#wpadminbar').clone()[0];
 
+	var previewLoginColorTimeout;
+
+	function clearDelayedPreview() {
+	  window.clearTimeout( previewLoginColorTimeout );
+	}
+
 	function optionsframework_add_file( event, selector) {
 
 		var upload = $(".uploaded-file"), frame;
@@ -66,12 +72,11 @@ jQuery(document).ready(function($){
 								if ( optionsframework_selector.attr('id') === "section-logo_icon" ) {
 
 									optionsframework_adminbar_show_preview( url );
+								} else {
+									optionsframework_show_preveiw( optionsframework_selector );
 								}
-								// console.log(url);
-								// console.log(xml,url,svgObject);
-								
-								optionsframework_show_preveiw( optionsframework_selector );
-								// optionsframework_selector.find('.screenshot').empty().hide().append('<img src="' + url + '"><a class="remove-image">Remove</a>');
+								return;
+
 		            	});
 
 						optionsframework_selector.find('.screenshot').empty().hide().append( $(svgObject) );
@@ -91,6 +96,7 @@ jQuery(document).ready(function($){
 					}
 					optionsframework_selector.find('.screenshot').appendTo( optionsframework_selector.closest('.option').slideDown('fast') ).slideDown('fast');
 					optionsframework_selector.find('.screenshot').slideDown('fast');
+					optionsframework_selector.find('#login_logo_css-image_wrap').slideDown('fast');
 				} else {
 					optionsframework_show_preveiw( optionsframework_selector );
 				}
@@ -112,18 +118,21 @@ jQuery(document).ready(function($){
 		var screenshot_background = {
 			              "opacity": "1",
 			     "background-image": "url(" + selector.find('.upload:input').val() + ")",
-			     "background-color": selector.find('.of-background-color:input').val(),
 		        "background-repeat": selector.find('.of-background-repeat:input').val(),
 		      "background-position": selector.find('.of-background-position:input').val(),
 		    "background-attachment": selector.find('.of-background-attachment:input').val()
 		};
-		selector.find('#login_logo_css-image_wrap').css( "background-color", screenshot_background["background-color"] );
 		selector.find('.screenshot').css( screenshot_background ).slideDown().find('img').css({'opacity':"0"});
+	  	
 	}
 
 	function optionsframework_adminbar_show_preview( url ) {
+
+		optionsframework_clone_adminbar();
 			
-        $preview_element = $( optionsframework_adminbar ).find('#wp-admin-bar-site-name .ab-icon.svg').attr( 'style', 'background-image: url("' + url + '") !important;' );
+        $( optionsframework_adminbar ).find('#wp-admin-bar-site-name > a.ab-item .ab-icon.svg').remove();
+		$( optionsframework_adminbar ).find('#wp-admin-bar-site-name > a.ab-item').prepend('<span class="ab-item ab-icon svg" />');
+    	$( optionsframework_adminbar ).find('#wp-admin-bar-site-name > a.ab-item .ab-icon.svg').attr( 'style', 'background-image: url("' + url + '") !important;' );
 
         // get the inner element by id
 		wp.svgPainter.init();
@@ -169,8 +178,13 @@ jQuery(document).ready(function($){
 		if ( $('.section-upload .upload-notice').length > 0 ) {
 			$('.upload-button').remove();
 		}
+		if ( selector.attr('id') === "section-login_logo_css" ) {
+			// $('#login_logo_css-image_wrap').slideUp();
+		}
 		if ( selector.attr('id') === "section-logo_icon" ) {
 			optionsframework_clone_adminbar();
+
+			selector.find('#logo_icon-image.screenshot').slideUp('fast');
 		}
 		selector.find('.upload-button').on('click', function(event) {
 			optionsframework_add_file(event, $(this).parents('.section'));
@@ -198,10 +212,22 @@ jQuery(document).ready(function($){
 	$('.section-background .has-file:input').each( function() {
 		optionsframework_show_preveiw( $(this).parents('.section') );
 	});
-	
+	if($('#login_logo_css').filter('.has-file').length > 0 ) {
+		optionsframework_show_preveiw( $(this).parents('.section') );
+	} else {
+		$('#login_logo_css').closest('.section').find('.screenshot').hide();
+	}
+
 	$('#login_logo_css-image').wrap('<div id="login_logo_css-image_wrap">');
-	$('#login_logo_css-image_wrap').append('<div id="login_logo_css-login_facade">').prependTo( $('#login_logo_css-image_wrap').parent() );
-	$('#login_logo_css_repeat, #login_logo_css_attachment, #login_logo_css_position').find('option').attr('disabled', 'disabled' ).closest('.of-background-properties').hide();
+	$('#login_logo_css-image_wrap').hide().append('<div id="login_logo_css-login_facade">').prependTo( $('#login_logo_css-image_wrap').parent() );
+	$('#login_logo_css_repeat, #login_logo_css_attachment').find('option').not(':selected').remove();
+
+	clearDelayedPreview();
+	previewLoginColorTimeout = window.setTimeout( function(){
+	    var backgroundColor = $('#section-login_logo_css').find('.of-background-color:input').val();
+		$('#section-login_logo_css').find('#login_logo_css-image_wrap').css( "background-color", backgroundColor ).slideDown();
+		
+	}, 30 );
 
 	$('.section-upload .has-file:input').each( function() {
 
