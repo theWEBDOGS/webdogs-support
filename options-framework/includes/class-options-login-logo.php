@@ -48,6 +48,7 @@ class Options_Framework_Login_Logo {
 	public function init() {
 		global $blog_id;
 		$this->logo_locations = array();
+		
 		if ( is_multisite() && function_exists( 'get_current_site' ) ) {
 			// First, see if there is one for this specific site (blog)
 			$this->logo_locations['site'] = array(
@@ -84,6 +85,10 @@ class Options_Framework_Login_Logo {
 		$this->logo_locations['global'] =  array(
 			'path' => WP_CONTENT_DIR . '/login-logo',
 			'url' => $this->maybe_ssl( content_url( 'login-logo' ) )
+		);
+		$this->logo_locations['default'] = array(
+			'path' =>  ABSPATH . 'wp-admin/images/wordpress-logo',
+			'url' => $this->maybe_ssl( admin_url( 'images/wordpress-logo' ) )
 		);
 
 	}

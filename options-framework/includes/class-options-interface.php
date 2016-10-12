@@ -65,7 +65,7 @@ class Options_Framework_Interface {
 				<div id="optionsframework-submit">
 					<input type="submit" class="button-primary" name="update" value="<?php esc_attr_e( 'Save Options', 'options-framework' ); ?>" />
 					<?php $prev_proof = get_option( 'wd_maintenance_notification_proof' ); ?>
-					<?php $next_notice = wd_create_daily_notification_schedule(); ?>
+					<?php $next_notice = wds_create_daily_notification_schedule(); ?>
 					<?php if($prev_proof) : ?>
 						<p class="wd_notification_events">
 							<span class="wd_last_notification_sent" data-prev-notice="<?php echo $prev_proof; ?>">
@@ -74,7 +74,7 @@ class Options_Framework_Interface {
 							<span class="wd_notification_scheduled" data-next-notice="">
 							</span>	
 						</p>
-					<?php elseif( wd_create_daily_notification_schedule() ): ?>
+					<?php elseif( wds_create_daily_notification_schedule() ): ?>
 						<p class="wd_notification_events"><span class="wd_notification_scheduled" data-next-notice="<?php echo $next_proof; ?>"><?php print( __('Maintanace notifications are scheduled.') ); ?></span></p>
 					<?php endif; ?>
 					<input type="submit" class="reset-button button-secondary hide" name="reset" value="<?php esc_attr_e( 'Restore Defaults', 'options-framework' ); ?>" onclick="return confirm( '<?php print esc_js( __( 'Click OK to reset. Any theme settings will be lost!', 'options-framework' ) ); ?>' );" />
@@ -137,7 +137,9 @@ class Options_Framework_Interface {
 					$output .= '<h4 class="heading">' . esc_html( $value['name'] ) . '</h4>' . "\n";
 				}
 				if ( $value['type'] == 'scheme' ) {
-					$output .= '<p class="button-group button-small alignright"><button class="button show-basic-scheme hide-if-no-js active button-secondary">Basic</button><button class="button show-advanced-scheme hide-if-no-js button-secondary">Advanced</button></p>';
+
+					$output .= get_submit_button( __( 'Preview', 'admin-color-schemes' ), 'secondary preview-scheme alignright hide-if-no-js', 'preview', false );
+
 				}
 				if ( $value['type'] != 'editor' ) {
 					$output .= '<div class="option">' . "\n" . '<div class="controls">' . "\n";
@@ -272,6 +274,7 @@ class Options_Framework_Interface {
 
 				// Uploader
 				case "upload":
+					$val = ( !empty($val) ) ? $val : admin_url( 'images/wordpress-logo.svg' );
 					$output .= Options_Framework_Media_Uploader::optionsframework_uploader( $value['id'], $val, null );
 
 					break;
@@ -363,8 +366,8 @@ class Options_Framework_Interface {
 					$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][color]' ) . '" id="' . esc_attr( $value['id'] . '_color' ) . '" class="of-color of-background-color"  type="text" value="' . esc_attr( $background['color'] ) . '"' . $default_color .' />';
 
 					// Background Image
-					if ( !isset($background['image']) ) {
-						$background['image'] = '';
+					if ( !isset($background['image']) || empty( $background['image'] )) {
+						$background['image'] = admin_url( 'images/wordpress-logo.svg' );
 					}
 					$output .= Options_Framework_Media_Uploader::optionsframework_uploader( $value['id'], $background['image'], null, esc_attr( $option_name . '[' . $value['id'] . '][image]' ) );
 					
@@ -407,15 +410,37 @@ class Options_Framework_Interface {
 				// Admin color scheme
 				case 'scheme':
 
+					$scheme = $val;
+
 					$class = 'of-scheme-properties color-scheme-pickers';
 
 					$output .= '<div class="' . esc_attr( $class ) . '">';
+
 					
+					$output .= '<div class="of-scheme bottom-pad alignright small section">';
+					
+					// $output .= '<p class="explain">' . esc_html( $explain_value ) . '</p>';
+
+
 					$output .= wp_nonce_field( Options_Framework_Admin_Color_Schemes::NONCE, '_acs_ofnonce', null, false );
 
 					$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][name]' ) . '" id="' . esc_attr( $value['id'] . '_name' ) . '" class="of-hidden of-scheme"  type="hidden" value="' . esc_attr( get_bloginfo( 'name' ) ) . '" />';
-						
 					
+
+
+					$output .= '<label class="explain" for="' . esc_attr( $value['id'] . '_must_use' ) . '">';
+					$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][must_use]' ) . '" id="' . esc_attr( $value['id'] . '_must_use' ) . '"  class="checkbox of-input of-scheme" type="checkbox" '. checked( $scheme['must_use'], 'on', false ) .' />';
+					$output .= ' Must use?</label>';
+				
+					$output .= '<p class="explain">' . esc_html( $value['must_use'] ) . '</p>';
+					
+					$output .= '<p class="button-group"><button class="button show-basic-scheme hide-if-no-js active button-secondary">Basic</button><button class="button show-advanced-scheme hide-if-no-js button-secondary">Advanced</button></p>';
+
+					$output .= '</div>';
+
+					$output .= '<div class="of-scheme section section-color-scheme-pickers">';
+
+
 					$default = array();
 
 					$admin_schemes = Options_Framework_Admin_Color_Schemes::get_instance();
@@ -442,11 +467,12 @@ class Options_Framework_Interface {
 						$output .= '</div>';
 					endforeach;
 
-					$output .= get_submit_button( __( 'Preview', 'admin-color-schemes' ), 'secondary preview-scheme hide-if-no-js alignright', 'preview', false );
 					// $output .= '<button id="preview" class="button small-button preview-scheme hide-if-no-js" data-nonce="'. wp_create_nonce( 'admin-color-schemes-save' ) .'">Preview</button>';
 
 					$loops = $admin_schemes->get_colors( 'advanced' );
 
+
+					$output .= '</div>';
 
 					$output .= '<div class="advanced-color-scheme-pickers section inset clear top-border bottom-pad hide-if-js">';
 
@@ -666,7 +692,7 @@ class Options_Framework_Interface {
 			}
 			if ( ( $value['type'] != "heading" ) && ( $value['type'] != "form" ) && ( $value['type'] != "info" ) ) {
 				$output .= '</div>';
-				if ( ( $value['type'] != "checkbox" ) && ( $value['type'] != "editor" ) ) {
+				if ( ( $value['type'] != "checkbox" ) && ( $value['type'] != "editor" ) && ( $value['type'] != "scheme" ) ) {
 					$output .= '<p class="explain">' . wp_kses( $explain_value, $allowedtags) . '</p>'."\n";
 				}
 				$output .= '</div></div>'."\n";

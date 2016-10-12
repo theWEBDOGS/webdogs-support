@@ -81,14 +81,15 @@ class Options_Framework_Media_Uploader {
 
 		if ( $value != '' ) {
 			$remove = '<a class="remove-image">Remove</a>';
-			$image = preg_match( '/(^.*\.jpg|jpeg|png|gif|ico*)/i', $value );
-			$object = preg_match( '/(^.*\.svg*)/i', $value );
+			$image = preg_match( '/(^.*\.jpg|jpeg|png|gif|ico|svg*)/i', $value );
+			/*$image = preg_match( '/(^.*\.jpg|jpeg|png|gif|ico*)/i', $value );
+			$object = preg_match( '/(^.*\.svg*)/i', $value );*/
 			if ( $image ) {
 				$output .= '<img src="' . $value . '" alt="" />' . $remove;
 			} 
-			elseif ( $object ) {
-				$output .= '<object data="' . $value . '" type="image/svg+xml" class="screenshot-svg" width="100%" height="100%"></object>' . $remove;
-			} 
+			// elseif ( $object ) {
+			// 	$output .= '<object data="' . $value . '" type="image/svg+xml" class="screenshot-svg" width="100%" height="100%"></object>' . $remove;
+			// } 
 			else {
 				$parts = explode( "/", $value );
 				for( $i = 0; $i < sizeof( $parts ); ++$i ) {

@@ -189,9 +189,13 @@
 	float:left;
 }
 #optionsframework .controls .of-background-position {
-	width:125px;
-	margin-right:5px;
-	float:left;
+    width:125px;
+    margin-right:5px;
+    float:left;
+}
+#optionsframework #section-login_logo_css .controls .of-background-position {
+    margin-right: 0;
+    margin-left: 5px;
 }
 #optionsframework .controls .of-background-attachment {
 	width:125px;
@@ -202,31 +206,55 @@
 	margin-top:3px;
 	float: left;
 }
+#optionsframework .section-upload .remove-file,
+#optionsframework .section-upload .upload-button,
 #optionsframework .section-background .remove-file,
 #optionsframework .section-background .upload-button {
     margin-left: 5px;
 }
 #optionsframework .section-background .controls {
-    width: auto;
+    width: 100%;
     float: none;
     min-width: 390px;
-    display: inline;
+    /* display: inline; */
+    padding-right: 0;
+}
+#optionsframework .section-upload .controls {
+    float: left;
+    min-width: 310px;
+    width: 45%;
+    padding-right: 0;
 }
 #optionsframework .section-scheme {
 	padding-top: 1.33em;
 }
 #optionsframework .section-scheme.inset,
 #optionsframework .section-scheme.top-border {
-	padding-top: 10px;
+	/* padding-top: 10px; */
+}
+#optionsframework .section-scheme .controls .of-scheme-properties .section-color-scheme-pickers {
+
 }
 #optionsframework .section-scheme .controls .of-scheme-properties .color-scheme-picker {
     width: 283px;    
     width: 21.1%;
+    width: 31.666%;
     margin-bottom: 20px;
     display: inline-block;
+    vertical-align: top;
+}
+#optionsframework .section-scheme .controls .of-scheme-properties .section.small {
+    margin-right: 12.333%;
+}
+#optionsframework .of-scheme-properties .of-scheme.section.small p.explain {
+    margin-top: 9px;
+    font-weight: normal;
 }
 #optionsframework .section-scheme .controls .of-scheme-properties .advanced-color-scheme-pickers .color-scheme-picker {
     width: 31.666%;
+}
+#optionsframework .section-scheme .controls .of-scheme-properties p.button-group {
+    margin-top: 36px !important;
 }
 #optionsframework .section-scheme .controls .of-scheme-properties label {
     display: block;
@@ -236,6 +264,7 @@
     width: 100%;
     padding-right: 0;
 }
+
 #optionsframework .group .section-scheme .heading {
     display: inline-block;
     margin-top: 0.66em;
@@ -339,14 +368,19 @@
     width: 32px;
     display: inline-block;
     margin: auto;
-    float: left;
+    float: none;
     border: none !important;
     padding: 0 5px 0 5px;
-    position: static;
+    position: static;/* 
     margin-left: 5px;
-    margin-right: 5px;
+    margin-right: 5px; */
     min-height: 26px;
     max-height: 32px;
+}
+#optionsframework #logo_icon-image.screenshot {
+    position: absolute;
+    top: 12px;
+    right: 12px;
 }
 #optionsframework .screenshot .remove-image {
 	background:url("../images/ico-delete.png") no-repeat;
@@ -391,6 +425,15 @@
     display: inline-block;
     float: right;
 }
+
+
+#section-login_logo_css #wpadminbar * {
+    z-index: 0 !important;
+}
+#optionsframework #section-login_logo_css {
+    padding-top: 5px !important;
+}
+
 #optionsframework  #login_logo_css-image_wrap {
 	position: relative;
     /* left: 11px; */
@@ -398,7 +441,7 @@
     height: inherit;
     width: 100%;
     /* top: 0; */
-    margin-top: -12px;
+    /* margin-top: -12px; */
     margin-bottom: 16px;
     /* margin-left: 0; */
     /* margin-right: -420px; */
@@ -406,7 +449,7 @@
     /* float: right; */
     /* background: #d3e5e5; */
     padding-top: 40px;
-    padding-bottom: 28px;
+    padding-bottom: 58px;
 }
 #optionsframework #login_logo_css-image_wrap:after {
     content: " ";
@@ -427,6 +470,7 @@
 }
 #optionsframework #login_logo_css-login_facade {
     width: 272px;
+    height: 272px;
     display: block;
     content: " ";
     bottom: auto;
@@ -442,7 +486,7 @@
 }
 
 #optionsframework #login_logo_css-image.screenshot object {
-    opacity: 0 !important;
+    /* opacity: 0 !important; */
 }
 #optionsframework .screenshot {
     background-repeat: no-repeat;
@@ -451,6 +495,7 @@
     display:none !important;
 }
 #login_logo_css_repeat,
+/* #login_logo_css_position, */
 #login_logo_css_attachment {
     display: none;
 }
@@ -467,15 +512,31 @@
     width:100px !important;
     min-width: 120px;
 }
-
+#optionsframework #section-logo_icon h4.heading {
+    display: inline-block;
+    vertical-align: top;
+    width: 111px;
+    /* margin-right: 5px; */
+}
+#optionsframework #section-logo_icon .explain {
+    /* display: none; */
+    max-width: 50%;
+    margin-top: 7px;
+}
+#optionsframework #section-logo_icon .option {
+    display: inline-block;
+}
 #maintenance_message,
 #maintenance_notes {
     width: 584px !important;
 }
-#section-exclude_domain {
+#section-exclude_domain, 
+#section-show_domain_flags {
     margin-right: 0 !important;
+    /* max-width: 160px; */
 }
-#section-exclude_domain .explain {
+#section-exclude_domain .explain,
+#section-show_domain_flags .explain {
     clear: left;
     max-width: 74% !important;
 }

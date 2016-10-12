@@ -173,7 +173,7 @@ class Options_Framework_Admin {
 	}
 
 
-	public function get_webdogs_logo_icon() {
+	public function get_logo_icon() {
 
 	    $custom_logo_icon = of_get_option( 'logo_icon', false );
 
@@ -254,7 +254,7 @@ class Options_Framework_Admin {
 	 
 	    $title = "";
 
-	    $custom_logo_icon = $this->get_webdogs_logo_icon();
+	    // $custom_logo_icon = $this->get_logo_icon();
 
 	    if( $custom_logo_icon ) {
 
@@ -313,20 +313,21 @@ class Options_Framework_Admin {
 	function enqueue_admin_styles( $hook ) {  ?>
 <style type="text/css">
 
-	body, html {
+	/* body, html {
 	    height: 100%;
 	    margin: 0;
 	    padding: 0;
 	    display: table;
 	    position: relative;
 	    width: 100%;
-	}
+	} */
 	body {
 		background-color: transparent !important;
 	}
 	#adminmenu #toplevel_page_options-framework div.wp-menu-image.svg {
 	    -webkit-background-size: 26px 26px;
 	    background-size: 26px 26px;
+	    height: 34px;
 	}
 	#toplevel_page_options-framework .wp-menu-image.dashicons-before img {
 		height: 28px;
@@ -334,29 +335,30 @@ class Options_Framework_Admin {
 	    padding-top: 2px;
 	    margin-left: -3px;
 	}
-	#wpadminbar #wp-admin-bar-site-name a.ab-item .ab-icon {
-	    /* padding-bottom: 2px; */
+/* 	#wpadminbar #wp-admin-bar-site-name a.ab-item .ab-icon {
+	    // padding-bottom: 2px;
 	    width: 22px;
 	    height: 22px;
 	    vertical-align: middle;
 	    background-repeat:no-repeat; 
 	    background-position:center !important;
-	}
-
+	} */
+/* 
 	#wpadminbar #wp-admin-bar-site-name a.ab-item svg {
 	    padding-bottom: 2px;
 	    width: 26px;
 	    height: 20px;
 	    vertical-align: middle;
-	}
+	    display: none;
+	} */
 
-	#wpadminbar #wp-admin-bar-site-name a.ab-item:before {
+	/* #wpadminbar #wp-admin-bar-site-name a.ab-item:before {
 	    content: none !important;
 	    display: none;
-	}
-	#wpadminbar #wp-admin-bar-site-name a.ab-item .ab-icon:not([src*=".svg"]) {
+	} */
+	/* #wpadminbar #wp-admin-bar-site-name a.ab-item .ab-icon:not([src*=".svg"]) {
 	    background-size:contain;
-	}
+	} */
 	.webdogs-nag, 
 	.webdogs-nag.notice {
 	    color: #FFFFFF;
@@ -424,14 +426,35 @@ class Options_Framework_Admin {
 	    line-height: 28px;
 	    margin-top: 0;
 	}
-</style><?php
+	/* @media screen and (max-width: 782px){
+    	#wpadminbar>#wp-toolbar > #wp-admin-bar-root-default > #wp-admin-bar-site-name .ab-item.ab-icon.svg {
+	        margin: 0;
+	        padding: 0;
+	        width: 52px;
+	        height: 46px;
+	        text-align: center;
+	        background-size:62%;
+	    }
+	} */
+</style>
+<style type="text/css" id="logo_icon_style">
+<?php echo html_entity_decode(of_get_option('logo_icon_css','')); ?>	
+</style>
+<?php
 
 		if ( $this->options_screen != $hook )
 	        return;
 
+
+		wp_enqueue_style('login');
+		wp_enqueue_style('forms');
 		wp_enqueue_style( 'optionsframework', plugin_dir_url( dirname(__FILE__) ) . 'css/optionsframework.css', array(),  Options_Framework::VERSION );
 		wp_enqueue_style( 'wp-color-picker' );
 	}
+
+
+
+
 
 	/**
      * Loads the required javascript
@@ -443,11 +466,16 @@ class Options_Framework_Admin {
 		if ( $this->options_screen != $hook )
 	        return;
 
-		// wp_enqueue_script( 'wds_sass', plugin_dir_url( dirname(__FILE__) ) . 'js/sass.js', array(), false, Options_Framework::VERSION );
-		// Enqueue custom option panel JS
-		wp_enqueue_script( 'options-custom', plugin_dir_url( dirname(__FILE__) ) . 'js/options-custom.js', array( 'jquery','wp-color-picker' ), Options_Framework::VERSION );
+		wp_enqueue_script( 'svg-icon-font', plugin_dir_url( dirname(__FILE__) ) . 'js/svgiconfont.js', array(), Options_Framework::VERSION, true );
 
-		wp_enqueue_script( 'admin-color-schemes', plugin_dir_url( dirname(__FILE__) ) . 'js/admin-color-schemes.js', array( 'jquery', 'wp-color-picker' ), false, Options_Framework::VERSION );
+		// wp_enqueue_script( 'jquery-parallaxify', plugin_dir_url( dirname(__FILE__) ) . 'js/jquery.parallaxify.min.js', array( 'jquery' ), Options_Framework::VERSION, false );
+		// wp_enqueue_script( 'wds_sass', plugin_dir_url( dirname(__FILE__) ) . 'js/sass.js', array(), false, Options_Framework::VERSION );
+		
+		// Enqueue custom option panel JS
+		wp_enqueue_script( 'options-custom', plugin_dir_url( dirname(__FILE__) ) . 'js/options-custom.js', array( 'jquery','wp-color-picker' ), Options_Framework::VERSION, true );
+
+		wp_enqueue_script( 'admin-color-schemes', plugin_dir_url( dirname(__FILE__) ) . 'js/admin-color-schemes.js', array( 'jquery', 'wp-color-picker' ), Options_Framework::VERSION, true );
+		
 		// Inline scripts from options-interface.php
 		add_action( 'admin_head', array( $this, 'of_admin_head' ) );
 	}
@@ -456,6 +484,10 @@ class Options_Framework_Admin {
 		// Hook to add custom scripts
 		do_action( 'optionsframework_custom_scripts' );
 	}
+
+
+
+
 
 	/**
      * Builds out the options panel.
@@ -547,6 +579,11 @@ class Options_Framework_Admin {
 			// Set checkbox to false if it wasn't sent in the $_POST
 			if ( 'checkbox' == $option['type'] && ! isset( $input[$id] ) ) {
 				$input[$id] = false;
+			}
+
+			// Set checkbox to false if it wasn't sent in the $_POST
+			if ( 'scheme' == $option['type'] && ! isset( $input[$id]['must_use'] ) ) {
+				$input[$id]['must_use'] = false;
 			}
 
 			// Set each item in the multicheck to false if it wasn't sent in the $_POST

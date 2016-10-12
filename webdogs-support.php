@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.1.1
+Version:     2.1.2
 */
 
 /*
@@ -164,8 +164,9 @@ if(!class_exists('WEBDOGS')) {
 
                 $greetings = wds_internal_greetings();
                 $greeting = $greetings[mt_rand(0, count($greetings) - 1)];
+                $display_name = $user->display_name;
 
-                $newtitle = sprintf( $greeting, $user->display_name );
+                $newtitle = str_replace( "Howdy, {$display_name}", sprintf( $greeting, $display_name ), $newtitle );
 
             } elseif( $greeting ) {
                 $newtitle = str_replace( 'Howdy,', $greeting, $newtitle );
@@ -398,12 +399,13 @@ if(!class_exists('WEBDOGS')) {
         }
     }
 
-    function wd_create_daily_notification_schedule(){
+    function wds_create_daily_notification_schedule(){
 
         //bail is not a mantainance account
         // if( ! defined('DB_NAME') ){ return; }
         // if(   defined('DB_NAME') && stripos( DB_NAME, 'snapshot' ) !== false ) { return; }
-        if( stripos( of_get_option( 'exclude_domain' ), site_url() ) !== false ) { return; }
+
+        if( wds_domain_exculded() ) { return; }
 
         //Use wp_next_scheduled to check if the event is already scheduled
         $timestamp = wp_next_scheduled( 'wd_create_daily_notification' );
@@ -517,15 +519,7 @@ if(!class_exists('WEBDOGS')) {
 
     function wd_send_maintenance_notification( $test = false ){
 
-            $exclude_domain = of_get_option( 'exclude_domain', false );
-        if( $exclude_domain ) {
-            $exclude_domain = array_map( 'trim', explode(',', $exclude_domain ) ) ;
-
-            //bail is not a mantainance account
-            foreach ($exclude_domain as $term) {
-                if ( stripos( site_url(), $term ) !== FALSE ) { return; }
-            }
-        }
+        if( wds_domain_exculded() ) { return; }
         
           $new_date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
          $next_send = wd_get_next_schedule();
@@ -658,18 +652,281 @@ if(!class_exists('WEBDOGS')) {
 
     add_filter( '_admin.scss', 'filter_admin_scss', 10, 1 );
 
+    add_filter( 'custom.scss', 'filter_admin_scss', 10, 1 );
+
     function filter_admin_scss( $_admin_scss ) {
 
-        $html_body_patch = "\nhtml {\n  background: \$body-background;\n\n   body {\n        background: \$body-background;\n }\n}\n";
+          $patch = "";
+        $patches = apply_filters( 'scss_patches', array(
 
-        $ab_icon_patch = "\n#wpadminbar:not(.mobile) li:hover .ab-icon {\n  color: \$menu-highlight-icon;\n}\n\n#wpadminbar li:hover .ab-icon,\n#wpadminbar li a:focus .ab-icon,\n#wpadminbar li.hover .ab-icon {\n  color: \$menu-submenu-focus-text;\n}\n\n#wpadminbar.mobile .quicklinks .ab-icon {\n  color: \$menu-submenu-focus-text;\n}\n\n#wpadminbar.mobile .quicklinks .hover .ab-icon {\n   color: \$menu-icon;\n}\n\n.wp-responsive-open #wpadminbar #wp-admin-bar-menu-toggle .ab-icon {\n color: \$menu-icon;\n}\n";
+         array(
+            'keys'   => array( 'body-background','body-background' ), 
+            'format' =>"\nhtml {\n  background: \$%s;\n\n   body {\n        background: \$%s;\n }\n}\n" ),
+         
+         array(
+            'keys'   => array( 'menu-highlight-icon','menu-submenu-focus-text','menu-submenu-focus-text','menu-icon','menu-icon' ), 
+            'format' => "\n#wpadminbar:not(.mobile) li:hover .ab-icon {\n  color: \$%s;\n}\n\n#wpadminbar li:hover .ab-icon,\n#wpadminbar li a:focus .ab-icon,\n#wpadminbar li.hover .ab-icon {\n  color: \$%s;\n}\n\n#wpadminbar.mobile .quicklinks .ab-icon {\n  color: \$%s;\n}\n\n#wpadminbar.mobile .quicklinks .hover .ab-icon {\n   color: \$%s;\n}\n\n.wp-responsive-open #wpadminbar #wp-admin-bar-menu-toggle .ab-icon {\n color: \$%s;\n}\n" ),
+        
+         array(
+            'keys'   => array( ), 
+            'format' => "\n.about-wrap h2 .nav-tab-active,\n.nav-tab-active,\n.nav-tab-active:hover {\n background-color: #f1f1f1;\n    border-bottom-color: #f1f1f1;\n}\n" )
+        
+        ) );
 
-        $active_tab_patch = "\n.about-wrap h2 .nav-tab-active,\n.nav-tab-active,\n.nav-tab-active:hover {\n background-color: #f1f1f1;\n    border-bottom-color: #f1f1f1;\n}\n";
+        foreach ($patches as $args ) {
+            
+            $patch .= vsprintf( $args['format'], apply_filters( 'scss_keys', $args['keys'] ) );
 
-        return $_admin_scss . $html_body_patch . $ab_icon_patch . $active_tab_patch;
+        }
+        return $_admin_scss . $patch;
     }
 
+    function format_scss_keys( $array ){ 
+        return array_values( json_decode( str_replace("-", "_", json_encode( $array ) ), true ) ); 
+    }
+
+    function wds_must_use_admin_color(){
+        $scheme = of_get_option( 'admin_color_scheme', array() );
+        return ( isset( $scheme['must_use'] ) && 'on' === $scheme['must_use'] );
+    }
+
+    function wds_domain_exculded(){
+        $exclude = array();
+        
+        $domain_string = of_get_option( 'exclude_domain', false );
+        
+        if( $domain_string ) {
+            $domain_string = array_map( 'trim', explode(',', $domain_string ) ) ;
+
+            foreach ($domain_string as $term) {
+
+                if ( stripos( site_url(), $term ) !== FALSE ) { 
+                    $exclude[] = $term;
+                }
+            }
+        }
+        return ( empty( $exclude ) ) ? FALSE : $exclude ;
+    }
+
+
+    function wds_is_production_site(){
+        if ( function_exists( 'is_wpe_snapshot' ) ) {
+            // True if we're running inside a staging-area snapshot in WPEngines
+            return ( FALSE === is_wpe_snapshot() );
+        }
+        return TRUE;
+    }
+
+    function wds_is_staging_site(){
+        if ( function_exists( 'is_wpe_snapshot' ) ) {
+            // True if we're running inside a staging-area snapshot in WPEngines
+            return ( FALSE !== is_wpe_snapshot() );
+        }
+        return fALSE;
+    }
+
+    function wds_show_domain_flags(){
+
+        $domain_flags      = wds_get_domain_flags();
+        $show_when         = of_get_option('show_domain_flags', '-1');
+        $show_domain_flags = FALSE;
+
+        switch ( $show_when ) {
+            // ALWAYS   
+            case '1':
+                $show_domain_flags = wds_domain_exculded() ? TRUE : FALSE ;
+                break;
+            // NEVER
+            case '0':
+                $show_domain_flags = FALSE ;
+                break;
+            // LOGIN
+            case '-1':
+            default:
+                $show_domain_flags = is_user_logged_in() ? TRUE : FALSE ;
+                break;
+        }
+
+        if( ! $show_domain_flags && $domain_flags ){
+            $domain_flags = FALSE;
+        } elseif( is_array( $domain_flags )) {
+            $domain_flags = array_map('trim', $domain_flags );
+        }
+
+        return apply_filters('wds_show_domain_flags', $domain_flags );   
+    }
+
+    function wds_get_domain_flags(){
+
+        $exclutions = wds_domain_exculded();
+
+        $flags = array();
+
+        if( $exclutions ) {
+           $flags  = $exclutions; 
+        }
+        if( wds_is_staging_site() ) {
+           $flags[] = 'staging'; 
+        }
+        if( wds_is_production_site() ) {
+           $flags[] = 'production'; 
+        }
+
+        $flags = empty( $flags ) ? FALSE : array_unique( array_values( $flags ) );
+
+        return apply_filters('wds_get_domain_flags', $flags );
+    }
     
+    // OUTPUT DOMAIN FLAGS
+    function webdogs_domain_flags() {
+
+        if( is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX ) { return; }
+
+        $domain_flags = wds_show_domain_flags();
+
+        if ( ! $domain_flags ){ return; }
+        ?>
+        <style type="text/css">
+#webdogs_flags_wrap {
+    right: 0;
+    left: 0;
+    height: 0px;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    z-index: 100000000000;
+    display: block;
+    opacity: 1;
+    overflow: visible;
+    border-bottom: 5px solid #9bb567;
+    opacity: 0.334;
+/*     -webkit-transition: all 1s linear 1s;
+    -moz-transition: all 1s linear 2s;
+    transition: all 1s linear 2s; */
+}
+
+#webdogs_flags {
+    color: #FFF;
+    border: 22px solid transparent;
+    border-bottom-color: #9bb567;
+    line-height: 12px;
+    font-size: 9px;
+    text-transform: uppercase;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    position: relative;
+    display: block;
+    float: right;
+    height: 0;
+    width: auto;
+    top: -44px;
+    right: -100%;
+    z-index: 10000;
+    overflow: visible;
+    -webkit-transition: all 1.4s ease-in-out 2s;
+    -moz-transition: all 1.4s ease-in-out 2s;
+    transition: all 1.4s ease-in-out 2s;
+}
+
+#webdogs_flags_list {
+    position: relative;
+    display: block;
+    top: 8px;
+    padding: 0 26px 0 9px;
+    margin: 0 auto;
+    min-width: 120px;
+    text-align: center;
+}
+
+#webdogs_flags_wrap .wds-domain-flag {
+    margin: 0 0 0 0;
+    right: -500%;
+    width: auto;
+    padding: 0 44px 0 0;
+    position: relative;
+    display: block;
+    float: right;
+}
+#webdogs_flags_wrap .wds-domain-flag:before {
+    content: " ";
+    border: 27px solid transparent;
+    border-bottom-color: rgba(55, 122, 159, 0.36);
+    position: absolute;
+    z-index: -1;
+    top: -35px;
+    left: -36px;
+    right: -1000%;
+}
+
+#webdogs_flags_wrap:hover {
+    opacity: 1;
+    -webkit-transition: all .23s linear;
+    -moz-transition: all .23s linear;
+    transition: all .23s linear;
+}
+
+#webdogs_flags_wrap:hover #webdogs_flags {
+    right: -24px;
+    -webkit-transition: all .23s ease;
+    -moz-transition: all .23s ease;
+    transition: all .23s ease;
+}
+#webdogs_flags_wrap:hover .wds-domain-flag {
+    right: 0%;
+}
+<?php 
+
+$flag_format = '
+#webdogs_flags_wrap .wds-domain-flag.wds-domain-flag-%1$s {
+    -webkit-transition: all 1.4s ease-in %2$Fs;
+    -moz-transition: all 1.4s ease-in %2$Fs;
+    transition: all 1.4s ease-in %2$Fs;
+}';
+
+$flag_format_hover = '
+#webdogs_flags_wrap:hover .wds-domain-flag.wds-domain-flag-%1$s {
+    -webkit-transition: all .23s ease-out %2$Fs;
+    -moz-transition: all .23s ease-out %2$Fs;
+    transition: all .23s ease-out %2$Fs;
+}';
+$base_delay = 2;
+foreach ( array_reverse( $domain_flags ) as $flag ) {
+    $base_delay = $base_delay + 0.23;
+    printf( $flag_format, sanitize_html_class( $flag ), $base_delay );
+}
+$base_delay = $base_delay + 0.115;
+printf('
+#webdogs_flags_wrap, 
+#webdogs_flags {
+    -webkit-transition: all 1.4s ease-in-out %1$Fs;
+    -moz-transition: all 1.4s ease-in-out %1$Fs;
+    transition: all 1.4s ease-in-out %1$Fs;
+}', $base_delay );
+
+$base_delay = 0;
+foreach ( $domain_flags as $flag ) {
+    $base_delay = $base_delay + 0.23;
+    printf( $flag_format_hover, sanitize_html_class( $flag ), $base_delay );
+}
+?>
+</style>
+        <div id="webdogs_flags_wrap">
+            <div class="" id="webdogs_flags">
+                <ul class="" id="webdogs_flags_list">
+                <?php
+
+                foreach ( array_reverse( $domain_flags ) as $flag ) {
+                    printf('<li class="wds-domain-flag wds-domain-flag-%s">%s</li>', sanitize_html_class( $flag ), esc_html( $flag ) );
+                } 
+                ?>
+                </ul>
+            </div>
+        </div>
+        <?php
+    }
+
+    add_action('shutdown', 'webdogs_domain_flags');
+
     // PUT SITE IN MAINENANCE MODE
     function webdogs_maintenace_mode() {
         if ('yes' === of_get_option('maintenance_mode', 'no')){
@@ -720,7 +977,7 @@ function webdogs_activation() {
         add_role( 'webdogs', 'WEBDOGS', $caps );
     }
 
-    function webdogs_init_schedule() { wd_create_daily_notification_schedule(); }
+    function webdogs_init_schedule() { wds_create_daily_notification_schedule(); }
 
     function webdogs_init_watchdog() {
         if(!defined( 'WATCHDOG_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog.zip'; $WATCHDOG_TO = trailingslashit( __DIR__ ) .'watchdog/' ; 

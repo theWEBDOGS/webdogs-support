@@ -16,6 +16,8 @@ if ( ! defined( 'WPINC' ) ) {
 function optionsframework_init() {
 
 	// Instantiate the login logo plugin class.
+	// Loads the required Options Framework classes.
+	require plugin_dir_path( __FILE__ ) . 'options.php';
 	require plugin_dir_path( __FILE__ ) . 'includes/class-options-login-logo.php';
 	require plugin_dir_path( __FILE__ ) . 'includes/class-options-admin-color-schemes.php';
 
@@ -31,8 +33,6 @@ function optionsframework_init() {
 	//  If user can't edit theme options, exit
 	if ( ! current_user_can( 'manage_options' ) ) return;
 
-	// Loads the required Options Framework classes.
-	require plugin_dir_path( __FILE__ ) . 'options.php';
 	require plugin_dir_path( __FILE__ ) . 'includes/class-options-plugin-activation.php';
 
 	require plugin_dir_path( __FILE__ ) . 'includes/class-options-framework.php';

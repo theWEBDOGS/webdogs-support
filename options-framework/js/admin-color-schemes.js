@@ -1,8 +1,7 @@
-var scss="";
-var pmap={};
 
 (function($){
-
+	var scss="";
+	var pmap={};
 	var defaultMap = {
 	  '$text-color':		 '#ffffff',
 	  '$base-color':		 '#23282d',
@@ -65,7 +64,33 @@ var pmap={};
 	    });
 	    clearDelayedPreview();
 	}
+	function sync_svg_painter() {
 
+		if ( typeof window.wp.svgPainter !== 'undefined' ) {
+                
+            var wpSvgPainter = window.wp.svgPainter;
+
+            var accessor_map = {'icon_color':'base','menu_icon':'base','highlight_color':'focus',/*'menu_highlight_icon':'focus',*/'menu_current_icon':'current'};
+
+            var colorScheme  = {"icons":{"base":"#82878c","focus":"#fff","current":"#fff"}};
+           
+			if ( typeof window._wpColorScheme !== 'undefined' ) {
+				colorScheme = window._wpColorScheme;
+			}
+ 
+            $.each( accessor_map, function(i,o){
+            	var $color_field = $('#admin_color_scheme_' + i );
+            	if( typeof $color_field !== 'undefined' && $color_field.length > 0 && $color_field.val() !== "" ){
+            		colorScheme.icons[o] = $color_field.val();
+            	} 
+            });
+
+            wpSvgPainter.init();
+            wpSvgPainter.setColors( colorScheme );
+            wpSvgPainter.paint();
+
+	    }
+	}
 	function sync_scheme_preveiw(){
 
 		var $pickers = jQuery('.of-color.of-scheme');
@@ -82,6 +107,8 @@ var pmap={};
 		});
 		scss = pmap.toArray().join("\n") + "\n\n\n@import '_admin.scss';\n";
 		sass_admin_colors( scss );
+
+		sync_svg_painter();
 	}
 
 
@@ -96,7 +123,7 @@ var pmap={};
 
 		var wp_http_referer = '&_wp_http_referer=' + $(this).parents('form').find('input[name="_wp_http_referer"]').val();
 
-		var preview = $(this).parents('.color-scheme-pickers').find('input').serialize() + wp_http_referer + '&action=admin-color-schemes-save';
+		var preview = $(this).parents('form').find('.color-scheme-pickers input').serialize() + wp_http_referer + '&action=admin-color-schemes-save';
 
 		$.ajax({
 			type: 'POST',
@@ -109,12 +136,13 @@ var pmap={};
 				} else if ( typeof r.uri != 'undefined' ) {
 					$('<link rel="stylesheet" id="colors-css" type="text/css" media="all"/>').appendTo('head');
 					$('#colors-css').attr('href', r.uri);
-					$('h1').after( '<div class="webdogs-nag">' + r.message + '</div>' );
+					$('h1').after( '<div class="webdogs-nag notice">' + r.message + '</div>' );
 				}
+				sync_svg_painter();
 			}
 		})
 	});
-	$('#optionsframework .section-scheme > .button-group > button').on('click', function(e){
+	$('#optionsframework .section-scheme .button-group > button').on('click', function(e){
 
 		e.preventDefault();
 		e.stopPropagation();

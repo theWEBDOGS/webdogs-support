@@ -42,7 +42,7 @@ class Options_Framework_Admin_Color_Schemes {
 		self::$instance = $this;
 		$this->base = WEBDOGS_SUPPORT_DIR . '/options-framework';
 		add_action( 'init', array( $this, 'init' ) );
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		// add_action( 'admin_init', array( $this, 'admin_init' ) );
 	}
 
 	public static function get_instance() {
@@ -100,22 +100,98 @@ class Options_Framework_Admin_Color_Schemes {
 		add_action( 'admin_post_admin-color-schemes-save', array( $this, 'save' ) );
 		add_action( 'wp_ajax_admin-color-schemes-save',    array( $this, 'save' ) );
 		add_action( 'optionsframework_after_validate',     array( $this, 'of_save' ) );
+
+
+		add_filter( 'get_color_scheme_options',    array( __CLASS__, 'filter_color_scheme_options'), 10, 1 ); 
+
+		// Override the user's admin color scheme.
+		add_filter( 'get_user_option_admin_color', array( __CLASS__, 'must_use_admin_color'           ),10, 1 );
+
+		// Hide the Admin Color Scheme field from users who can't set a forced color scheme.
+		add_action( 'admin_color_scheme_picker',   array( $this, 'hide_admin_color_input'      ), 8 );
+
+		/*
+		 * Note: not bothering with preventing users from being able to save a value for admin_color
+		 * since it's not really a big deal if they do.
+		 */
+/*
 	}
 
-	public function admin_init() {
+	public function admin_init() {*/
 
-		$schemes = $this->get_option( 'schemes', array() );
+		$schemes = apply_filters( 'get_color_scheme_options', $this->get_option( 'schemes', array() ) );
 
 		foreach ( $schemes as $scheme ) {
+
 			wp_admin_css_color(
 				$scheme['slug'],
-				get_bloginfo( 'name' ),
+				$scheme['name'],
 				esc_url( $scheme['uri'] ),
 				array( $scheme['base_color'], $scheme['icon_color'], $scheme['highlight_color'], $scheme['notification_color'] ),
 				array( 'base' => $scheme['icon_color'], 'focus' => $scheme['icon_focus'], 'current' => $scheme['icon_current'] )
 			);
 		}
 	}
+
+	/**
+	 * Overrides the user's admin color scheme with the forced admin color
+	 * scheme, if set.
+	 *
+	 * @since 1.0
+	 *
+	 * @param  string $admin_color_scheme The admin color scheme.
+	 * @return string
+	 */
+	public static function filter_color_scheme_options( $color_schemes ) {
+
+		if ( current_user_can( 'webdogs' ) ) {
+
+			$color_schemes = array_merge( array_values( $color_schemes ), array_values( wds_admin_color_schemes() ) );
+		}
+
+		return $color_schemes;
+	}
+		
+	/**
+	 * Overrides the user's admin color scheme with the forced admin color
+	 * scheme, if set.
+	 *
+	 * @since 1.0
+	 *
+	 * @param  string $admin_color_scheme The admin color scheme.
+	 * @return string
+	 */
+	public static function must_use_admin_color( $admin_color_scheme ) {
+		
+		if ( current_user_can( 'webdogs' ) ) {
+
+			$admin_color_scheme = ( wds_is_production_site() ) ? "webdogs_ps" : "webdogs_ds" ;
+
+		} elseif ( wds_must_use_admin_color() ) {
+			
+			// If a forced admin color has been configured, use it.
+			$scheme = $this->get_color_scheme();
+			$admin_color_scheme = $scheme->slug;
+		}
+
+		return $admin_color_scheme;
+	}
+	/**
+	 * Hides the Admin Color Scheme input and label when appropriate.
+	 *
+	 * The input is hidden for users who do not have the capability to set the
+	 * forced admin color scheme *and* when an admin color scheme hasn't been
+	 * set yet (so that user's can still choose until a forced admin color
+	 * scheme is chosen).
+	 *
+	 * @since 1.1
+	 */
+	public function hide_admin_color_input() {
+		if ( wds_must_use_admin_color() && ! current_user_can( 'webdogs' ) ) {
+			remove_action( 'admin_color_scheme_picker', 'admin_color_scheme_picker' );
+		}
+	}
+
 
 	public function admin_menu() {
 		$hook = add_management_page( 'Admin Color Scheme', 'Admin Colors', 'manage_options', 'options-framework', array( $this, 'admin_page' ) );
@@ -142,11 +218,10 @@ class Options_Framework_Admin_Color_Schemes {
 
 	public function get_Sass_JS() {
 		if( ! is_admin() || ! current_user_can('manage_options' ) ) return;
-/*
+
 		$wp_upload_dir = wp_upload_dir();
 
-		$upload_url = $wp_upload_dir['baseurl'] . '/admin-color-scheme';*/
-		$upload_url = ABSPATH . '/wp-admin/css/colors/';
+		$upload_url = is_dir( $wp_upload_dir['baseurl'] . '/admin-color-scheme' ) ? $upload_url : ABSPATH . '/wp-admin/css/colors/';
 	 ?>
 <script type="text/javascript">
 
@@ -365,7 +440,12 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 
 </script>
 	<?php }
+
+
+
+
 	public function admin_enqueue_scripts() {
+		// Compile and write!
 		// wp_enqueue_script( 'options-framework', plugins_url( '/js/admin-color-scheme.js', dirname( __FILE__ ) ), array( 'wp-color-picker' ), false, true );
 		// wp_enqueue_style( 'options-framework', plugins_url( '/css/admin-color-scheme.css', dirname( __FILE__ ) ), array( 'wp-color-picker' ) );
 	}
@@ -484,7 +564,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 			if ( $doing_ajax ) {
 				$response = array(
 					'errors' => true,
-					'message' => __( 'Please make more selections to preview the color scheme.', 'options-framework' ),
+					'message' => wds_base_strings( 'acs_selections_preview' )//__( 'Please make more selections to preview the color scheme.', 'options-framework' ),
 				);
 
 				echo json_encode( $response );
@@ -541,7 +621,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 			if ( $doing_ajax ) {
 				$response = array(
 					'errors' => true,
-					'message' => __( 'Could not write custom SCSS file.', 'options-framework' ),
+					'message' => wds_base_strings( 'acs_write_custom_fail' )
 				);
 
 				echo json_encode( $response );
@@ -549,7 +629,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 			}
 
 			// @todo: error that the scheme couldn't be written and redirect
-			exit( 'Could not write custom SCSS file.' );
+			exit( wds_base_strings( 'acs_write_custom_fail' ) );
 		}
 
 		// Compile and write!
@@ -557,11 +637,11 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 		$sass = new SassParser();
 		$css = $sass->toCss( $scss_file );
 
-		if ( ! $wp_filesystem->put_contents( $css_file, apply_filters( '_admin.scss', $css ), FS_CHMOD_FILE) ) {
+		if ( ! $wp_filesystem->put_contents( $css_file, $css, FS_CHMOD_FILE) ) {
 			if ( $doing_ajax ) {
 				$response = array(
 					'errors' => true,
-					'message' => __( 'Could not write compiled CSS file.', 'options-framework' ),
+					'message' => wds_base_strings( 'acs_write_compiled_fail' )
 				);
 
 				echo json_encode( $response );
@@ -569,7 +649,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 			}
 
 			// @todo: error that the compiled scheme couldn't be written and redirect
-			exit( 'Could not write compiled CSS file.' );
+			exit( wds_base_strings( 'acs_write_compiled_fail' ) );
 		}
 
 		// add the URI of the sheet to the settings array
@@ -578,14 +658,14 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 		if ( $doing_ajax ) {
 			$response = array(
 				'uri' => $scheme->uri,
-				'message' => __( 'Previewing. Be sure to save if you like the result.', 'options-framework' ),
+				'message' => wds_base_strings( 'acs_previewing_scheme' )
 			);
 
 			echo json_encode( $response );
 			die();
 		}
 
-		$this->set_option( 'schemes', array( $scheme->id => $scheme->to_array() ) );
+		$this->set_option( 'schemes', array( $scheme->slug => $scheme->to_array() ) );
 
 		// switch to the scheme
 		update_user_meta( get_current_user_id(), 'admin_color', $scheme->slug );
@@ -602,6 +682,8 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 		$_post = stripslashes_deep( $_POST );
 		
 		$scheme = $this->get_color_scheme();
+
+		add_filter( 'scss_keys', 'format_scss_keys', 10 , 1 );
 
 		$optionsframework_settings = get_option( 'optionsframework' );
 
@@ -644,7 +726,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 		// okay, let's see about getting credentials
 		// @todo: what to do about preview
 		if ( false === ( $creds = request_filesystem_credentials( $this->admin_url() ) ) ) {
-			add_settings_error( 'options-framework', 'color_css', 'Could not write CSS file.', 'error' );
+			add_settings_error( 'options-framework', 'color_css', wds_base_strings( 'acs_write_compiled_fail' ), 'error' );
 			return true;
 		}
 
@@ -672,11 +754,12 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 
 		$this->maybe_copy_core_files( $upload_dir );
 
+
 		// write the custom.scss file
-		if ( ! $wp_filesystem->put_contents( $scss_file, apply_filters( '_admin.scss', $scss), FS_CHMOD_FILE) ) {
+		if ( ! $wp_filesystem->put_contents( $scss_file, apply_filters( 'custom.scss', $scss), FS_CHMOD_FILE) ) {
 
 			// @todo: error that the scheme couldn't be written and redirect
-			add_settings_error( 'options-framework', 'color_css', 'Could not write custom SCSS file.', 'error' );
+			add_settings_error( 'options-framework', 'color_css', wds_base_strings( 'acs_write_custom_fail' ), 'error' );
 			return true;
 		}
 
@@ -685,11 +768,9 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 		$sass = new SassParser();
 		$css = $sass->toCss( $scss_file );
 
-		if ( ! $wp_filesystem->put_contents( $css_file, apply_filters( '_admin.scss', $css), FS_CHMOD_FILE) ) {
-			
-			$message = __( 'Could not write compiled CSS file.', 'options-framework' );
+		if ( ! $wp_filesystem->put_contents( $css_file, $css, FS_CHMOD_FILE) ) {
 
-			add_settings_error( 'options-framework', 'color_css', $message, 'update-nag dismissable' );
+			add_settings_error( 'options-framework', 'color_css', wds_base_strings( 'acs_write_compiled_fail' ), 'update-nag dismissable' );
 		
 
 			return true;
@@ -700,7 +781,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 		// add the URI of the sheet to the settings array
 		$scheme->uri = $uri;
 
-		$this->set_option( 'schemes', array( $scheme->id => $scheme->to_array() ) );
+		$this->set_option( 'schemes', array( $scheme->slug => $scheme->to_array() ) );
 
 		// switch to the scheme
 		// update_user_meta( get_current_user_id(), 'admin_color', $scheme->slug );
@@ -721,7 +802,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 					if ( $doing_ajax ) {
 						$response = array(
 							'errors' => true,
-							'message' => __( 'Could not copy a core file.', 'options-framework' ),
+							'message' => wds_base_strings( 'acs_copy_file_fail' )
 						);
 
 						echo json_encode( $response );
@@ -729,7 +810,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 					}
 
 					// @todo: error that the scheme couldn't be written and redirect
-					exit( "Could not copy the core file {$file}." );
+					exit( wds_base_strings( 'acs_copy_file_fail' ) );
 				}
 			}
 		}
@@ -739,7 +820,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 				if ( $doing_ajax ) {
 					$response = array(
 						'errors' => true,
-						'message' => __( 'Could not copy a core file.', 'options-framework' ),
+						'message' => wds_base_strings( 'acs_copy_file_fail' )
 					);
 
 					echo json_encode( $response );
@@ -747,12 +828,89 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 				}
 
 				// @todo: error that the scheme couldn't be written and redirect
-				exit( "Could not copy the core file colors.css." );
+				exit( wds_base_strings( 'acs_copy_file_fail' ) );
 			}
 		}
 	}
 }
 
+
+/**
+ * Admin Bar Color class
+ */
+class Admin_Bar_Color {
+
+	private $base;
+
+	function __construct() {
+		$this->base = WEBDOGS_SUPPORT_DIR . '/options-framework';
+		add_action( 'wp_before_admin_bar_render', array( $this, 'save_wp_admin_color_schemes_list' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_admin_bar_color' ) );
+	}
+	/**
+	 * Save the color schemes list into wp_options table
+	 */
+	function save_wp_admin_color_schemes_list() {
+		global $_wp_admin_css_colors;
+		if ( count( $_wp_admin_css_colors ) > 1 && has_action( 'admin_color_scheme_picker' ) ) {
+			update_option( 'wp_admin_color_schemes', $_wp_admin_css_colors );
+		}
+	}
+	/**
+	 * Enqueue the registered color schemes on the front end
+	 */
+	function enqueue_admin_bar_color() {
+		/*$custom_logo_icon = of_get_option( 'logo_icon', false );
+
+	    
+	    if( $custom_logo_icon ) {
+	    	// not an svg
+	    	// use image
+	    	if( stripos( $custom_logo_icon, '.svg') === false ) {
+	    		// return;
+	    		// $image = $custom_logo_icon;
+
+    		//eles use SVG
+	    	} else {
+
+		    	$data = file_get_contents( $custom_logo_icon );
+		    	// return $data;`
+
+		    	if( ! $data ) { return false; }
+
+				$iconName = 'new-icon';
+				$iconCode = 'xf226';
+
+				require_once( $this->base . '/lib/svg-icon-font-generator/IconFontGenerator.php' );
+
+				$generator = new IconFontGenerator;
+				$generator->generateFromString( $data, $iconName, $iconCode, array(), FALSE );
+				var_export($generator->getFont()->getXML());
+			}
+		}*/
+
+		if ( ! is_admin_bar_showing() ) {
+			return;
+		}
+		$user_color = get_user_option( 'admin_color' );
+		if ( isset( $user_color ) ) {
+			$admin_scheme = Options_Framework_Admin_Color_Schemes::get_instance();
+			$schemes = apply_filters( 'get_color_scheme_options', $admin_scheme->get_option( 'schemes', array() ) );
+			$schemes_slugs = wp_list_pluck( $schemes, 'slug' );
+			$schemes = array_combine( array_values( $schemes_slugs ), array_values( $schemes ) );
+			// wp_enqueue_style( $user_color, $schemes[$user_color]['uri'] );
+			/*print_r($user_color);
+			var_export($schemes[$user_color]['uri']);*/
+		}
+			?>
+<style type="text/css" id="logo_icon_style">
+<?php echo html_entity_decode(of_get_option('logo_icon_css','')); ?>	
+</style>
+			<?php
+	}
+}
+
+$admin_bar_color = new Admin_Bar_Color();
 
 
 class Admin_Color_Scheme {
@@ -764,9 +922,15 @@ class Admin_Color_Scheme {
 	protected $accessors = array( 'id', 'slug', 'name', 'uri', 'icon_focus', 'icon_current' );
 
 	// Icon colors for SVG painter - likely temporary placement, as it will need some more special handling
-	protected $icon_color = '#fff';
-	protected $icon_focus = '#fff';
-	protected $icon_current = '#fff';
+	protected $icon_color = '#ffffff';
+	protected $icon_focus = '#ffffff';
+	protected $icon_current = '#ffffff';
+
+	protected $accessor_map = array( 
+					             'menu_icon'           => 'icon_color',
+								 'highlight_color'     => 'icon_focus',
+								 'menu_highlight_icon' => 'icon_focus',
+								 'menu_current_icon'   => 'icon_current' );
 
 	public function __construct( $attr = NULL ) {
 		// extend accessors
@@ -780,6 +944,11 @@ class Admin_Color_Scheme {
 			foreach ( $this->accessors as $thing ) {
 				if ( isset( $attr[$thing] ) && ! empty( $attr[$thing] ) ) {
 					$this->{$thing} = $attr[$thing];
+				}
+			}
+			foreach ($this->accessor_map as $thing => $accessor ) {
+				if ( isset( $attr[$thing] ) && ! empty( $attr[$thing] ) ) {
+					$this->{$accessor} = $attr[$thing];
 				}
 			}
 		} else {

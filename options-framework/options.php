@@ -133,10 +133,10 @@ function optionsframework_options() {
 	// check if set in cutomizer
 	$custom_logo_id = get_theme_mod( 'custom_logo' );
 	$image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
-	$login_logo = ( !empty($image[0] ) ) ? $image[0] : Options_Framework_Login_Logo::$instance->get_location('url');
+	$login_logo = ( ! empty( $image[0] ) ) ? $image[0] : Options_Framework_Login_Logo::$instance->get_location('url');
 
 	$background_defaults = array(
-		'color' => '',
+		'color' => '#f1f1f1',
 		'image' => $login_logo,
 		'repeat' => 'no-repeat',
 		'position' => 'bottom center',
@@ -165,19 +165,22 @@ function optionsframework_options() {
 		'6' => __('Biannually', 'options_check'),
 	);
 	
-	$day_offset = array();
-		for ($i=1; $i < 29; $i++) { 
-			$day_offset[$i] = $i;
-		}
+	$day_offset = array(); for ($i=1; $i < 29; $i++) { $day_offset[$i] = $i; }
+
+	$domain_flag_array = array(
+		 '0' => __('Never', 'options_check'),
+		 '1' => __('Always', 'options_check'),
+		'-1' => __('Login', 'options_check'),
+	);
 
 	$boolean_active = array(
-		'yes' => __('Active', 'options_check'),
-		'no' => __('Hidden', 'options_check'),
+	   'yes' => __('Active', 'options_check'),
+	   'no'  => __('Hidden', 'options_check'),
 	);
 
 	$boolean_radio = array(
-		'yes' => __('Yes', 'options_check'),
-		'no' => __('No', 'options_check'),
+	   'yes' => __('Yes', 'options_check'),
+	   'no'  => __('No', 'options_check'),
 	);
 
 	/////////////////////////////////
@@ -230,19 +233,7 @@ function optionsframework_options() {
 	$delete_base = empty($delete_base) ? "Nothing to cleanup." : $delete_base ;
 
 
-	$exclude = false;
-	$domain_string = of_get_option( 'exclude_domain', false );
-    
-    if( $domain_string ) {
-        $domain_string = array_map( 'trim', explode(',', $domain_string ) ) ;
-
-        //bail is not a mantainance account
-        foreach ($domain_string as $term) {
-            if ( stripos( site_url(), $term ) !== FALSE ) { $exclude = true; break; }
-        }
-    }
-
-	$exclude_domain = $exclude ? '<strong>Current domain:</strong> Excluded' : '<strong>Current domain:</strong> Not&nbsp;excluded';
+	$exclude_domain = ( wds_domain_exculded() ) ? '<strong>Current domain:</strong> Excluded' : '<strong>Current domain:</strong> Not&nbsp;excluded';
 
 
 
@@ -329,6 +320,7 @@ function optionsframework_options() {
 	$options[] = array(
 		'name' => __('Maintenance Instructions', 'options_check'),
 		'id' => 'maintenance_notes',
+		'settings'=> array('rows' => 13),
 		'class' => 'clear alignleft',
 		'type' => 'textarea');
 
@@ -337,8 +329,17 @@ function optionsframework_options() {
 		'desc' => $exclude_domain,
 		'id' => 'exclude_domain',
 		'std' => 'staging',
-		'class' => 'alignleft mini', 
+		'class' => 'alignleft mini bottom-pad', 
 		'type' => 'text');
+
+	$options[] = array(
+		'name' => __('Show Flags', 'options_check'),
+		'desc' => __('Environment and domain markers', 'options_check'),
+		'id' => 'show_domain_flags',
+		'std' => '-1',
+		'type' => 'radio',
+		'class' => 'alignleft mini', 
+		'options' => $domain_flag_array);
 
 	$options[] = array(
 		'type' => 'info',
@@ -531,6 +532,18 @@ function optionsframework_options() {
 		'type' => 'heading');
 
 	$options[] = array(
+		'name' => __('Toolbar Logo', 'options_check'),  	
+		'desc' => __('Square viewbox, single color, compound path.', 'options_check'),
+		'id' => 'logo_icon',
+		'class' => 'clear',
+		'type' => 'upload');
+
+	$options[] = array(
+		'id' => 'logo_icon_css',
+		'class' => 'hide',
+		'type' => 'textarea');
+
+	$options[] = array(
 		'name' => __('Login Logo and Background', 'options_check'),
 		'id' => 'login_logo_css',
 		'std' => $background_defaults,
@@ -564,14 +577,9 @@ function optionsframework_options() {
 				'css' => "'backgroundSize', val + 'px'")));
 
 	$options[] = array(
-		'name' => __('Toolbar Logo-icon', 'options_check'),  	// 'desc' => __('Upload a single path SVG for best results.', 'options_check'),
-		'id' => 'logo_icon',
-		'class' => 'top-border bottom-pad clear inset',
-		'type' => 'upload');
-
-	$options[] = array(
 		'name' => __('Admin Color Scheme', 'options_check'),
 		'desc' => '',
+		'must_use' => __('Restrict the admin colors to tne custom scheme.'),
 		'id' => 'admin_color_scheme',
 		'class' => 'clear top-border', 
 		'type' => 'scheme');
@@ -781,6 +789,11 @@ function wds_base_strings( $key = null ){
             'message' => "The following updates are available for %s website. \n\rIf you would like WEBDOGS to install these updates, please reply to this email. \n\r%s \n\rIf you would like WEBDOGS to install these updates, please reply to this email.
 
  "), // $site_name, $updates
+        'acs_selections_preview'		  => __( 'Please make more selections to preview the color scheme.', 'options-framework' ),
+        'acs_previewing_scheme'		      => __( 'Previewing. Be sure to save if you like the result.', 'options-framework' ),
+        'acs_write_compiled_fail'		  => __( 'Could not write compiled CSS file.', 'options-framework' ),
+        'acs_write_custom_fail'		      => __( 'Could not write custom SCSS file.', 'options-framework' ),
+        'acs_copy_file_fail'		      => __( 'Could not copy a core file.', 'options-framework' ),
 
 		'return'                          => __( 'Go back to Base Plugins Installer', 'webdogs-support' ),
 		'plugin_activated'                => __( 'Plugin activated successfully.', 'webdogs-support' ),
@@ -919,4 +932,102 @@ function wds_register_base_activation() {
 }
 
 add_action( 'optionsframework_register', 'wds_register_base_activation', 10 );
+
+
+function wds_admin_color_schemes( $scheme = null ) {
+	
+	$suffix = is_rtl() ? '-rtl' : '';
+
+	$admin_color_schemes = array(
+
+		'webdogs_ps' => array(
+
+			'id' => 2,
+			'slug' => 'webdogs_ps',
+			'name' => 'WEBDOGS PS',
+			'uri' => plugins_url( "css/webdogs-ps/colors$suffix.css", __FILE__ ),
+			'icon_focus' => '#ECFFD3',
+			'icon_current' => '#ECFFD3',
+			'base_color' => '#F7FBFC',
+			'icon_color' => '#7BBC49',
+			'highlight_color' => '#3D5E63',
+			'notification_color' => '#748477',
+			'button_color' => '#7BBC49',
+			'text_color' => '#474747',
+			'body_background' => '#FCFEFF',
+			'link' => '#3D5E63',
+			'link_focus' => '#9CB4BC',
+			'form_checked' => '#F28E4F',
+			'menu_background' => '#F7FBFC',
+			'menu_text' => '#C4C4C4',
+			'menu_icon' => '#7BBC49',
+			'menu_highlight_background' => '#748477',
+			'menu_highlight_text' => '#F7FFEF',
+			'menu_highlight_icon' => '#ECFFD3',
+			'menu_current_background' => '#3D5E63',
+			'menu_current_text' => '#ECFFD3',
+			'menu_current_icon' => '#ECFFD3',
+			'menu_submenu_background' => '#FFFFFF',
+			'menu_submenu_text' => '#9CB4BC',
+			'menu_submenu_background_alt' => '#D0F2FC',
+			'menu_submenu_focus_text' => '#3D5E63',
+			'menu_submenu_current_text' => '#748477',
+			'menu_bubble_background' => '#F28E4F',
+			'menu_bubble_text' => '#FFFFFF',
+			'menu_bubble_current_background' => '#F28E4F',
+			'menu_bubble_current_text' => '#FFFFFF',
+			'menu_collapse_text' => '#919191',
+			'menu_collapse_icon' => '#919191',
+			'menu_collapse_focus_text' => '#9CB4BC',
+			'menu_collapse_focus_icon' => '#9CB4BC',
+			'adminbar_avatar_frame' => 'TRANSPARENT',
+			'adminbar_input_background' => '',
+		),
+
+		'webdogs_ds' => array(
+			'id' => 3,
+			'slug' => 'webdogs_ds',
+			'name' => 'WEBDOGS DS',
+			'uri' => plugins_url( "css/webdogs-ds/colors$suffix.css", __FILE__ ),
+			'icon_focus' => '#ECFFD3',
+			'icon_current' => '#ECFFD3',
+			'base_color' => '#666666',
+			'icon_color' => '#D0F2FC',
+			'highlight_color' => '#377A9F',
+			'notification_color' => '#9BB567',
+			'button_color' => '#9BB567',
+			'text_color' => '#C4C4C4',
+			'body_background' => '#D6D6D6',
+			'link' => '#377A9F',
+			'link_focus' => '#D0F2FC',
+			'form_checked' => '#9BB567',
+			'menu_background' => '#666666',
+			'menu_text' => '#C4C4C4',
+			'menu_icon' => '#D0F2FC',
+			'menu_highlight_background' => '#31353F',
+			'menu_highlight_text' => '#F7FFEF',
+			'menu_highlight_icon' => '#ECFFD3',
+			'menu_current_background' => '#377A9F',
+			'menu_current_text' => '#ECFFD3',
+			'menu_current_icon' => '#ECFFD3',
+			'menu_submenu_background' => '#474747',
+			'menu_submenu_text' => '#FCFCFC',
+			'menu_submenu_background_alt' => '#D0F2FC',
+			'menu_submenu_focus_text' => '#ECFFD3',
+			'menu_submenu_current_text' => '#D0F2FC',
+			'menu_bubble_background' => '#9BB567',
+			'menu_bubble_text' => '#D0F2FC',
+			'menu_bubble_current_background' => '#9DB780',
+			'menu_bubble_current_text' => '#FFFFFF',
+			'menu_collapse_text' => '#919191',
+			'menu_collapse_icon' => '#919191',
+			'menu_collapse_focus_text' => '#9CB4BC',
+			'menu_collapse_focus_icon' => '#9CB4BC',
+			'adminbar_avatar_frame' => 'transparent',
+			'adminbar_input_background' => '',
+		)
+	);
+
+	return ( isset( $scheme ) && array_key_exists( $scheme, $admin_color_schemes ) ) ? apply_filters("admin_color_schemes_{$scheme}", $admin_color_schemes[ $scheme ] ) : apply_filters("admin_color_schemes", $admin_color_schemes );
+}
 
