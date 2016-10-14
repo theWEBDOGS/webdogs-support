@@ -2195,7 +2195,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 				    $imploded = implode(', ', $deleted_names);
 					$rendered = 
 							sprintf(
-								translate_nooped_plural( $this->strings[ 'plugin_deletion' ], count($delete), 'optionsframework' ),
+								translate_nooped_plural( $this->strings[ 'theme_deletion' ], count($delete), 'optionsframework' ),
 								$imploded,
 								count($delete)
 							);
