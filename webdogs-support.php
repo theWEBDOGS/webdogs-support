@@ -1039,7 +1039,7 @@ foreach ( $domain_flags as $flag ) {
 
     function wds_maybe_clear_cache( $current_screen ){
 
-        $clear = ( did_action( 'webdogs_do_clear_cache' ) && wds_is_staging_site() ) ? FALSE : TRUE ;
+        $clear = ( did_action( 'webdogs_do_clear_cache' ) || wds_is_staging_site() ) ? FALSE : TRUE ;
         
         if( $clear ){
             add_settings_error( 'options-framework', 'save_options', __( 'HTML-page-caching, CDN (statics), and WordPress Object/Transient Caches have been cleared.', 'options-framework' ), 'updated fade' ); 
