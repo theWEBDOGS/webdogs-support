@@ -770,9 +770,17 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 
 
 			wp_enqueue_script( 'updates' );
-			wp_print_request_filesystem_credentials_modal();
-			wp_print_admin_notice_templates();
-			wp_print_update_row_templates();
+			if(function_exists('wp_print_request_filesystem_credentials_modal')){
+				wp_print_request_filesystem_credentials_modal();
+			}
+
+			if(function_exists('wp_print_admin_notice_templates')){
+				wp_print_admin_notice_templates();
+			}
+
+			if(function_exists('wp_print_update_row_templates')){
+				wp_print_update_row_templates();
+			}
 		}
 
 		/**

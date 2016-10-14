@@ -210,6 +210,10 @@ function of_sanitize_scheme( $input ) {
 
 	$output = array();
 
+	if( empty( $input['must_use'] ) ) {
+		$input['must_use'] = "";
+	}
+
 	$output['must_use'] = apply_filters( 'of_sanitize_checkbox(', $input['must_use'] );
 
 	$loops = $admin_schemes->get_colors( 'basic' );
