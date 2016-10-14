@@ -464,7 +464,6 @@ if ( ! function_exists( 'wd_get_notification' ) ) {
 if ( ! function_exists( 'wd_get_active_dates' ) ) {
 
     function wd_get_active_dates( $freq, $day, $month, $year ) {
-
         
         $date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
 
@@ -574,10 +573,10 @@ if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
         
         if( $test ){ wp_die( $message ); }
     }
-
-    add_action( 'wd_create_daily_notification', 'wd_send_maintenance_notification' );
-
 }
+
+
+
 
 if ( function_exists( 'wd_send_maintenance_notification' ) ) {
 
@@ -588,6 +587,8 @@ if ( function_exists( 'wd_send_maintenance_notification' ) ) {
 
     }
 }
+add_action( 'wd_create_daily_notification', 'wd_send_maintenance_notification' );
+
 
 if ( ! function_exists( 'optionsframework_load_plugins' ) ) {
 
@@ -598,8 +599,10 @@ if ( ! function_exists( 'optionsframework_load_plugins' ) ) {
         $GLOBALS['optionsframeworkpluginactivation'] = $instance;
     }
 
-    add_action( 'optionsframeworkpluginactivation_init', 'optionsframework_load_plugins', 20, 1 );
 }
+add_action( 'optionsframeworkpluginactivation_init', 'optionsframework_load_plugins', 20, 1 );
+
+
 
 if ( ! function_exists( 'wd_get_brightness' ) ) {
 
@@ -675,8 +678,8 @@ if ( ! function_exists( 'wds_remove_wp_logo' ) ) {
         $wp_admin_bar->remove_node( 'wp-logo' );
     }
 
-    add_action( 'admin_bar_menu', 'wds_remove_wp_logo', 999 );
 }
+add_action( 'admin_bar_menu', 'wds_remove_wp_logo', 999 );
 
 
 if ( ! function_exists( 'filter_admin_scss' ) ) {
@@ -708,11 +711,11 @@ if ( ! function_exists( 'filter_admin_scss' ) ) {
         return $_admin_scss . $patch;
     }
 
-    add_filter( '_admin.scss', 'filter_admin_scss', 10, 1 );
-
-    add_filter( 'custom.scss', 'filter_admin_scss', 10, 1 );
 }
 
+add_filter( '_admin.scss', 'filter_admin_scss', 10, 1 );
+
+add_filter( 'custom.scss', 'filter_admin_scss', 10, 1 );
 
 if ( ! function_exists( 'format_scss_keys' ) ) {
 
@@ -1089,8 +1092,8 @@ foreach ( $domain_flags as $flag ) {
         <?php
     }
 
-    add_action('shutdown', 'webdogs_domain_flags');
 }
+add_action('shutdown', 'webdogs_domain_flags');
 
 
 if ( ! function_exists( 'wds_maybe_clear_cache' ) ) {
@@ -1116,12 +1119,11 @@ if ( ! function_exists( 'webdogs_clear_cache' ) ) {
             // print( __( 'All caches have been purged.', 'options-framework' ) );
         }
     }
-    
-    add_action( 'upgrader_process_complete', 'webdogs_clear_cache', 100 );    
-    add_action( 'automatic_updates_complete', 'webdogs_clear_cache', 100 );
-    add_action( 'optionsframework_after_validate', 'webdogs_clear_cache', 100 );
-    add_action( 'optionsframework_update_bulk_plugins_complete_actions', 'webdogs_clear_cache', 100 );
-}
+}/*
+add_action( 'upgrader_process_complete', 'webdogs_clear_cache', 100 );    
+add_action( 'automatic_updates_complete', 'webdogs_clear_cache', 100 );
+add_action( 'optionsframework_after_validate', 'webdogs_clear_cache', 100 );
+add_action( 'optionsframework_update_bulk_plugins_complete_actions', 'webdogs_clear_cache', 100 );*/
 
 if ( ! function_exists( 'webdogs_maintenace_mode' ) ) {
 
@@ -1134,33 +1136,34 @@ if ( ! function_exists( 'webdogs_maintenace_mode' ) ) {
         }
     }
 
-    add_action('get_header', 'webdogs_maintenace_mode');
+}
+add_action('get_header', 'webdogs_maintenace_mode');
+
+
+// REMOVE HEADER META TAGS
+if ( 'yes' === of_get_option('remove_rsd_link', 'no')){
+    remove_action('wp_head', 'rsd_link');
 }
 
-    // REMOVE HEADER META TAGS
-    if ( 'yes' === of_get_option('remove_rsd_link', 'no')){
-        remove_action('wp_head', 'rsd_link');
-    }
+if ( 'yes' === of_get_option('remove_wp_generator', 'no')){
+    remove_action('wp_head', 'wp_generator');
+}
 
-    if ( 'yes' === of_get_option('remove_wp_generator', 'no')){
-        remove_action('wp_head', 'wp_generator');
-    }
+if ( 'yes' === of_get_option('remove_site_feed_links', 'no')){
+    remove_action('wp_head', 'feed_links', 2);
+}
 
-    if ( 'yes' === of_get_option('remove_site_feed_links', 'no')){
-        remove_action('wp_head', 'feed_links', 2);
-    }
+if ( 'yes' === of_get_option('remove_comments_feed_links', 'no')){
+    remove_action('wp_head', 'automatic_feed_links', 3);
+}
 
-    if ( 'yes' === of_get_option('remove_comments_feed_links', 'no')){
-        remove_action('wp_head', 'automatic_feed_links', 3);
-    }
+if ( 'yes' === of_get_option('remove_wlwmanifest_link', 'no')){
+    remove_action('wp_head', 'wlwmanifest_link');
+}
 
-    if ( 'yes' === of_get_option('remove_wlwmanifest_link', 'no')){
-        remove_action('wp_head', 'wlwmanifest_link');
-    }
-
-    if ( 'yes' === of_get_option('remove_feed_links_extra', 'no')){
-        remove_action('wp_head', 'feed_links_extra', 3);
-    }
+if ( 'yes' === of_get_option('remove_feed_links_extra', 'no')){
+    remove_action('wp_head', 'feed_links_extra', 3);
+}
 
 
 if ( ! function_exists( 'webdogs_activation' ) ) {
