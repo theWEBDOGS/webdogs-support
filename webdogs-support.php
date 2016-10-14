@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.1.4.1
+Version:     2.1.4.2
 */
 
 /*
@@ -636,12 +636,6 @@ if ( ! function_exists( 'wds_create_daily_notification_schedule' ) ) {
     
     function wds_create_daily_notification_schedule(){
 
-        //bail is not a mantainance account
-        // if( ! defined('DB_NAME') ){ return; }
-        // if(   defined('DB_NAME') && stripos( DB_NAME, 'snapshot' ) !== false ) { return; }
-
-        if( wds_domain_exculded() ) { return; }
-
         //Use wp_next_scheduled to check if the event is already scheduled
         $timestamp = wp_next_scheduled( 'wd_create_daily_notification' );
 
@@ -672,7 +666,6 @@ if ( ! function_exists( 'wd_get_notification' ) ) {
         $notice    = wds_base_strings( $notice_id );
 
         return ( $active )
-       
 
         ?// ACTIVE MAINTAINANCE SUPPORT
         array( 
@@ -785,7 +778,7 @@ if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
 
             // SAVE THE PROOF SO IF WE CHECK AGAIN
             // THE PROOF WILL MATCH AND PASS
-            if(!$test) { 
+            if( ! $test ) { 
 
                 update_option( 'wd_maintenance_notification_proof', $new_date );
             }
@@ -804,35 +797,22 @@ if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
         
         if( $test ){ wp_die( $message ); }
     }
-}
 
-
-
-
-if ( function_exists( 'wd_send_maintenance_notification' ) ) {
-
-    if (isset(  $_GET['wd_send_maintenance_notification']) 
+    //////////////////////////////////////////////////////
+    // INLINE TEST////////////////////////////////////////
+    if (isset(  $_GET['wd_send_maintenance_notification'])
     && "test"===$_GET['wd_send_maintenance_notification']){
-        
-        wd_send_maintenance_notification( true );
-
-    }
+        wd_send_maintenance_notification( true ); }
 }
 add_action( 'wd_create_daily_notification', 'wd_send_maintenance_notification' );
 
 
 if ( ! function_exists( 'optionsframework_load_plugins' ) ) {
-
     function optionsframework_load_plugins(&$instance){
-
         unset( $GLOBALS['optionsframeworkpluginactivation'] );
-
-        $GLOBALS['optionsframeworkpluginactivation'] = $instance;
-    }
-
+        $GLOBALS['optionsframeworkpluginactivation'] = $instance; } 
 }
 add_action( 'optionsframeworkpluginactivation_init', 'optionsframework_load_plugins', 20, 1 );
-
 
 
 if ( ! function_exists( 'wd_get_brightness' ) ) {
@@ -899,7 +879,6 @@ if ( ! function_exists( 'wd_get_icon_logo' ) ) {
         return ( $data_image ) ? 'data:image/svg+xml;base64,' . base64_encode( $comp ) : $comp ;
     }
 }
-
 
     
 if ( ! function_exists( 'wds_remove_wp_logo' ) ) {
@@ -1209,44 +1188,33 @@ if ( ! function_exists( 'webdogs_activation' ) ) {
             else { wp_die( 'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.' ); } } }
         }
 
-        function webdogs_init_color_schemes() {
-            global $wp_filesystem;
-            $wp_upload_dir = wp_upload_dir();
-               $upload_dir = $wp_upload_dir['basedir'] . '/admin-color-scheme';
-                $core_scss = array( '_admin.scss', '_mixins.scss', '_variables.scss' );
-                $admin_dir = ABSPATH . '/wp-admin/css/';
 
-            foreach ( $core_scss as $file ) {
-            if ( ! file_exists( $upload_dir . "/{$file}" ) ) {
-            if ( ! $wp_filesystem->put_contents( $upload_dir . "/{$file}", $wp_filesystem->get_contents( $admin_dir . 'colors/' . $file, FS_CHMOD_FILE) ) ) {
-            if ( $doing_ajax ) { $response = array( 'errors' => true, 'message' => __( 'Could not copy a core file.', 'options-framework' ), ); echo json_encode( $response ); die(); }
-            wp_die( "Could not copy the core file {$file}." ); } } }
-
-            if ( ! file_exists( $upload_dir . "/colors.css" ) ) {
-            if ( ! $wp_filesystem->put_contents( $upload_dir . "/colors.css", $wp_filesystem->get_contents( $admin_dir . 'colors.css', FS_CHMOD_FILE) ) ) {
-            if ( $doing_ajax ) { $response = array( 'errors' => true, 'message' => __( 'Could not copy a core file.', 'options-framework' ), ); echo json_encode( $response ); die(); }
-            wp_die( "Could not copy the core file colors.css." ); } }
-        }
-
-
-        /////////////////////////
-        //                         
-        //   ADD SUPPORT ROLES    
-        //                         
-        webdogs_init_roles();      
-        //                         
-        //   ADD NOTIFICATION CRON  
-        //                         
-        webdogs_init_schedule();   
-        //                         
-        //   UNPACK WATCHDOG TO MU 
-        //                        
-        webdogs_init_watchdog();  
-        //                        
-        //   COPY SCSS TO UPLOADS    
-        //                        
-        webdogs_init_color_schemes();
-        //
+        /////////////////////////////
+        //                           
+        //   ADD SUPPORT ROLES       
+        //                           
+        /////////////////////////////
+        webdogs_init_roles();////////
+        /////////////////////////////
+        //                           
+        //   ADD NOTIFICATION CRON   
+        //                           
+        /////////////////////////////
+        webdogs_init_schedule();/////
+        /////////////////////////////
+        //                           
+        //   UNPACK WATCHDOG TO MU   
+        //                           
+        /////////////////////////////
+        webdogs_init_watchdog();/////
+        /////////////////////////////
+        /////////////////////////////
+        //                         //
+        //   A C T I V A T I O N   //
+        //    C O M P L E T E D    //
+        //                         //
+        //    Y O U   E N J O Y    //
+        //                         //
         /////////////////////////////
 
     }
