@@ -668,7 +668,7 @@ if ( ! function_exists( 'wd_get_logo_icon' ) ) {
 
 
     
-if ( ! function_exists( 'remove_wp_logo' ) ) {
+if ( ! function_exists( 'wds_remove_wp_logo' ) ) {
     
     function wds_remove_wp_logo( $wp_admin_bar ) {
 
@@ -714,7 +714,7 @@ if ( ! function_exists( 'filter_admin_scss' ) ) {
 }
 
 
-if ( ! function_exists( 'filter_admin_scss' ) ) {
+if ( ! function_exists( 'format_scss_keys' ) ) {
 
     function format_scss_keys( $array ){ 
         return array_values( json_decode( str_replace("-", "_", json_encode( $array ) ), true ) ); 
