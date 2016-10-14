@@ -1160,7 +1160,10 @@ if ( ! function_exists( 'webdogs_activation' ) ) {
 
     function webdogs_activation() {
 
-        deactivate_plugins( WP_PLUGIN_DIR . '/webdogs-support-dashboard-widget/webdogs-support-dashboard-widget.php' );
+        deactivate_plugins( array(
+        WP_PLUGIN_DIR . '/webdogs-support-dashboard-widget/webdogs-support-dashboard-widget.php',
+        WP_PLUGIN_DIR . '/login-logo-svg/login-logo.php',
+        WP_PLUGIN_DIR . '/login-logo/login-logo.php' ) );
 
         function webdogs_init_roles() {
             $admin = get_role('administrator');
