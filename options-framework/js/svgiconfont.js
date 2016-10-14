@@ -54031,7 +54031,7 @@ commandManager.suscribe('render', renderFont );
 
 jQuery(iconInput).on('change', initFiles );
 
-document.addEventListener("DOMContentLoaded", initFiles );
+// document.addEventListener("DOMContentLoaded", initFiles );
 // window.addEventListener("load", function(){ 
 //     clearDelayedPreview();
 //     previewLogoIconTimeout = window.setTimeout( initFiles, 30 );

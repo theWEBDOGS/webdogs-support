@@ -855,6 +855,8 @@ class Admin_Bar_Color {
 
 	public function wp_enqueue_style(){
 
+		if( empty( of_get_option('logo_icon_css','') ) ) { return; }
+
 		$wp_upload_dir = wp_upload_dir();
 		$upload_dir = $wp_upload_dir['basedir'] . '/admin-color-scheme';
 		$upload_url = $wp_upload_dir['baseurl'] . '/admin-color-scheme';
