@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.1.4
+Version:     2.1.4.0
 */
 
 /*
@@ -88,6 +88,9 @@ if(!class_exists('WEBDOGS')) {
             add_action( 'wp_dashboard_setup',                   array(&$this,'webdogs_add_dashboard_widget'         ));
         
             add_action( 'admin_enqueue_scripts',                array(&$this,'webdogs_enqueue_scripts'              ));
+
+            add_action( 'admin_enqueue_scripts',                array(&$this,'webdogs_enqueue_domain_flags'         ));
+            add_action( 'wp_enqueue_scripts',                   array(&$this,'webdogs_enqueue_domain_flags'         ));
         
             add_action( 'wp_ajax_webdogs_result_dashboard',     array(&$this,'webdogs_result_dashboard_callback'    )); 
 
@@ -222,6 +225,234 @@ if(!class_exists('WEBDOGS')) {
                 add_action( 'admin_footer', array(&$this,'webdogs_dashboard_javascript'));
             }
         }
+
+        /**
+         *
+         */
+        function webdogs_enqueue_domain_flags() {
+
+            if( wds_show_domain_flags() ) {
+                wp_enqueue_style( 'dashicons' );
+                add_action( 'shutdown', array(&$this,'webdogs_domain_flags'));
+            }
+        }
+
+        
+        // OUTPUT DOMAIN FLAGS
+        function webdogs_domain_flags() {
+
+            if( is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX ) { return; }
+
+            $domain_flags = wds_show_domain_flags();
+
+            if ( ! $domain_flags ){ return; } ?>
+
+            <style type="text/css">
+
+            #webdogs_flags_wrap {
+                right: 0;
+                left: 0;
+                height: 0px;
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                z-index: 100000000000;
+                display: block;
+                opacity: 1;
+                overflow: visible;
+                border-bottom: 5px solid #9bb567;
+                opacity: 0.334;
+            /*     -webkit-transition: all 1s linear 1s;
+                -moz-transition: all 1s linear 2s;
+                transition: all 1s linear 2s; */
+            }
+
+            #webdogs_flags {
+                color: #FFF;
+                border: 22px solid transparent;
+                border-bottom-color: #9bb567;
+                line-height: 12px;
+                font-size: 9px;
+                text-transform: uppercase;
+                font-family: sans-serif;
+                letter-spacing: 1px;
+                position: relative;
+                display: block;
+                float: right;
+                height: 0;
+                width: auto;
+                top: -44px;
+                right: -100%;
+                z-index: 10000;
+                overflow: visible;
+                -webkit-transition: all 1.4s ease-in-out;
+                -moz-transition: all 1.4s ease-in-out;
+                transition: all 1.4s ease-in-out;
+            }
+
+            #webdogs_flags_list {
+                position: relative;
+                display: block;
+                top: 8px;
+                padding: 0 26px 0 9px;
+                margin: 0 auto;
+                min-width: 120px;
+                text-align: center;
+            }
+
+            #webdogs_flags_wrap .wds-domain-flag {
+                margin: 0 0 0 0;
+                right: -500%;
+                width: auto;
+                padding: 0 44px 0 0;
+                position: relative;
+                display: block;
+                float: right;
+            }
+
+            #webdogs_flags_wrap .wds-domain-flag:before {
+                content: " ";
+                border: 27px solid transparent;
+                border-bottom-color: rgba(55, 122, 159, 0.36);
+                position: absolute;
+                z-index: -1;
+                top: -35px;
+                left: -36px;
+                right: -1000%;
+            }
+
+            #webdogs_flags_wrap .wds-domain-flag > span {
+                display: block;
+                text-align: center;
+            }
+
+            #webdogs_flags_wrap.active, 
+            #webdogs_flags_wrap.hover, 
+            #webdogs_flags_wrap:hover {
+                opacity: 1;
+                -webkit-transition: all .23s linear;
+                -moz-transition: all .23s linear;
+                transition: all .23s linear;
+            }
+
+            #webdogs_flags_wrap.active #webdogs_flags,
+            #webdogs_flags_wrap.hover #webdogs_flags,
+            #webdogs_flags_wrap:hover #webdogs_flags {
+                right: -64px;
+                -webkit-transition: all .23s ease;
+                -moz-transition: all .23s ease;
+                transition: all .23s ease;
+            }
+
+            #webdogs_flags_wrap.active .wds-domain-flag,
+            #webdogs_flags_wrap.hover .wds-domain-flag,
+            #webdogs_flags_wrap:hover .wds-domain-flag {
+                right: 0%;
+            }
+
+            #webdogs_flags_wrap .notice-dismiss .screen-reader-text { display:none ;}
+            #webdogs_flags_wrap .notice-dismiss {
+                top: -4px;
+                right: auto;
+                z-index: 10000;
+                position: relative;
+                display: inline-block;
+                float: left;
+                margin: 0 42px 0 0;
+                opacity: 1;
+                border: none !important;
+                padding: 0;
+                background: 0 0;
+                cursor: pointer
+                color:rgba(255, 255, 255, 0.3);
+                -webkit-border-radius:50%;
+                border-radius:50%;
+            }
+
+            #webdogs_flags_wrap .notice-dismiss:before {
+                background: 0 0;
+                color:rgba(255, 255, 255, 0.3);
+                content: "\f153";
+                display: block;
+                font: 400 16px/20px dashicons;
+                speak: none;
+                height: 20px;
+                text-align: center;
+                margin: -1px -1px -1px 0px;
+                width: 20px;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            #webdogs_flags_wrap .notice-dismiss:active:before,
+            #webdogs_flags_wrap .notice-dismiss:focus:before,
+            #webdogs_flags_wrap .notice-dismiss:hover:before {
+                color:rgba(255, 255, 255, 0.5);
+            }
+
+            #webdogs_flags_wrap .notice-dismiss:focus {
+                outline: 0;
+                -webkit-box-shadow: 0 0 0 1px #5b9dd9,0 0 2px 1px rgba(30,140,190,.8);
+                box-shadow: 0 0 0 1px #5b9dd9,0 0 2px 1px rgba(30,140,190,.8);
+            }
+            .ie8 #webdogs_flags_wrap .notice-dismiss:focus {
+                outline: #5b9dd9 solid 1px
+            }
+            <?php 
+
+            $flag_format = '
+            #webdogs_flags_wrap .wds-domain-flag.wds-domain-flag-%1$s {
+                -webkit-transition: all 1.4s ease-in %2$Fs;
+                -moz-transition: all 1.4s ease-in %2$Fs;
+                transition: all 1.4s ease-in %2$Fs;
+            }';
+
+            $flag_format_hover = '
+            #webdogs_flags_wrap.active .wds-domain-flag.wds-domain-flag-%1$s,
+            #webdogs_flags_wrap.hover .wds-domain-flag.wds-domain-flag-%1$s,
+            #webdogs_flags_wrap:hover .wds-domain-flag.wds-domain-flag-%1$s {
+                -webkit-transition: all .23s ease-out %2$Fs;
+                -moz-transition: all .23s ease-out %2$Fs;
+                transition: all .23s ease-out %2$Fs;
+            }';
+            $base_delay = 0;
+            foreach ( array_reverse( $domain_flags ) as $flag ) {
+                $base_delay = $base_delay + 0.23;
+                printf( $flag_format, sanitize_html_class( $flag ), $base_delay );
+            }
+            $base_delay = $base_delay + 0.115;
+            printf('
+            #webdogs_flags_wrap, 
+            #webdogs_flags {
+                -webkit-transition: all 1.4s ease-in-out %1$Fs;
+                -moz-transition: all 1.4s ease-in-out %1$Fs;
+                transition: all 1.4s ease-in-out %1$Fs;
+            }', $base_delay );
+
+            $base_delay = 0;
+            foreach ( $domain_flags as $flag ) {
+                $base_delay = $base_delay + 0.23;
+                printf( $flag_format_hover, sanitize_html_class( $flag ), $base_delay );
+            }
+            ?>
+            </style>
+            <div class="" id="webdogs_flags_wrap" onmouseenter="this.className='active';">
+                <div id="webdogs_flags">
+                    <ul id="webdogs_flags_list">
+                        <button type="button" class="notice-dismiss" onclick="webdogs_flags_wrap.className='';this.blur();return false;"><span class="screen-reader-text">Dismiss flags.</span></button>
+                        <?php
+
+                        foreach ( array_reverse( $domain_flags ) as $flag ) {
+                            printf('<li class="wds-domain-flag wds-domain-flag-%s"><span>%s</span></li>', sanitize_html_class( $flag ), esc_html( $flag ) ); }
+                        ?>
+                    </ul>
+                </div>
+            </div>
+            <script type="text/javascript"> window.onload = function() { webdogs_flags_wrap.className='active'; } </script>
+            <?php
+        }
+
+
 
         /**
          * @return void
@@ -712,10 +943,9 @@ if ( ! function_exists( 'filter_admin_scss' ) ) {
     }
 
 }
-
 add_filter( '_admin.scss', 'filter_admin_scss', 10, 1 );
-
 add_filter( 'custom.scss', 'filter_admin_scss', 10, 1 );
+
 
 if ( ! function_exists( 'format_scss_keys' ) ) {
 
@@ -875,225 +1105,6 @@ if ( ! function_exists( 'wds_get_domain_flags' ) ) {
         return apply_filters('wds_get_domain_flags', $flags );
     }
 }
-
-if ( ! function_exists( 'webdogs_domain_flags' ) ) {
-    
-    // OUTPUT DOMAIN FLAGS
-    function webdogs_domain_flags() {
-
-        if( is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX ) { return; }
-
-        $domain_flags = wds_show_domain_flags();
-
-        if ( ! $domain_flags ){ return; }
-        ?>
-
-<style type="text/css">
-
-#webdogs_flags_wrap {
-    right: 0;
-    left: 0;
-    height: 0px;
-    position: fixed;
-    top: auto;
-    bottom: 0;
-    z-index: 100000000000;
-    display: block;
-    opacity: 1;
-    overflow: visible;
-    border-bottom: 5px solid #9bb567;
-    opacity: 0.334;
-/*     -webkit-transition: all 1s linear 1s;
-    -moz-transition: all 1s linear 2s;
-    transition: all 1s linear 2s; */
-}
-
-#webdogs_flags {
-    color: #FFF;
-    border: 22px solid transparent;
-    border-bottom-color: #9bb567;
-    line-height: 12px;
-    font-size: 9px;
-    text-transform: uppercase;
-    font-family: sans-serif;
-    letter-spacing: 1px;
-    position: relative;
-    display: block;
-    float: right;
-    height: 0;
-    width: auto;
-    top: -44px;
-    right: -100%;
-    z-index: 10000;
-    overflow: visible;
-    -webkit-transition: all 1.4s ease-in-out;
-    -moz-transition: all 1.4s ease-in-out;
-    transition: all 1.4s ease-in-out;
-}
-
-#webdogs_flags_list {
-    position: relative;
-    display: block;
-    top: 8px;
-    padding: 0 26px 0 9px;
-    margin: 0 auto;
-    min-width: 120px;
-    text-align: center;
-}
-
-#webdogs_flags_wrap .wds-domain-flag {
-    margin: 0 0 0 0;
-    right: -500%;
-    width: auto;
-    padding: 0 44px 0 0;
-    position: relative;
-    display: block;
-    float: right;
-}
-
-#webdogs_flags_wrap .wds-domain-flag:before {
-    content: " ";
-    border: 27px solid transparent;
-    border-bottom-color: rgba(55, 122, 159, 0.36);
-    position: absolute;
-    z-index: -1;
-    top: -35px;
-    left: -36px;
-    right: -1000%;
-}
-
-#webdogs_flags_wrap .wds-domain-flag > span {
-    display: block;
-    text-align: center;
-}
-
-#webdogs_flags_wrap.active, 
-#webdogs_flags_wrap.hover, 
-#webdogs_flags_wrap:hover {
-    opacity: 1;
-    -webkit-transition: all .23s linear;
-    -moz-transition: all .23s linear;
-    transition: all .23s linear;
-}
-
-#webdogs_flags_wrap.active #webdogs_flags,
-#webdogs_flags_wrap.hover #webdogs_flags,
-#webdogs_flags_wrap:hover #webdogs_flags {
-    right: -64px;
-    -webkit-transition: all .23s ease;
-    -moz-transition: all .23s ease;
-    transition: all .23s ease;
-}
-
-#webdogs_flags_wrap.active .wds-domain-flag,
-#webdogs_flags_wrap.hover .wds-domain-flag,
-#webdogs_flags_wrap:hover .wds-domain-flag {
-    right: 0%;
-}
-
-#webdogs_flags_wrap .notice-dismiss {
-    top: -4px;
-    right: auto;
-    z-index: 10000;
-    position: relative;
-    display: inline-block;
-    float: left;
-    margin: 0 42px 0 0;
-    opacity: 1;
-    border: none;
-    padding: 0;
-    background: 0 0;
-    cursor: pointer
-    color:rgba(255, 255, 255, 0.3);
-    -webkit-border-radius:50%;
-    border-radius:50%;
-}
-
-#webdogs_flags_wrap .notice-dismiss:before {
-    background: 0 0;
-    color:rgba(255, 255, 255, 0.3);
-    content: "\f153";
-    display: block;
-    font: 400 16px/20px dashicons;
-    speak: none;
-    height: 20px;
-    text-align: center;
-    width: 20px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-#webdogs_flags_wrap .notice-dismiss:active:before,
-#webdogs_flags_wrap .notice-dismiss:focus:before,
-#webdogs_flags_wrap .notice-dismiss:hover:before {
-    color:rgba(255, 255, 255, 0.5);
-}
-
-#webdogs_flags_wrap .notice-dismiss:focus {
-    outline: 0;
-    -webkit-box-shadow: 0 0 0 1px #5b9dd9,0 0 2px 1px rgba(30,140,190,.8);
-    box-shadow: 0 0 0 1px #5b9dd9,0 0 2px 1px rgba(30,140,190,.8);
-}
-
-.ie8 #webdogs_flags_wrap .notice-dismiss:focus {
-    outline: #5b9dd9 solid 1px
-}
-<?php 
-
-$flag_format = '
-#webdogs_flags_wrap .wds-domain-flag.wds-domain-flag-%1$s {
-    -webkit-transition: all 1.4s ease-in %2$Fs;
-    -moz-transition: all 1.4s ease-in %2$Fs;
-    transition: all 1.4s ease-in %2$Fs;
-}';
-
-$flag_format_hover = '
-#webdogs_flags_wrap.active .wds-domain-flag.wds-domain-flag-%1$s,
-#webdogs_flags_wrap.hover .wds-domain-flag.wds-domain-flag-%1$s,
-#webdogs_flags_wrap:hover .wds-domain-flag.wds-domain-flag-%1$s {
-    -webkit-transition: all .23s ease-out %2$Fs;
-    -moz-transition: all .23s ease-out %2$Fs;
-    transition: all .23s ease-out %2$Fs;
-}';
-$base_delay = 0;
-foreach ( array_reverse( $domain_flags ) as $flag ) {
-    $base_delay = $base_delay + 0.23;
-    printf( $flag_format, sanitize_html_class( $flag ), $base_delay );
-}
-$base_delay = $base_delay + 0.115;
-printf('
-#webdogs_flags_wrap, 
-#webdogs_flags {
-    -webkit-transition: all 1.4s ease-in-out %1$Fs;
-    -moz-transition: all 1.4s ease-in-out %1$Fs;
-    transition: all 1.4s ease-in-out %1$Fs;
-}', $base_delay );
-
-$base_delay = 0;
-foreach ( $domain_flags as $flag ) {
-    $base_delay = $base_delay + 0.23;
-    printf( $flag_format_hover, sanitize_html_class( $flag ), $base_delay );
-}
-?>
-</style>
-        <div class="" id="webdogs_flags_wrap" onmouseenter="this.className='active';">
-            <div id="webdogs_flags">
-                <ul id="webdogs_flags_list">
-                    <button type="button" class="notice-dismiss" onclick="webdogs_flags_wrap.className='';this.blur();return false;"><span class="screen-reader-text">Dismiss flags.</span></button>
-                    <?php
-
-                    foreach ( array_reverse( $domain_flags ) as $flag ) {
-                        printf('<li class="wds-domain-flag wds-domain-flag-%s"><span>%s</span></li>', sanitize_html_class( $flag ), esc_html( $flag ) ); }
-                    ?>
-                </ul>
-            </div>
-        </div>
-        <script type="text/javascript"> window.onload = function() { webdogs_flags_wrap.className='active'; } </script>
-        <?php
-    }
-
-}
-add_action('shutdown', 'webdogs_domain_flags');
 
 
 if ( ! function_exists( 'wds_maybe_clear_cache' ) ) {
