@@ -83,13 +83,21 @@ function wds_base_plugins(){
 			'name'      => 'WEBDOGS Support',
 			'slug'      => 'webdogs-support-dashboard-widget',
 			'file_path' => 'webdogs-support-dashboard-widget/webdogs-support-dashboard-widget.php',
-			'force_deletion' => true,
+			'force_deactivation' => true,
+			'force_deletion'     => true,
+		),
+		array(
+			'name'      => 'Login Logo',
+			'slug'      => 'login-logo',
+			'file_path' => 'login-logo/login-logo.php',
+			'force_deactivation' => true,
+			'force_deletion'     => true,
 		),
 		array(
 			'name'      => 'Login Logo - SVG',
 			'slug'      => 'login-logo-svg',
 			'file_path' => 'login-logo-svg/login-logo.php',
-			'force_deactivation' => false, 
+			'force_deactivation' => true, 
 			'force_deletion'     => true,
 		),
 		array(
