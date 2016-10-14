@@ -719,7 +719,7 @@ class Options_Framework_Interface {
 
 		// Outputs closing div if there tabs
 		if ( Options_Framework_Interface::optionsframework_tabs() != '' ) {
-			echo '</div>';
+			// echo '</div>';
 		}
 
 	}

@@ -96,6 +96,10 @@ class Options_Framework_Admin {
 		// Displays notice after options save
 		add_action( 'optionsframework_after_validate', array( $this, 'save_options_notice' ) );
 
+		if ( isset( $_GET['settings-updated'] ) && 'true' == $_GET['settings-updated'] ) {
+			add_action( 'current_screen', 'wds_maybe_clear_cache', 10, 1 );
+		}
+
     }
 
 	/*
@@ -438,7 +442,7 @@ class Options_Framework_Admin {
 	} */
 </style>
 <style type="text/css" id="logo_icon_style">
-<?php echo html_entity_decode(of_get_option('logo_icon_css','')); ?>	
+<?php //echo html_entity_decode(of_get_option('logo_icon_css','')); ?>	
 </style>
 <?php
 
@@ -478,6 +482,8 @@ class Options_Framework_Admin {
 		
 		// Inline scripts from options-interface.php
 		add_action( 'admin_head', array( $this, 'of_admin_head' ) );
+
+
 	}
 
 	function of_admin_head() {

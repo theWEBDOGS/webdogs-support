@@ -170,7 +170,7 @@ class Options_Framework_Admin_Color_Schemes {
 		} elseif ( wds_must_use_admin_color() ) {
 			
 			// If a forced admin color has been configured, use it.
-			$scheme = $this->get_color_scheme();
+			$scheme = SELF::$instance->get_color_scheme();
 			$admin_color_scheme = $scheme->slug;
 		}
 
@@ -756,7 +756,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 
 
 		// write the custom.scss file
-		if ( ! $wp_filesystem->put_contents( $scss_file, apply_filters( 'custom.scss', $scss), FS_CHMOD_FILE) ) {
+		if ( ! $wp_filesystem->put_contents( $scss_file, apply_filters( 'custom.scss', $scss ), FS_CHMOD_FILE ) ) {
 
 			// @todo: error that the scheme couldn't be written and redirect
 			add_settings_error( 'options-framework', 'color_css', wds_base_strings( 'acs_write_custom_fail' ), 'error' );
@@ -845,7 +845,102 @@ class Admin_Bar_Color {
 	function __construct() {
 		$this->base = WEBDOGS_SUPPORT_DIR . '/options-framework';
 		add_action( 'wp_before_admin_bar_render', array( $this, 'save_wp_admin_color_schemes_list' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_admin_bar_color' ) );
+		
+		add_action( 'admin_enqueue_scripts', array( $this, 'wp_enqueue_style' ) );
+		add_action( 'wp_enqueue_scripts',    array( $this, 'wp_enqueue_style' ) );
+		add_action( 'wp_enqueue_scripts',    array( $this, 'enqueue_admin_bar_color' ) );
+
+		add_action( 'optionsframework_after_validate',     array( $this, 'save_logo_icon_css_file' ), 100 );
+	}
+
+	public function wp_enqueue_style(){
+
+		$wp_upload_dir = wp_upload_dir();
+		$upload_dir = $wp_upload_dir['basedir'] . '/admin-color-scheme';
+		$upload_url = $wp_upload_dir['baseurl'] . '/admin-color-scheme';
+
+		// @todo: error handling if this can't be made - needs to be differentiated from already there
+		if(!is_dir( $upload_dir )){ return; }
+
+		// @todo: save into another subdirectory for multiple scheme handling
+		$css_file = $upload_dir . '/logo-icon.css';
+		$uri      = $upload_url . '/logo-icon.css';
+
+		if(!is_file( $css_file )){ return; }
+
+		wp_enqueue_style( 'logo-icon', $uri );
+
+	}
+
+	public function admin_url() {
+		return admin_url( 'admin.php?page=options-framework' );
+	}
+
+	public function save_logo_icon_css_file() {
+
+		if( ! current_user_can( 'manage_options' )){ return; }
+
+		check_admin_referer( Options_Framework_Admin_Color_Schemes::NONCE, '_acs_ofnonce' );
+		$_post = stripslashes_deep( $_POST );
+
+		$optionsframework_settings = get_option( 'optionsframework' );
+
+		// Gets the unique option id
+		if ( isset( $optionsframework_settings['id'] ) ) {
+			$option_name = $optionsframework_settings['id'];
+		}
+		else {
+			$option_name = 'optionsframework';
+		};
+
+		$logo_icon_font_css = ( isset( $_post[ $option_name ][ 'logo_icon_css' ] ) ) ? $_post[ $option_name ][ 'logo_icon_css' ] : false ;
+
+		// No content Bail
+		if(!$logo_icon_font_css){return;}
+
+
+		// okay, let's see about getting credentials
+		// @todo: what to do about preview
+		if ( false === ( $creds = request_filesystem_credentials( $this->admin_url() ) ) ) {
+			add_settings_error( 'options-framework', 'logo_icon_css', wds_base_strings( 'acs_write_custom_fail' ), 'error' );
+			return true;
+		}
+
+		// now we have some credentials, try to get the wp_filesystem running
+		if ( ! WP_Filesystem( $creds ) ) {
+			// our credentials were no good, ask the user for them again
+			request_filesystem_credentials( $this->admin_url(), '', true );
+
+			return true;
+		}
+		
+		/**
+		 * Uplaod / male file
+		 */
+
+		global $wp_filesystem;
+
+		$wp_upload_dir = wp_upload_dir();
+		$upload_dir = $wp_upload_dir['basedir'] . '/admin-color-scheme';
+		$upload_url = $wp_upload_dir['baseurl'] . '/admin-color-scheme';
+
+		// @todo: error handling if this can't be made - needs to be differentiated from already there
+		if(!is_dir( $upload_dir )){
+			$wp_filesystem->mkdir( $upload_dir );
+		}
+
+		// @todo: save into another subdirectory for multiple scheme handling
+		$css_file = $upload_dir . '/logo-icon.css';
+		$uri      = $upload_url . '/logo-icon.css';
+
+
+		// write the custom.scss file
+		if ( ! $wp_filesystem->put_contents( $css_file, $logo_icon_font_css, FS_CHMOD_FILE ) ) {
+
+			// @todo: error that the scheme couldn't be written and redirect
+			add_settings_error( 'options-framework', 'color_css', wds_base_strings( 'acs_write_custom_fail' ), 'error' );
+			return true;
+		}
 	}
 	/**
 	 * Save the color schemes list into wp_options table
@@ -902,11 +997,11 @@ class Admin_Bar_Color {
 			/*print_r($user_color);
 			var_export($schemes[$user_color]['uri']);*/
 		}
-			?>
-<style type="text/css" id="logo_icon_style">
-<?php echo html_entity_decode(of_get_option('logo_icon_css','')); ?>	
-</style>
-			<?php
+
+
+		//<style type="text/css" id="logo_icon_style">
+		// echo html_entity_decode(of_get_option('logo_icon_css','')); 	
+		//	</style> -->
 	}
 }
 

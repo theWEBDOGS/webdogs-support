@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.1.2
+Version:     2.1.3
 */
 
 /*
@@ -690,6 +690,17 @@ if(!class_exists('WEBDOGS')) {
         return ( isset( $scheme['must_use'] ) && 'on' === $scheme['must_use'] );
     }
 
+    /**
+     * Remove all characters except letters.
+     *
+     * @param string $string
+     * @return string
+     */
+    function stripNonAlpha( $string ) {
+        return preg_replace( "/[^a-z]/i", "", $string );
+    }
+
+
     function wds_domain_exculded(){
         $exclude = array();
         
@@ -701,14 +712,34 @@ if(!class_exists('WEBDOGS')) {
             foreach ($domain_string as $term) {
 
                 if ( stripos( site_url(), $term ) !== FALSE ) { 
-                    $exclude[] = $term;
+                    $exclude[] =  $term;
                 }
             }
         }
         return ( empty( $exclude ) ) ? FALSE : $exclude ;
     }
 
+    function wds_extra_domain_flags(){
 
+        $domain_strings = apply_filters('wds_extra_domain_flags', array(
+            'wpengine.',
+            '.com',
+            '.net',
+            '.org',
+            '.edu',
+            'www.' ) );
+
+        $extra = array();
+
+        foreach ($domain_strings as $term) {
+
+            if ( stripos( site_url(), $term ) !== FALSE ) { 
+                $extra[] = $term;
+            }
+        }
+        return ( empty( $extra ) ) ? FALSE : $extra ;
+    }
+   
     function wds_is_production_site(){
         if ( function_exists( 'is_wpe_snapshot' ) ) {
             // True if we're running inside a staging-area snapshot in WPEngines
@@ -731,10 +762,10 @@ if(!class_exists('WEBDOGS')) {
         $show_when         = of_get_option('show_domain_flags', '-1');
         $show_domain_flags = FALSE;
 
-        switch ( $show_when ) {
+        switch ( strval( $show_when ) ) {
             // ALWAYS   
             case '1':
-                $show_domain_flags = wds_domain_exculded() ? TRUE : FALSE ;
+                $show_domain_flags = ( wds_domain_exculded() || ( is_user_logged_in() && current_user_can( 'manage_options' ) ) ) ? TRUE : FALSE ;
                 break;
             // NEVER
             case '0':
@@ -750,7 +781,7 @@ if(!class_exists('WEBDOGS')) {
         if( ! $show_domain_flags && $domain_flags ){
             $domain_flags = FALSE;
         } elseif( is_array( $domain_flags )) {
-            $domain_flags = array_map('trim', $domain_flags );
+            $domain_flags = array_map( 'stripNonAlpha', $domain_flags );
         }
 
         return apply_filters('wds_show_domain_flags', $domain_flags );   
@@ -759,6 +790,7 @@ if(!class_exists('WEBDOGS')) {
     function wds_get_domain_flags(){
 
         $exclutions = wds_domain_exculded();
+            $extras = wds_extra_domain_flags();
 
         $flags = array();
 
@@ -770,6 +802,9 @@ if(!class_exists('WEBDOGS')) {
         }
         if( wds_is_production_site() ) {
            $flags[] = 'production'; 
+        }
+        if ( $extras ) { 
+           $flags = array_merge( $flags, $extras ); 
         }
 
         $flags = empty( $flags ) ? FALSE : array_unique( array_values( $flags ) );
@@ -786,7 +821,9 @@ if(!class_exists('WEBDOGS')) {
 
         if ( ! $domain_flags ){ return; }
         ?>
-        <style type="text/css">
+
+<style type="text/css">
+
 #webdogs_flags_wrap {
     right: 0;
     left: 0;
@@ -823,9 +860,9 @@ if(!class_exists('WEBDOGS')) {
     right: -100%;
     z-index: 10000;
     overflow: visible;
-    -webkit-transition: all 1.4s ease-in-out 2s;
-    -moz-transition: all 1.4s ease-in-out 2s;
-    transition: all 1.4s ease-in-out 2s;
+    -webkit-transition: all 1.4s ease-in-out;
+    -moz-transition: all 1.4s ease-in-out;
+    transition: all 1.4s ease-in-out;
 }
 
 #webdogs_flags_list {
@@ -847,6 +884,7 @@ if(!class_exists('WEBDOGS')) {
     display: block;
     float: right;
 }
+
 #webdogs_flags_wrap .wds-domain-flag:before {
     content: " ";
     border: 27px solid transparent;
@@ -858,6 +896,13 @@ if(!class_exists('WEBDOGS')) {
     right: -1000%;
 }
 
+#webdogs_flags_wrap .wds-domain-flag > span {
+    display: block;
+    text-align: center;
+}
+
+#webdogs_flags_wrap.active, 
+#webdogs_flags_wrap.hover, 
 #webdogs_flags_wrap:hover {
     opacity: 1;
     -webkit-transition: all .23s linear;
@@ -865,14 +910,67 @@ if(!class_exists('WEBDOGS')) {
     transition: all .23s linear;
 }
 
+#webdogs_flags_wrap.active #webdogs_flags,
+#webdogs_flags_wrap.hover #webdogs_flags,
 #webdogs_flags_wrap:hover #webdogs_flags {
-    right: -24px;
+    right: -64px;
     -webkit-transition: all .23s ease;
     -moz-transition: all .23s ease;
     transition: all .23s ease;
 }
+
+#webdogs_flags_wrap.active .wds-domain-flag,
+#webdogs_flags_wrap.hover .wds-domain-flag,
 #webdogs_flags_wrap:hover .wds-domain-flag {
     right: 0%;
+}
+
+#webdogs_flags_wrap .notice-dismiss {
+    top: -4px;
+    right: auto;
+    z-index: 10000;
+    position: relative;
+    display: inline-block;
+    float: left;
+    margin: 0 42px 0 0;
+    opacity: 1;
+    border: none;
+    padding: 0;
+    background: 0 0;
+    cursor: pointer
+    color:rgba(255, 255, 255, 0.3);
+    -webkit-border-radius:50%;
+    border-radius:50%;
+}
+
+#webdogs_flags_wrap .notice-dismiss:before {
+    background: 0 0;
+    color:rgba(255, 255, 255, 0.3);
+    content: "\f153";
+    display: block;
+    font: 400 16px/20px dashicons;
+    speak: none;
+    height: 20px;
+    text-align: center;
+    width: 20px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#webdogs_flags_wrap .notice-dismiss:active:before,
+#webdogs_flags_wrap .notice-dismiss:focus:before,
+#webdogs_flags_wrap .notice-dismiss:hover:before {
+    color:rgba(255, 255, 255, 0.5);
+}
+
+#webdogs_flags_wrap .notice-dismiss:focus {
+    outline: 0;
+    -webkit-box-shadow: 0 0 0 1px #5b9dd9,0 0 2px 1px rgba(30,140,190,.8);
+    box-shadow: 0 0 0 1px #5b9dd9,0 0 2px 1px rgba(30,140,190,.8);
+}
+
+.ie8 #webdogs_flags_wrap .notice-dismiss:focus {
+    outline: #5b9dd9 solid 1px
 }
 <?php 
 
@@ -884,12 +982,14 @@ $flag_format = '
 }';
 
 $flag_format_hover = '
+#webdogs_flags_wrap.active .wds-domain-flag.wds-domain-flag-%1$s,
+#webdogs_flags_wrap.hover .wds-domain-flag.wds-domain-flag-%1$s,
 #webdogs_flags_wrap:hover .wds-domain-flag.wds-domain-flag-%1$s {
     -webkit-transition: all .23s ease-out %2$Fs;
     -moz-transition: all .23s ease-out %2$Fs;
     transition: all .23s ease-out %2$Fs;
 }';
-$base_delay = 2;
+$base_delay = 0;
 foreach ( array_reverse( $domain_flags ) as $flag ) {
     $base_delay = $base_delay + 0.23;
     printf( $flag_format, sanitize_html_class( $flag ), $base_delay );
@@ -910,22 +1010,56 @@ foreach ( $domain_flags as $flag ) {
 }
 ?>
 </style>
-        <div id="webdogs_flags_wrap">
-            <div class="" id="webdogs_flags">
-                <ul class="" id="webdogs_flags_list">
-                <?php
+        <div class="" id="webdogs_flags_wrap" onmouseenter="this.className='active';">
+            <div id="webdogs_flags">
+                <ul id="webdogs_flags_list">
+                    <button type="button" class="notice-dismiss" onclick="webdogs_flags_wrap.className='';this.blur();return false;"><span class="screen-reader-text">Dismiss flags.</span></button>
+                    <?php
 
-                foreach ( array_reverse( $domain_flags ) as $flag ) {
-                    printf('<li class="wds-domain-flag wds-domain-flag-%s">%s</li>', sanitize_html_class( $flag ), esc_html( $flag ) );
-                } 
-                ?>
+                    foreach ( array_reverse( $domain_flags ) as $flag ) {
+                        printf('<li class="wds-domain-flag wds-domain-flag-%s"><span>%s</span></li>', sanitize_html_class( $flag ), esc_html( $flag ) ); }
+                    ?>
                 </ul>
             </div>
         </div>
+        <script type="text/javascript"> window.onload = function() { webdogs_flags_wrap.className='active'; } </script>
         <?php
     }
 
     add_action('shutdown', 'webdogs_domain_flags');
+
+
+    // CLEAR WPE CACHE
+    /*function webdogs_clear_cache() {
+         add_action( 'current_screen', 'wds_maybe_clear_cache', 10, 1 );
+    }*/
+
+    function wds_maybe_clear_cache( $current_screen ){
+
+        $clear = did_action( 'webdogs_do_clear_cache' ) ? FALSE : TRUE ;
+        
+        if( $clear ){
+            add_settings_error( 'options-framework', 'save_options', __( 'HTML-page-caching, CDN (statics), and WordPress Object/Transient Caches have been cleared.', 'options-framework' ), 'updated fade' ); 
+            add_action( 'shutdown', 'webdogs_clear_cache' );
+        }
+
+    }
+
+    // CLEAR WPE CACHE
+    function webdogs_clear_cache() {
+        if( wds_is_production_site() ) {
+            WpeCommon::purge_memcached();
+            WpeCommon::clear_maxcdn_cache();
+            WpeCommon::purge_varnish_cache();  // refresh our own cache (after CDN purge, in case that needed to clear before we access new content)
+            // print( __( 'All caches have been purged.', 'options-framework' ) );
+        }
+    }
+    
+    add_action( 'upgrader_process_complete', 'webdogs_clear_cache', 100 );    
+    add_action( 'automatic_updates_complete', 'webdogs_clear_cache', 100 );
+    add_action( 'optionsframework_after_validate', 'webdogs_clear_cache', 100 );
+    add_action( 'optionsframework_update_bulk_plugins_complete_actions', 'webdogs_clear_cache', 100 );
+    
 
     // PUT SITE IN MAINENANCE MODE
     function webdogs_maintenace_mode() {

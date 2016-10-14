@@ -53978,7 +53978,7 @@ function renderFont() {
   fontBundler.bundle( iconStreams, {
       fontName: 'logo_icon_font',
       normalize: true,
-      fontHeight: 32,
+      fontHeight: 69,
       descent:  0,
       fixedWidth: false,
     }, function(result) {

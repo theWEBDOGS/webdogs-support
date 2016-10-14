@@ -533,7 +533,7 @@
 #section-exclude_domain, 
 #section-show_domain_flags {
     margin-right: 0 !important;
-    /* max-width: 160px; */
+    max-width: 160px;
 }
 #section-exclude_domain .explain,
 #section-show_domain_flags .explain {

@@ -178,6 +178,10 @@ div#wp-responsive-toggle a:before { color: #d0f2fc; }
  */
 html { background: #d6d6d6; }
 html body { background: #d6d6d6; }
+#wpadminbar {
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.2);
+    box-shadow: 0 1px 1px rgba(0,0,0,.2);
+}
 #wpadminbar:not(.mobile) li:hover .ab-icon { color: #ecffd3; }
 #wpadminbar li:hover .ab-icon, #wpadminbar li a:focus .ab-icon, #wpadminbar li.hover .ab-icon { color: #ecffd3; }
 #wpadminbar.mobile .quicklinks .ab-icon { color: #ecffd3; }
