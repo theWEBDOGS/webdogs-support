@@ -429,7 +429,7 @@ class Options_Framework_Interface {
 
 
 					$output .= '<label class="explain" for="' . esc_attr( $value['id'] . '_must_use' ) . '">';
-					$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][must_use]' ) . '" id="' . esc_attr( $value['id'] . '_must_use' ) . '"  class="checkbox of-input of-scheme" type="checkbox" '. checked( $scheme['must_use'], 'on', false ) .' />';
+					$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][must_use]' ) . '" id="' . esc_attr( $value['id'] . '_must_use' ) . '"  class="checkbox of-input of-scheme" type="checkbox" '. checked( @$scheme['must_use'], 'on', false ) .' />';
 					$output .= ' Must use?</label>';
 				
 					$output .= '<p class="explain">' . esc_html( $value['must_use'] ) . '</p>';
