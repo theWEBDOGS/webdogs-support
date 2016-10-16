@@ -107,7 +107,7 @@ function wds_base_plugins(){
 			'name'      => 'Hello Dolly',
 			'slug'      => 'hello-dolly',
 			'file_path' => 'hello.php',
-			'force_deletion' => true, 
+			'force_deletion' => true,
 		)
 	) );
 }
@@ -127,12 +127,12 @@ function optionsframework_options() {
 	//                     //
 	/////////////////////////
 
-	// Retrieve a list of all 
+	// Retrieve a list of all
 	// installed plugins (WP cached).
-	$installed_plugins = get_plugins(); 
+	$installed_plugins = get_plugins();
 
 	$plugins = wds_base_plugins();
-	 $themes = wds_bundled_themes(); 
+	 $themes = wds_bundled_themes();
 
 	// Custom Logo
 	// check if set in cutomizer
@@ -169,7 +169,7 @@ function optionsframework_options() {
 		'3' => __('Quarterly', 'options_check'),
 		'6' => __('Biannually', 'options_check'),
 	);
-	
+
 	$day_offset = array(); for ($i=1; $i < 29; $i++) { $day_offset[$i] = $i; }
 
 	$domain_flag_array = array(
@@ -202,7 +202,7 @@ function optionsframework_options() {
 			if ( is_plugin_active( $plugin['file_path'] ) ) {
 				$active_deletion_notice = true;
 				$delete_plugins[] = $plugin['name'] . '<span style="position: absolute;"><sup>*</sup></span>' ;
-			} else { 
+			} else {
 				$delete_plugins[] = $plugin['name'];
 			}
 		}
@@ -215,13 +215,13 @@ function optionsframework_options() {
 	}
 
 	$delete_themes = array();
-	foreach ( $themes as $slug => $theme ) { 
+	foreach ( $themes as $slug => $theme ) {
 		if ( true === $theme['force_deletion'] ) {
 
 			if ( true === $theme['active'] ) {
 				$active_deletion_notice = true;
 				$delete_themes[] = $theme['name'] . '<span style="position: absolute;"><sup>*</sup></span>' ;
-			} else { 
+			} else {
 				$delete_themes[] = $theme['name'];
 			}
 		}
@@ -232,7 +232,7 @@ function optionsframework_options() {
 	if ( ! empty($delete_plugins) ) $delete_base .= '<strong>' . __('Plugins: ', 'options_check') . '</strong>' . implode(', ', $delete_plugins ) . "<br/><br/>";
 
 	if ( ! empty($delete_themes)  ) $delete_base .= '<strong>' . __('Themes: ' , 'options_check') . '</strong>' . implode(', ', $delete_themes  );
-	
+
 	if ( ! empty($delete_base)    ) $delete_base .= '</p><p class="explain"><span><sup>*</sup></span><small>' . __(' Excludes active themes &amp; plugins' , 'options_check') . '</small>';
 
 	$delete_base = empty($delete_base) ? "Nothing to cleanup." : $delete_base ;
@@ -243,7 +243,7 @@ function optionsframework_options() {
 
 
 	$options = array();
-	
+
 	///////////////////////////
 	//				         //
 	//  SETUP TABS AND FORM  //
@@ -254,9 +254,9 @@ function optionsframework_options() {
 		'type' => 'form',
 		'id' => 'options_framework_form',
 		'name' => 'options-framework',
-		'wrap' => array( 
+		'wrap' => array(
 			'start' => true,),
-		'options' => array( 
+		'options' => array(
 			'action' => 'options.php',
 			'method' => 'post'));
 
@@ -282,14 +282,14 @@ function optionsframework_options() {
 		'std' => '0',
 		'type' => 'select',
 		'class' => 'small alignleft mini',
-		'options' => $service_array); 
+		'options' => $service_array);
 
 	$options[] = array(
 		'name' => __('Notification Frequency', 'options_check'),
 		'id' => 'maintenance_notification_frequency',
 		'std' => '1',
 		'type' => 'radio',
-		'class' => 'alignleft inline', 
+		'class' => 'alignleft inline',
 		'options' => $frequency_array);
 
 	$options[] = array(
@@ -298,7 +298,7 @@ function optionsframework_options() {
 		'id' => 'maintenance_notification_offset',
 		'std' => '1',
 		'type' => 'select',
-		'class' => 'mini alignleft', 
+		'class' => 'mini alignleft',
 		'options' => $day_offset);
 
 	$options[] = array(
@@ -318,8 +318,8 @@ function optionsframework_options() {
 	$options[] = array(
 		'id' => 'maintenance_notes_wrap',
 		'type' => 'info',
-		'wrap' => array( 
-			'start' => true, 
+		'wrap' => array(
+			'start' => true,
 			'class' => 'clear top-border'));
 
 	$options[] = array(
@@ -334,7 +334,7 @@ function optionsframework_options() {
 		'desc' => $exclude_domain,
 		'id' => 'exclude_domain',
 		'std' => 'staging',
-		'class' => 'alignleft mini bottom-pad', 
+		'class' => 'alignleft mini bottom-pad',
 		'type' => 'text');
 
 	$options[] = array(
@@ -343,12 +343,12 @@ function optionsframework_options() {
 		'id' => 'show_domain_flags',
 		'std' => '-1',
 		'type' => 'radio',
-		'class' => 'alignleft mini', 
+		'class' => 'alignleft mini',
 		'options' => $domain_flag_array);
 
 	$options[] = array(
 		'type' => 'info',
-		'wrap' => array( 
+		'wrap' => array(
 			'end' => true));
 
 
@@ -460,7 +460,7 @@ function optionsframework_options() {
 		'type' => 'info',
 		'class' => 'clear');
 
-	
+
 
 
 	/*
@@ -494,14 +494,14 @@ function optionsframework_options() {
 		'std' => 'yes',
 		'class' => 'alignleft inline',
 		'options' => $boolean_radio);
-	
+
 	$options[] = array(
 		'name' => 'Cleanup Core Bundles',
-		'type' => 'info',		
+		'type' => 'info',
 		'desc' => $delete_base,
 		'class' => 'alignleft small',
-		'wrap' => array( 
-			'start' => true, 
+		'wrap' => array(
+			'start' => true,
 			'class' => 'clear top-border inset bottom-pad',));
 
 	$options[] = array(
@@ -522,7 +522,7 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'type' => 'info',
-		'wrap' => array( 
+		'wrap' => array(
 			'end' => true));
 
 
@@ -537,7 +537,7 @@ function optionsframework_options() {
 		'type' => 'heading');
 
 	$options[] = array(
-		'name' => __('Toolbar Logo', 'options_check'),  	
+		'name' => __('Toolbar Logo', 'options_check'),
 		'desc' => __('Square viewbox, single color, compound path.', 'options_check'),
 		'id' => 'logo_icon',
 		'class' => 'clear',
@@ -559,7 +559,7 @@ function optionsframework_options() {
 		'id' => 'login_logo_bottom_margin',
 		'std' => '0',
 		'type' => 'select',
-		'class' => 'mini inline alignright', 
+		'class' => 'mini inline alignright',
 		'options' => $login_logo_margin_bottom_array,
 		'rule' => array(
 			'id' => 'login_logo_css-image',
@@ -572,7 +572,7 @@ function optionsframework_options() {
 		'id' => 'login_logo_height',
 		'std' => '100',
 		'type' => 'select',
-		'class' => 'mini inline alignright', 
+		'class' => 'mini inline alignright',
 		'options' => $login_logo_height_array,
 		'rule' => array(
 			'id' => 'login_logo_css-image',
@@ -586,7 +586,7 @@ function optionsframework_options() {
 		'desc' => '',
 		'must_use' => __('Restrict the admin colors to tne custom scheme.'),
 		'id' => 'admin_color_scheme',
-		'class' => 'clear top-border', 
+		'class' => 'clear top-border',
 		'type' => 'scheme');
 
 	$options[] = array(
@@ -605,8 +605,8 @@ function optionsframework_options() {
 		'order' => 4,
 		'type' => 'heading',
 		'class' => 'inset bottom-pad',
-		'function' => 'Options_Framework_Install_Plugins_Page' ); 
-		
+		'function' => 'Options_Framework_Install_Plugins_Page' );
+
 
 
 
@@ -675,7 +675,7 @@ function wds_internal_greetings(){
 
 /**
  *
- * Determine which bundled themes are 
+ * Determine which bundled themes are
  * installed and mark them for deletion.
  *
  */
@@ -687,7 +687,7 @@ function wds_bundled_themes(){
 
 	foreach ($themes as $theme) {
 	    if( 'the WordPress team' !== $theme['author'] ) { continue; }
-	    
+
 	    $marked_themes[] = array(
 			'name'           => $theme['name'],
 			'slug'           => $theme['id'],
@@ -700,7 +700,7 @@ function wds_bundled_themes(){
 
 /**
  *
- * Determine which bundled themes are 
+ * Determine which bundled themes are
  * installed and mMark them for deletion.
  *
  */
@@ -771,24 +771,24 @@ function wds_base_strings( $key = null ){
 			'Activate plugins',
 			'webdogs-support'
 		),
-		'plugin_deletion'                 => _n_noop( 
-			'The following plugin has been removed: %1$s.', 
-			'The following plugins have been removed: %1$s.', 
-			'webdogs-support' 
+		'plugin_deletion'                 => _n_noop(
+			'The following plugin has been removed: %1$s.',
+			'The following plugins have been removed: %1$s.',
+			'webdogs-support'
 		),
-		'theme_deletion'      			  => _n_noop( 
-			'The following theme has been removed: %s1$.', 
-			'The following themes have been removed: %1$s.', 
-			'webdogs-support' 
+		'theme_deletion'      			  => _n_noop(
+			'The following theme has been removed: %s1$.',
+			'The following themes have been removed: %1$s.',
+			'webdogs-support'
 		),
 
-		'active_maintainance_notification' => 
-        array( 
+		'active_maintainance_notification' =>
+        array(
             'subject' => "Scheduled Maintenance for %s | %s", // site_name, $site_url
             'message' => "The following updates are available for %s website: \n\r%s
 
  "), // $site_name, $updates
-		'on_demand_maintainance_notification' => 
+		'on_demand_maintainance_notification' =>
         array(
             'subject' => "WordPress Updates are Available for %s | %s", // site_name, $site_url
             'message' => "The following updates are available for %s website. \n\rIf you would like WEBDOGS to install these updates, please reply to this email. \n\r%s \n\rIf you would like WEBDOGS to install these updates, please reply to this email.
@@ -824,7 +824,7 @@ function wds_base_strings( $key = null ){
  */
 
 function wds_filter_options_capability($options=array()) {
-    
+
     if(empty($options)) return $options;
 
     $capability = array();
@@ -836,12 +836,12 @@ function wds_filter_options_capability($options=array()) {
 
         $cap = false;
         $prev_cap = ( isset( $capability[ $counter ] ) && ! empty( $capability[ $counter ] ) ) ? $capability[ $counter ] : false ;
-        
+
         if ( $value['type'] === "heading" ) {
             ++$counter;
         }
-        
-        if ( isset( $value['capability'] ) 
+
+        if ( isset( $value['capability'] )
         && ! empty( $value['capability'] ) ) {
 
             $cap = $value['capability'];
@@ -850,7 +850,7 @@ function wds_filter_options_capability($options=array()) {
                 $capability[ $counter ] = $cap;
             }
         }
-        if ( isset( $capability[ $counter ] ) 
+        if ( isset( $capability[ $counter ] )
         && ! empty( $capability[ $counter ] ) ) {
             $cap = $capability[ $counter ];
         }
@@ -940,10 +940,41 @@ add_action( 'optionsframework_register', 'wds_register_base_activation', 10 );
 
 
 function wds_admin_color_schemes( $scheme = null ) {
-	
+
 	$suffix = is_rtl() ? '-rtl' : '';
 
 	$admin_color_schemes = array(
+
+		'wpengine_tc' => array(
+
+			'id' => 2,
+			'slug' => 'wpengine_tc',
+			'name' => 'WPEngine TC',
+			'uri' => plugins_url( "css/wpengine-tc/colors$suffix.css", __FILE__ ),
+			'icon_focus' => '#162a33',
+			'icon_current' => '#162a33',
+			'base_color' => '#162a33',
+			'icon_color' => '#40bac8',
+			'highlight_color' => '#2a8792',
+			'notification_color' => '#60bb8f',
+			'button_color' => '#40bac8',
+			'text_color' => '#2a8792',
+			'body_background' => '#f0f0f0',
+			'link' => '#40bac8',
+			'link_focus' => '#2a8792',
+			'form_checked' => '#2a8792',
+			'menu_background' => '#f0f0f0',
+			'menu_text' => '#40bac8',
+			'menu_icon' => '#40bac8',
+			'menu_highlight_background' => '#F7FBFC',
+			'menu_highlight_text' => '#2a8792',
+			'menu_highlight_icon' => '#2a8792',
+			'menu_current_background' => '#F7FBFC',
+			'menu_current_text' => '#162a33',
+			'menu_current_icon' => '#162a33',
+			'adminbar_avatar_frame' => 'transparent',
+			'adminbar_input_background' => '',
+		),
 
 		'webdogs_ps' => array(
 
@@ -985,7 +1016,7 @@ function wds_admin_color_schemes( $scheme = null ) {
 			'menu_collapse_icon' => '#919191',
 			'menu_collapse_focus_text' => '#9CB4BC',
 			'menu_collapse_focus_icon' => '#9CB4BC',
-			'adminbar_avatar_frame' => 'TRANSPARENT',
+			'adminbar_avatar_frame' => 'transparent',
 			'adminbar_input_background' => '',
 		),
 
