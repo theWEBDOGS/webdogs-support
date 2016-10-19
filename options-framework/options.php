@@ -338,13 +338,13 @@ function optionsframework_options() {
 		'type' => 'text');
 
 	$options[] = array(
-		'name' => __('Show Flags', 'options_check'),
-		'desc' => __('Environment and domain markers', 'options_check'),
+		'name' => __('Show Environment Info', 'options_check'),
+		'desc' => __('Only logged in admin users would see environemnt info when enabled', 'options_check'),
 		'id' => 'show_domain_flags',
 		'std' => '-1',
 		'type' => 'radio',
 		'class' => 'alignleft mini', 
-		'options' => $domain_flag_array);
+		'options' => $boolean_radio);
 
 	$options[] = array(
 		'type' => 'info',
@@ -707,8 +707,8 @@ function wds_bundled_themes(){
 function wds_base_strings( $key = null ){
 
 	$strings = array(
-		'page_title'                      => __( 'Install Recommended Plugins', 'webdogs-support' ),
-		'menu_title'                      => __( 'Install Plugins', 'webdogs-support' ),
+		'page_title'                      => __( 'Recommended Plugins', 'webdogs-support' ),
+		'menu_title'                      => __( 'Recommended Plugins', 'webdogs-support' ),
 		'installing'                      => __( 'Installing Plugin: %s', 'webdogs-support' ), // %s = plugin name.
 		'oops'                            => __( 'Something went wrong with the plugin API.', 'webdogs-support' ),
 		'notice_can_install_required'     => _n_noop(
