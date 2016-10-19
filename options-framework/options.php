@@ -175,7 +175,7 @@ function optionsframework_options() {
 	$domain_flag_array = array(
 		 '0' => __('Never', 'options_check'),
 		 '1' => __('Always', 'options_check'),
-		'-1' => __('Login', 'options_check'),
+		'-1' => __('Logged In', 'options_check'),
 	);
 
 	$boolean_active = array(
