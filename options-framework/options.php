@@ -800,7 +800,7 @@ function wds_base_strings( $key = null ){
         'acs_write_custom_fail'		      => __( 'Could not write custom SCSS file.', 'options-framework' ),
         'acs_copy_file_fail'		      => __( 'Could not copy a core file.', 'options-framework' ),
 
-		'return'                          => __( 'Go back to Base Plugins Installer', 'webdogs-support' ),
+		'return'                          => __( 'Go back to Recommended Plugins', 'webdogs-support' ),
 		'plugin_activated'                => __( 'Plugin activated successfully.', 'webdogs-support' ),
 		'activated_successfully'          => __( 'The following plugin was activated successfully:', 'webdogs-support' ),
 		'plugin_already_active'           => __( 'No action taken. Plugin %1$s was already active.', 'webdogs-support' ),  // %1$s = plugin name(s).
