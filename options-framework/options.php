@@ -538,7 +538,7 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'name' => __('Toolbar Logo', 'options_check'),  	
-		'desc' => __('Square viewbox, single color, compound path.', 'options_check'),
+		'desc' => __('Toolbar logo must be SVG format saved as a compound path in a square viewbox. The artwork element of a logo works best.', 'options_check'),
 		'id' => 'logo_icon',
 		'class' => 'clear',
 		'type' => 'upload');
