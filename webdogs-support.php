@@ -459,6 +459,12 @@ if(!class_exists('WEBDOGS')) {
                 printf( $flag_format_hover, sanitize_html_class( $flag ), $base_delay );
             }
             ?>
+            body.iframe #webdogs_flags_wrap {
+                display:none !important;
+            }
+            .plugins_page_optionsframework-install-plugins iframe[title="Update progress"] + script + p {
+                display:none !important;
+            }
             </style>
             <div class="" id="webdogs_flags_wrap" onmouseenter="this.className='active';">
                 <div id="webdogs_flags">
