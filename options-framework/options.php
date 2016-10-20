@@ -683,7 +683,11 @@ function wds_internal_greetings(){
 
         'So Good!',
 
-        '…You\'re lookin\' swell, Dolly!'
+        '…You\'re lookin\' swell, Dolly!',
+	
+	'%s builds websites that will blow your mind...POOF!',
+		
+	'IT\'S A TRAP!!!'
 
     ) );
 }
