@@ -462,7 +462,7 @@ if(!class_exists('WEBDOGS')) {
             body.iframe #webdogs_flags_wrap {
                 display:none !important;
             }
-            .plugins_page_optionsframework-install-plugins iframe[title="Update progress"] + script + p {
+            .plugins_page_optionsframework-install-plugins iframe[title="Update progress"] {
                 display:none !important;
             }
             </style>
