@@ -139,11 +139,8 @@ if(!class_exists('WEBDOGS')) {
                 $user->set_role( 'webdogs' );
             }
             if( ! current_user_can( 'manage_support' ) && is_webdog( $user ) ){
-                /*$admin = get_role('administrator');
+                $admin = get_role('administrator');
                 $admin->add_cap('manage_support_options');
-                 $caps = $admin->capabilities;
-                 $caps[ 'manage_support' ] = $caps[ 'manage_support_options' ] = 1;*/
-                
                 $user->add_cap( 'manage_support' );
                 $user->add_cap( 'manage_support_options' );
             }
