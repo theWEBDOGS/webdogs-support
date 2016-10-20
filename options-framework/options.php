@@ -641,37 +641,17 @@ function wds_internal_greetings(){
 
 	array(
 
-        'HYAH?!',
-
-        'hYah!',
+        'hYAh %s',
 
         'ON FLE3K',
 
         'This is What We Do',
 
-        'Welcome, %s!',
-
         'No Bone is Too BIG for %s!',
-
-        '%s Can Help You!',
-
-        'Who are these Geniuses?',
-
-        'We don\'t Bite!',
-
-        'Create. Grow. Maintain.',
-
-        'This is Our Work',
-
-        'This is Who We Are',
 
         'Y3K Ready',
 
-        'Creative Website Development',
-
-        '…One website at a time!',
-
-        'Howdy, NETCATS',
+        'NETCATS RULEZ',
 
         'Always… never forget: Log Your Time.',
 
@@ -679,15 +659,39 @@ function wds_internal_greetings(){
 
         'Quick %s… Look busy.',
 
-        'WOOF!',
-
-        'So Good!',
-
         '…You\'re lookin\' swell, Dolly!',
 	
 	'%s builds websites that will blow your mind...POOF!',
 		
-	'IT\'S A TRAP!!!'
+	'IT\'S A TRAP!!!',
+		
+	'Be exceptional (deliver above and beyond)',
+
+	'Ask the right questions (be proactive and never assume)',
+		
+	'Answer the right questions (listen for the real meaning)',
+		
+	'Learn constantly (and learn from mistakes)',
+		
+	'Everything has a map (find the best path)',
+		
+	'Make use of tools (everything has been done before)',
+		
+	'Let go of your ego',
+		
+	'It\'s everyone\'s first life (our intentions are good)',
+		
+	'You can\'t be perfect so you can always be better',
+		
+	'Positive words are great!',
+	
+	'10 - 15 minute rule (don\'t go down a rabbit-hole)',
+	
+	'If something seems broken, bring it up to the team',
+		
+	'Assume there is a simple explanation first',
+		
+	'Name files correctly (use descriptive titles, hyphens replace spaces)'
 
     ) );
 }
