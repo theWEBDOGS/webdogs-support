@@ -102,7 +102,7 @@ class Options_Framework_Admin_Color_Schemes {
 		add_action( 'optionsframework_after_validate',     array( $this, 'of_save' ) );
 
 
-		add_filter( 'get_color_scheme_options',    array( __CLASS__, 'filter_color_scheme_options'), 10, 1 ); 
+		add_filter( 'get_color_scheme_options',    array( __CLASS__, 'filter_color_scheme_options'), 10, 1 );
 
 		// Override the user's admin color scheme.
 		add_filter( 'get_user_option_admin_color', array( __CLASS__, 'must_use_admin_color'           ),10, 1 );
@@ -144,14 +144,14 @@ class Options_Framework_Admin_Color_Schemes {
 	 */
 	public static function filter_color_scheme_options( $color_schemes ) {
 
-		if ( current_user_can( 'webdogs' ) ) {
+		if ( current_user_can( 'webdogs' ) || current_user_can( 'manage_support_options' ) ) {
 
 			$color_schemes = array_merge( array_values( $color_schemes ), array_values( wds_admin_color_schemes() ) );
 		}
 
 		return $color_schemes;
 	}
-		
+
 	/**
 	 * Overrides the user's admin color scheme with the forced admin color
 	 * scheme, if set.
@@ -162,13 +162,13 @@ class Options_Framework_Admin_Color_Schemes {
 	 * @return string
 	 */
 	public static function must_use_admin_color( $admin_color_scheme ) {
-		
+
 		if ( current_user_can( 'webdogs' ) ) {
 
-			$admin_color_scheme = ( wds_is_production_site() ) ? "webdogs_ps" : "webdogs_ds" ;
+			$admin_color_scheme = ( wds_is_production_site() ) ? "webdogs_wpe" : "webdogs_ds" ;
 
 		} elseif ( wds_must_use_admin_color() ) {
-			
+
 			// If a forced admin color has been configured, use it.
 			$scheme = SELF::$instance->get_color_scheme();
 			$admin_color_scheme = $scheme->slug;
@@ -194,7 +194,7 @@ class Options_Framework_Admin_Color_Schemes {
 
 
 	public function admin_menu() {
-		$hook = add_management_page( 'Admin Color Scheme', 'Admin Colors', 'manage_options', 'options-framework', array( $this, 'admin_page' ) );
+		$hook = add_management_page( 'Admin Color Scheme', 'Admin Colors', 'manage_support_options', 'options-framework', array( $this, 'admin_page' ) );
 		add_action( 'load-' . $hook, array( $this, 'load' ) );
 	}
 
@@ -217,7 +217,7 @@ class Options_Framework_Admin_Color_Schemes {
 	}
 
 	public function get_Sass_JS() {
-		if( ! is_admin() || ! current_user_can('manage_options' ) ) return;
+		if( ! is_admin() || ! current_user_can('manage_support_options' ) ) return;
 
 		$wp_upload_dir = wp_upload_dir();
 
@@ -226,7 +226,7 @@ class Options_Framework_Admin_Color_Schemes {
 <script type="text/javascript">
 
 
-	
+
 /*! sass.js - v0.9.13 (236485c) - built 2016-09-25
   providing libsass 3.3.6 (3ae9a20)
   via emscripten 1.36.5 (8e29cf1)
@@ -520,7 +520,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 	}
 
 	public function save() {
-		current_user_can( 'manage_options' ) || die;
+		current_user_can( 'manage_support_options' ) || die;
 		check_admin_referer( self::NONCE, '_acs_ofnonce' );
 		$_post = stripslashes_deep( $_POST );
 		$doing_ajax = defined( 'DOING_AJAX' ) && DOING_AJAX;
@@ -676,11 +676,11 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 
 	public function of_save() {
 
-		if( ! current_user_can( 'manage_options' )){ return; }
+		if( ! current_user_can( 'manage_support_options' )){ return; }
 
 		check_admin_referer( self::NONCE, '_acs_ofnonce' );
 		$_post = stripslashes_deep( $_POST );
-		
+
 		$scheme = $this->get_color_scheme();
 
 		add_filter( 'scss_keys', 'format_scss_keys', 10 , 1 );
@@ -771,7 +771,6 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 		if ( ! $wp_filesystem->put_contents( $css_file, $css, FS_CHMOD_FILE) ) {
 
 			add_settings_error( 'options-framework', 'color_css', wds_base_strings( 'acs_write_compiled_fail' ), 'update-nag dismissable' );
-		
 
 			return true;
 			// @todo: error that the compiled scheme couldn't be written and redirect
@@ -845,7 +844,7 @@ class Admin_Bar_Color {
 	function __construct() {
 		$this->base = WEBDOGS_SUPPORT_DIR . '/options-framework';
 		add_action( 'wp_before_admin_bar_render', array( $this, 'save_wp_admin_color_schemes_list' ) );
-		
+
 		add_action( 'admin_enqueue_scripts', array( $this, 'wp_enqueue_style' ) );
 		add_action( 'wp_enqueue_scripts',    array( $this, 'wp_enqueue_style' ) );
 		add_action( 'wp_enqueue_scripts',    array( $this, 'enqueue_admin_bar_color' ) );
@@ -880,7 +879,7 @@ class Admin_Bar_Color {
 
 	public function save_logo_icon_css_file() {
 
-		if( ! current_user_can( 'manage_options' )){ return; }
+		if( ! current_user_can( 'manage_support_options' )){ return; }
 
 		check_admin_referer( Options_Framework_Admin_Color_Schemes::NONCE, '_acs_ofnonce' );
 		$_post = stripslashes_deep( $_POST );
@@ -915,7 +914,7 @@ class Admin_Bar_Color {
 
 			return true;
 		}
-		
+
 		/**
 		 * Uplaod / male file
 		 */
@@ -959,7 +958,7 @@ class Admin_Bar_Color {
 	function enqueue_admin_bar_color() {
 		/*$custom_logo_icon = of_get_option( 'logo_icon', false );
 
-	    
+
 	    if( $custom_logo_icon ) {
 	    	// not an svg
 	    	// use image
@@ -1002,7 +1001,7 @@ class Admin_Bar_Color {
 
 
 		//<style type="text/css" id="logo_icon_style">
-		// echo html_entity_decode(of_get_option('logo_icon_css','')); 	
+		// echo html_entity_decode(of_get_option('logo_icon_css',''));
 		//	</style> -->
 	}
 }
@@ -1023,7 +1022,7 @@ class Admin_Color_Scheme {
 	protected $icon_focus = '#ffffff';
 	protected $icon_current = '#ffffff';
 
-	protected $accessor_map = array( 
+	protected $accessor_map = array(
 					             'menu_icon'           => 'icon_color',
 								 'highlight_color'     => 'icon_focus',
 								 'menu_highlight_icon' => 'icon_focus',

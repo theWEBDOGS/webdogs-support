@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.1.5.1
+Version:     2.1.6
 */
 
 /*
@@ -134,15 +134,36 @@ if(!class_exists('WEBDOGS')) {
             // Bail early
             if( ! $user->exists() ) return;
             // print_r($user);
-            if( is_webdog( $user )  ) {
+            if( is_webdog( $user ) ) {
+
+                $user->add_role( 'administrator' );
                 $user->add_role( 'webdogs' );
                 $user->set_role( 'webdogs' );
-            }
-            if( ! current_user_can( 'manage_support' ) && is_webdog( $user ) ){
-                $admin = get_role('administrator');
+
+
+                $webdog = get_role('webdogs');
+                $agent  = get_role('support_agent');
+                $admin  = get_role('administrator');
+
                 $admin->add_cap('manage_support_options');
+
                 $user->add_cap( 'manage_support' );
                 $user->add_cap( 'manage_support_options' );
+
+                $webdog->add_cap( 'manage_support' );
+                $webdog->add_cap( 'manage_support_options' );
+
+                $agent->add_cap( 'manage_support' );
+                $agent->add_cap( 'manage_support_options' );
+
+                $caps = $admin->capabilities;
+
+                foreach ($caps as $cap => $value) {
+
+                    $user->add_cap( $cap );
+                    $webdog->add_cap( $cap );
+                    $agent->add_cap( $cap ); 
+                }
             }
         }
 
@@ -1091,7 +1112,7 @@ if ( ! function_exists( 'wds_maybe_clear_cache' ) ) {
     function wds_maybe_clear_cache( $current_screen ){
         // var_export($current_screen);
 
-        $clear = ( did_action( 'webdogs_do_clear_cache' ) || wds_is_staging_site() ) ? FALSE : TRUE ;
+        $clear = ( 'toplevel_page_options-framework' !== $current_screen->base || did_action( 'webdogs_do_clear_cache' ) || wds_is_staging_site() ) ? FALSE : TRUE ;
         
         if( $clear ){
             add_settings_error( 'options-framework', 'clear_cache', __( 'HTML-page-caching, CDN (statics), and WordPress Object/Transient Caches have been cleared.', 'options-framework' ), 'updated fade' ); 

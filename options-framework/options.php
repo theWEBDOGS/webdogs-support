@@ -80,7 +80,7 @@ function wds_base_plugins(){
 			'slug'      => 'redirection',
 		),
 		array(
-			'name'      => 'WEBDOGS Support',
+			'name'      => 'WEBDOGS Support Dashboard Widget',
 			'slug'      => 'webdogs-support-dashboard-widget',
 			'file_path' => 'webdogs-support-dashboard-widget/webdogs-support-dashboard-widget.php',
 			'force_deletion' => true,
@@ -198,7 +198,7 @@ function optionsframework_options() {
 
 	$delete_plugins = array();
 	foreach ( $plugins as $slug => $plugin ) {
-		if ( true === $plugin['force_deletion'] && ! empty( $installed_plugins[ $plugin['file_path'] ] ) ) {
+		if ( true === $plugin['force_deletion'] /*&& ! empty( $installed_plugins[ $plugin['file_path'] ] )*/ ) {
 			if ( is_plugin_active( $plugin['file_path'] ) ) {
 				$active_deletion_notice = true;
 				$delete_plugins[] = $plugin['name'] . '<span style="position: absolute;"><sup>*</sup></span>' ;
@@ -215,6 +215,7 @@ function optionsframework_options() {
 	}
 
 	$delete_themes = array();
+	$delete_themes[] = 'Authored by the WordPress team';
 	foreach ( $themes as $slug => $theme ) { 
 		if ( true === $theme['force_deletion'] ) {
 
@@ -578,8 +579,8 @@ function optionsframework_options() {
 			'id' => 'login_logo_css-image',
 			'on' => 'change',
 			'exe' => array(
-				'height' => "val",
-				'css' => "'backgroundSize', val + 'px'")));
+				'height' => "val"/*,
+				'css' => "'backgroundSize', val + 'px'"*/)));
 
 	$options[] = array(
 		'name' => __('Admin Color Scheme', 'options_check'),
@@ -661,37 +662,37 @@ function wds_internal_greetings(){
 
         '…You\'re lookin\' swell, Dolly!',
 	
-	'%s builds websites that will blow your mind...POOF!',
-		
-	'IT\'S A TRAP!!!',
-		
-	'Be exceptional (deliver above and beyond)',
+		'%s builds websites that will blow your mind...POOF!',
+			
+		'IT\'S A TRAP!!!',
+			
+		'Be exceptional (deliver above and beyond)',
 
-	'Ask the right questions (be proactive and never assume)',
+		'Ask the right questions (be proactive and never assume)',
+			
+		'Answer the right questions (listen for the real meaning)',
+			
+		'Learn constantly (and learn from mistakes)',
+			
+		'Everything has a map (find the best path)',
+			
+		'Make use of tools (everything has been done before)',
+			
+		'Let go of your ego',
+			
+		'It\'s everyone\'s first life (our intentions are good)',
+			
+		'You can\'t be perfect so you can always be better',
+			
+		'Positive words are great!',
 		
-	'Answer the right questions (listen for the real meaning)',
+		'10 - 15 minute rule (don\'t go down a rabbit-hole)',
 		
-	'Learn constantly (and learn from mistakes)',
-		
-	'Everything has a map (find the best path)',
-		
-	'Make use of tools (everything has been done before)',
-		
-	'Let go of your ego',
-		
-	'It\'s everyone\'s first life (our intentions are good)',
-		
-	'You can\'t be perfect so you can always be better',
-		
-	'Positive words are great!',
-	
-	'10 - 15 minute rule (don\'t go down a rabbit-hole)',
-	
-	'If something seems broken, bring it up to the team',
-		
-	'Assume there is a simple explanation first',
-		
-	'Name files correctly (use descriptive titles, hyphens replace spaces)'
+		'If something seems broken, bring it up to the team',
+			
+		'Assume there is a simple explanation first',
+			
+		'Name files correctly (use descriptive titles, hyphens replace spaces)'
 
     ) );
 }
@@ -1027,7 +1028,7 @@ function wds_admin_color_schemes( $scheme = null ) {
 			'text_color' => '#C4C4C4',
 			'body_background' => '#D6D6D6',
 			'link' => '#377A9F',
-			'link_focus' => '#D0F2FC',
+			'link_focus' => '#31353f',
 			'form_checked' => '#9BB567',
 			'menu_background' => '#666666',
 			'menu_text' => '#C4C4C4',
@@ -1051,6 +1052,80 @@ function wds_admin_color_schemes( $scheme = null ) {
 			'menu_collapse_icon' => '#919191',
 			'menu_collapse_focus_text' => '#9CB4BC',
 			'menu_collapse_focus_icon' => '#9CB4BC',
+			'adminbar_avatar_frame' => 'transparent',
+			'adminbar_input_background' => '',
+		),
+
+		'webdogs_wpe' => array(
+			'id' => 4,
+			'slug' => 'webdogs_wpe',
+			'name' => 'WEBDOGS WPE',
+			'uri' => plugins_url( "css/webdogs-wpe/colors$suffix.css", __FILE__ ),
+			'icon_focus' => '#80d8de',
+			'icon_current' => '#80d8de',
+			'base_color' => '#f7fbfc',
+			'icon_color' => '#80d8de',
+			'highlight_color' => '#3d5e63',
+			'notification_color' => '#60bb8f',
+			'button_color' => '#40bac8',
+			'text_color' => '#3d5e63',
+			'body_background' => '#fcfeff',
+			'link' => '#40bac8',
+			'link_focus' => '#2a8792',
+			'form_checked' => '#2a8792',
+			'menu_background' => '#f7fbfc',
+			'menu_text' => '#3d5e63',
+			'menu_icon' => '#80d8de',
+			'menu_highlight_background' => '#eaf6f9',
+			'menu_highlight_text' => '#474747',
+			'menu_highlight_icon' => '#40bac8',
+			'menu_current_background' => '#2a8792',
+			'menu_current_text' => '#ffffff',
+			'menu_current_icon' => '#80d8de',
+			'menu_submenu_background' => '#ffffff',
+			'menu_submenu_text' => '#9cb4bc',
+			'menu_submenu_background_alt' => '#80d8de',
+			'menu_submenu_focus_text' => '#3d5e63',
+			'menu_submenu_current_text' => '#3d5e63',
+			'menu_bubble_background' => '#f28e4f',
+			'menu_bubble_text' => '#ffffff',
+			'menu_bubble_current_background' => '#f28e4f',
+			'menu_bubble_current_text' => '#ffffff',
+			'menu_collapse_text' => '#3d5e63',
+			'menu_collapse_icon' => '#80d8de',
+			'menu_collapse_focus_text' => '#3d5e63',
+			'menu_collapse_focus_icon' => '#40bac8',
+			'adminbar_avatar_frame' => 'transparent',
+			'adminbar_input_background' => '',
+		),
+
+		'wpengine_tc' => array(
+
+			'id' => 5,
+			'slug' => 'wpengine_tc',
+			'name' => 'WPEngine TC',
+			'uri' => plugins_url( "css/wpengine-tc/colors$suffix.css", __FILE__ ),
+			'icon_focus' => '#162a33',
+			'icon_current' => '#162a33',
+			'base_color' => '#162a33',
+			'icon_color' => '#40bac8',
+			'highlight_color' => '#2a8792',
+			'notification_color' => '#60bb8f',
+			'button_color' => '#40bac8',
+			'text_color' => '#2a8792',
+			'body_background' => '#f0f0f0',
+			'link' => '#40bac8',
+			'link_focus' => '#2a8792',
+			'form_checked' => '#2a8792',
+			'menu_background' => '#f0f0f0',
+			'menu_text' => '#40bac8',
+			'menu_icon' => '#40bac8',
+			'menu_highlight_background' => '#F7FBFC',
+			'menu_highlight_text' => '#2a8792',
+			'menu_highlight_icon' => '#2a8792',
+			'menu_current_background' => '#F7FBFC',
+			'menu_current_text' => '#162a33',
+			'menu_current_icon' => '#162a33',
 			'adminbar_avatar_frame' => 'transparent',
 			'adminbar_input_background' => '',
 		)
