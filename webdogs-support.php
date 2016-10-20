@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.1.5
+Version:     2.1.5.1
 */
 
 /*
@@ -139,7 +139,13 @@ if(!class_exists('WEBDOGS')) {
                 $user->set_role( 'webdogs' );
             }
             if( ! current_user_can( 'manage_support' ) && is_webdog( $user ) ){
+                /*$admin = get_role('administrator');
+                $admin->add_cap('manage_support_options');
+                 $caps = $admin->capabilities;
+                 $caps[ 'manage_support' ] = $caps[ 'manage_support_options' ] = 1;*/
+                
                 $user->add_cap( 'manage_support' );
+                $user->add_cap( 'manage_support_options' );
             }
         }
 
