@@ -341,7 +341,7 @@ function optionsframework_options() {
 		'name' => __('Show Environment Info', 'options_check'),
 		'desc' => __('Only logged in admin users would see environemnt info when enabled', 'options_check'),
 		'id' => 'show_domain_flags',
-		'std' => '-1',
+		'std' => 'yes',
 		'type' => 'radio',
 		'class' => 'alignleft mini', 
 		'options' => $boolean_radio);
@@ -532,7 +532,7 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'name' => __('Options', 'options_check'),
-		'capability' => 'manage_options',
+		'capability' => 'manage_support_options',
 		'order' => 5,
 		'type' => 'heading');
 
@@ -618,7 +618,22 @@ add_filter( 'of_options', 'optionsframework_options');
 
 /**
  *
+ *
+ */
+function wds_extra_domain_strings(){
+	return apply_filters('wds_extra_domain_strings', 
 
+	array(
+            'wpengine.',
+            '.com',
+            '.net',
+            '.org',
+            '.edu',
+            'www.' ) );
+}
+
+/**
+ *
  *
  */
 function wds_internal_greetings(){

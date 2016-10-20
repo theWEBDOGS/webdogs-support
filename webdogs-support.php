@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.1.4.2
+Version:     2.1.5
 */
 
 /*
@@ -981,13 +981,9 @@ if ( ! function_exists( 'wds_extra_domain_flags' ) ) {
 
     function wds_extra_domain_flags(){
 
-        $domain_strings = apply_filters('wds_extra_domain_flags', array(
-            'wpengine.',
-            '.com',
-            '.net',
-            '.org',
-            '.edu',
-            'www.' ) );
+        if(!function_exists('wds_extra_domain_strings')) include_once plugin_dir_path( __FILE__ ) . '/options-framework/options.php';
+
+        $domain_strings = apply_filters('wds_extra_domain_flags', wds_extra_domain_strings() );
 
         $extra = array();
 
@@ -1028,23 +1024,24 @@ if ( ! function_exists( 'wds_show_domain_flags' ) ) {
     function wds_show_domain_flags(){
 
         $domain_flags      = wds_get_domain_flags();
-        $show_when         = of_get_option('show_domain_flags', '-1');
+        $show_when         = of_get_option('show_domain_flags', 'yes');
         $show_domain_flags = FALSE;
 
         switch ( strval( $show_when ) ) {
             // ALWAYS   
-            case '1':
-                $show_domain_flags = ( wds_domain_exculded() || ( is_user_logged_in() && current_user_can( 'manage_options' ) ) ) ? TRUE : FALSE ;
+            case 'yes':
+                $show_domain_flags = ( wds_domain_exculded() || ( is_user_logged_in() && current_user_can( 'manage_support_options' ) ) ) ? TRUE : FALSE ;
                 break;
             // NEVER
-            case '0':
+            case 'no':
+            default:
                 $show_domain_flags = FALSE ;
                 break;
             // LOGIN
-            case '-1':
+           /* case '-1':
             default:
                 $show_domain_flags = is_user_logged_in() ? TRUE : FALSE ;
-                break;
+                break;*/
         }
 
         if( ! $show_domain_flags && $domain_flags ){
@@ -1089,11 +1086,12 @@ if ( ! function_exists( 'wds_get_domain_flags' ) ) {
 if ( ! function_exists( 'wds_maybe_clear_cache' ) ) {
 
     function wds_maybe_clear_cache( $current_screen ){
+        // var_export($current_screen);
 
         $clear = ( did_action( 'webdogs_do_clear_cache' ) || wds_is_staging_site() ) ? FALSE : TRUE ;
         
         if( $clear ){
-            add_settings_error( 'options-framework', 'save_options', __( 'HTML-page-caching, CDN (statics), and WordPress Object/Transient Caches have been cleared.', 'options-framework' ), 'updated fade' ); 
+            add_settings_error( 'options-framework', 'clear_cache', __( 'HTML-page-caching, CDN (statics), and WordPress Object/Transient Caches have been cleared.', 'options-framework' ), 'updated fade' ); 
             add_action( 'shutdown', 'webdogs_clear_cache' );
         }
     }
@@ -1105,7 +1103,8 @@ if ( ! function_exists( 'webdogs_clear_cache' ) ) {
         if( wds_is_production_site() ) {
             WpeCommon::purge_memcached();
             WpeCommon::clear_maxcdn_cache();
-            WpeCommon::purge_varnish_cache();  // refresh our own cache (after CDN purge, in case that needed to clear before we access new content)
+            WpeCommon::purge_varnish_cache();  
+            // refresh our own cache (after CDN purge, in case that needed to clear before we access new content)
             // print( __( 'All caches have been purged.', 'options-framework' ) );
         }
     }
@@ -1120,8 +1119,8 @@ if ( ! function_exists( 'webdogs_maintenace_mode' ) ) {
     // PUT SITE IN MAINENANCE MODE
     function webdogs_maintenace_mode() {
         if ('yes' === of_get_option('maintenance_mode', 'no')){
-            if (!current_user_can('administrator')) {
-                wp_die( of_get_option('maintenance_mode', 'Maintenance Mode') );
+            if (! current_user_can('administrator')) {
+                wp_die( of_get_option('maintenance_message', 'Maintenance Mode') );
             }
         }
     }
@@ -1167,8 +1166,9 @@ if ( ! function_exists( 'webdogs_activation' ) ) {
 
         function webdogs_init_roles() {
             $admin = get_role('administrator');
+            $admin->add_cap('manage_support_options');
              $caps = $admin->capabilities;
-             $caps[ 'manage_support' ] = 1;
+             $caps[ 'manage_support' ] = $caps[ 'manage_support_options' ] = 1;
             add_role( 'support_agent', 'Support Agent', $caps );
             add_role( 'webdogs', 'WEBDOGS', $caps );
         }
