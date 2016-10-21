@@ -56,6 +56,17 @@ function of_sanitize_textarea( $input ) {
 add_filter( 'of_sanitize_textarea', 'of_sanitize_textarea' );
 
 /**
+ * @since 1.0
+ *
+ * @param  string $logo_icon_css The logo icon css.
+ * @return string
+ */
+function of_sanitize_logo_icon_css( $logo_icon_css ) {
+	return str_replace('f102', '\f102', html_entity_decode( $logo_icon_css ) );
+}
+add_filter( 'of_logo_icon_css', 'of_sanitize_logo_icon_css' );
+
+/**
  * Sanitization for checkbox input
  *
  * @param $input string (1 or empty) checkbox state

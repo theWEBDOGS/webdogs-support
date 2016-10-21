@@ -148,6 +148,7 @@ function optionsframework_options() {
 		'attachment' => 'scroll' );
 
 	$login_logo_height_array = array(
+	   '50' => __('50px',  'options_check'),
 	  '100' => __('100px', 'options_check'),
 	  '200' => __('200px', 'options_check'),
 	  '300' => __('300px', 'options_check'));
@@ -160,32 +161,32 @@ function optionsframework_options() {
 	   '40' => __('40px', 'options_check'));
 
 	$service_array = array(
-		'1' => __('Active', 'options_check'),
+		'1' => __('Active',    'options_check'),
 		'0' => __('On-Demand', 'options_check'),
 	);
 
 	$frequency_array = array(
-		'1' => __('Monthly', 'options_check'),
-		'3' => __('Quarterly', 'options_check'),
+		'1' => __('Monthly',    'options_check'),
+		'3' => __('Quarterly',  'options_check'),
 		'6' => __('Biannually', 'options_check'),
 	);
 	
 	$day_offset = array(); for ($i=1; $i < 29; $i++) { $day_offset[$i] = $i; }
 
 	$domain_flag_array = array(
-		 '0' => __('Never', 'options_check'),
-		 '1' => __('Always', 'options_check'),
+		 '0' => __('Never',     'options_check'),
+		 '1' => __('Always',    'options_check'),
 		'-1' => __('Logged In', 'options_check'),
 	);
 
 	$boolean_active = array(
 	   'yes' => __('Active', 'options_check'),
-	   'no'  => __('Hidden', 'options_check'),
+	    'no' => __('Hidden', 'options_check'),
 	);
 
 	$boolean_radio = array(
 	   'yes' => __('Yes', 'options_check'),
-	   'no'  => __('No', 'options_check'),
+	    'no' => __('No',  'options_check'),
 	);
 
 	/////////////////////////////////
@@ -1134,3 +1135,8 @@ function wds_admin_color_schemes( $scheme = null ) {
 	return ( isset( $scheme ) && array_key_exists( $scheme, $admin_color_schemes ) ) ? apply_filters("admin_color_schemes_{$scheme}", $admin_color_schemes[ $scheme ] ) : apply_filters("admin_color_schemes", $admin_color_schemes );
 }
 
+function wds_filter_admin_color_schemes( $schemes ) {
+	unset($schemes['webdogs_ps']);
+	return $schemes;
+}
+add_filter( 'admin_color_schemes', 'wds_filter_admin_color_schemes', 10, 1 );

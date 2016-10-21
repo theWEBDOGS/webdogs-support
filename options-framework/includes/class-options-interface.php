@@ -138,7 +138,8 @@ class Options_Framework_Interface {
 				}
 				if ( $value['type'] == 'scheme' ) {
 
-					$output .= get_submit_button( __( 'Preview', 'admin-color-schemes' ), 'secondary preview-scheme alignright hide-if-no-js', 'preview', false );
+					$output .= get_submit_button( __( 'Preview', 'admin-color-schemes' ), 'secondary preview-scheme alignright hide-if-no-js', 'preview_scheme', false );
+					$output .= get_submit_button( __( 'Clear', 'admin-color-schemes' ), 'secondary preview-scheme alignright hide-if-no-js', 'clear_scheme', false );
 
 				}
 				if ( $value['type'] != 'editor' ) {
@@ -200,7 +201,7 @@ class Options_Framework_Interface {
 					}
 
 					$val = stripslashes( $val );
-					$output .= '<textarea id="' . esc_attr( $value['id'] ) . '" class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" rows="' . $rows . '">' . esc_textarea( $val ) . '</textarea>';
+					$output .= '<textarea id="' . esc_attr( $value['id'] ) . '" class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" rows="' . $rows . '">' . apply_filters( 'of_'.$value['id'], esc_textarea( $val ) ) . '</textarea>';
 					break;
 
 				// Select Box

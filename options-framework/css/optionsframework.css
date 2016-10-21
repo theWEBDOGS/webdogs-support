@@ -225,6 +225,12 @@
     width: 45%;
     padding-right: 0;
 }
+#optionsframework #section-logo_icon.section-upload .controls {
+    float: left;
+    min-width: 300px;
+    width: 40%;
+    padding-right: 0;
+}
 #optionsframework .section-scheme {
 	padding-top: 1.33em;
 }
@@ -520,11 +526,13 @@
 }
 #optionsframework #section-logo_icon .explain {
     /* display: none; */
-    max-width: 50%;
+    max-width: 52%;
     margin-top: 7px;
+    margin-top: 0px;
 }
 #optionsframework #section-logo_icon .option {
     display: inline-block;
+    max-width: 700px;
 }
 #maintenance_message,
 #maintenance_notes {
@@ -588,6 +596,10 @@
 }
 #optionsframework .button-primary {
 	float:right;
+}
+#optionsframework #preview_scheme,
+#optionsframework #clear_scheme {
+    margin-left: 12px;
 }
 #optionsframework .section:after {
 	content: "";

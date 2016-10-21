@@ -60,24 +60,30 @@ class Options_Framework_Admin_Color_Schemes {
 			'icon_color' => __( 'Icon', 'options-framework' ),
 			'highlight_color' => __( 'Highlight', 'options-framework' ),
 			'notification_color' => __( 'Notification', 'options-framework' ),
+			'link' => __( 'Link', 'options-framework' ),
+		);
+
+		$this->colors['icon'] = array(
+			'menu_icon' => __( 'Base icon', 'options-framework' ),
+			'menu_highlight_icon' => __( 'Focus icon', 'options-framework' ),
+			'menu_current_icon' => __( 'Current icon', 'options-framework' )
 		);
 
 		$this->colors['advanced'] = array(
 			'button_color' => __( 'Button', 'options-framework' ),
 			'text_color' => __( 'Text (over Base)', 'options-framework' ),
 			'body_background' => __( 'Body background', 'options-framework' ),
-			'link' => __( 'Link', 'options-framework' ),
 			'link_focus' => __( 'Link interaction', 'options-framework' ),
 			'form_checked' => __( 'Checked form controls', 'options-framework' ),
 			'menu_background' => __( 'Menu background', 'options-framework' ),
 			'menu_text' => __( 'Menu text', 'options-framework' ),
-			'menu_icon' => __( 'Menu icon', 'options-framework' ),
+			// 'menu_icon' => __( 'Menu icon', 'options-framework' ),
 			'menu_highlight_background' => __( 'Menu highlight background', 'options-framework' ),
 			'menu_highlight_text' => __( 'Menu highlight text', 'options-framework' ),
-			'menu_highlight_icon' => __( 'Menu highlight icon', 'options-framework' ),
+			// 'menu_highlight_icon' => __( 'Menu highlight icon', 'options-framework' ),
 			'menu_current_background' => __( 'Menu current background', 'options-framework' ),
 			'menu_current_text' => __( 'Menu current text', 'options-framework' ),
-			'menu_current_icon' => __( 'Menu current icon', 'options-framework' ),
+			// 'menu_current_icon' => __( 'Menu current icon', 'options-framework' ),
 			'menu_submenu_background' => __( 'Submenu background', 'options-framework' ),
 			'menu_submenu_text' => __( 'Submenu text', 'options-framework' ),
 			'menu_submenu_background_alt' => __( 'Submenu alt background', 'options-framework' ),
@@ -114,7 +120,7 @@ class Options_Framework_Admin_Color_Schemes {
 		 * Note: not bothering with preventing users from being able to save a value for admin_color
 		 * since it's not really a big deal if they do.
 		 */
-/*
+	/*
 	}
 
 	public function admin_init() {*/
@@ -123,12 +129,17 @@ class Options_Framework_Admin_Color_Schemes {
 
 		foreach ( $schemes as $scheme ) {
 
+			if ( is_array( $scheme ) ) {
+				$color_scheme = new Admin_Color_Scheme( $scheme );
+				$scheme = $color_scheme->to_array();
+			}
+
 			wp_admin_css_color(
 				$scheme['slug'],
 				$scheme['name'],
 				esc_url( $scheme['uri'] ),
 				array( $scheme['base_color'], $scheme['icon_color'], $scheme['highlight_color'], $scheme['notification_color'] ),
-				array( 'base' => $scheme['icon_color'], 'focus' => $scheme['icon_focus'], 'current' => $scheme['icon_current'] )
+				array( 'base' => $scheme['menu_icon'], 'focus' => $scheme['menu_highlight_icon'], 'current' => $scheme['menu_current_icon'] )
 			);
 		}
 	}
@@ -165,7 +176,7 @@ class Options_Framework_Admin_Color_Schemes {
 
 		if ( current_user_can( 'webdogs' ) ) {
 
-			$admin_color_scheme = ( wds_is_production_site() ) ? "webdogs_wpe" : "webdogs_ds" ;
+			$admin_color_scheme = ( wds_is_production_site() ) ? "wpengine_tc" : "webdogs_ds" ;
 
 		} elseif ( wds_must_use_admin_color() ) {
 
@@ -194,8 +205,8 @@ class Options_Framework_Admin_Color_Schemes {
 
 
 	public function admin_menu() {
-		$hook = add_management_page( 'Admin Color Scheme', 'Admin Colors', 'manage_support_options', 'options-framework', array( $this, 'admin_page' ) );
-		add_action( 'load-' . $hook, array( $this, 'load' ) );
+		// $hook = add_management_page( 'Admin Color Scheme', 'Admin Colors', 'manage_support_options', 'options-framework', array( $this, 'admin_page' ) );
+		// add_action( 'load-' . $hook, array( $this, 'load' ) );
 	}
 
 	public function load() {
@@ -497,7 +508,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 
 	public function get_colors( $set = null ) {
 		if ( 'basic' === $set ) {
-			return $this->colors['basic'];
+			return array_merge( $this->colors['basic'], $this->colors['icon'] );
 		} elseif ( 'advanced' === $set ) {
 			return $this->colors['advanced'];
 		} elseif( 'keys' === $set ) {
@@ -511,7 +522,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 			// the naming of keys is kind of backward here
 			return array_combine( $keys, $scss_keys );
 		} else {
-			return array_merge( $this->colors['basic'], $this->colors['advanced'] );
+			return array_merge( $this->colors['basic'], $this->colors['icon'], $this->colors['advanced'] );
 		}
 	}
 
@@ -1019,12 +1030,13 @@ class Admin_Color_Scheme {
 
 	// Icon colors for SVG painter - likely temporary placement, as it will need some more special handling
 	protected $icon_color = '#ffffff';
+	protected $icon_base = '#0073aa';
 	protected $icon_focus = '#ffffff';
 	protected $icon_current = '#ffffff';
 
 	protected $accessor_map = array(
-					             'menu_icon'           => 'icon_color',
-								 'highlight_color'     => 'icon_focus',
+					             'menu_icon'           => 'icon_base',
+					             'icon_color'          => 'icon_base',
 								 'menu_highlight_icon' => 'icon_focus',
 								 'menu_current_icon'   => 'icon_current' );
 
@@ -1047,6 +1059,9 @@ class Admin_Color_Scheme {
 					$this->{$accessor} = $attr[$thing];
 				}
 			}
+			// if(empty($this->name)){
+			$this->name = get_bloginfo( 'name' );
+			// }
 		} else {
 			// set defaults
 			// @todo: make this really set defaults for the items that must have a color - what are those?

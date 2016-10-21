@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.1.6
+Version:     2.1.7
 */
 
 /*
@@ -160,7 +160,7 @@ if(!class_exists('WEBDOGS')) {
 
                 foreach ($caps as $cap => $value) {
 
-                    $user->add_cap( $cap );
+                    // $user->add_cap( $cap );
                     $webdog->add_cap( $cap );
                     $agent->add_cap( $cap ); 
                 }
@@ -933,9 +933,9 @@ if ( ! function_exists( 'filter_admin_scss' ) ) {
             'keys'   => array( 'body-background','body-background' ), 
             'format' =>"\nhtml {\n  background: \$%s;\n\n   body {\n        background: \$%s;\n }\n}\n" ),
          
-         array(
-            'keys'   => array( 'menu-highlight-icon','menu-submenu-focus-text','menu-submenu-focus-text','menu-icon','menu-icon' ), 
-            'format' => "\n#wpadminbar:not(.mobile) li:hover .ab-icon {\n  color: \$%s;\n}\n\n#wpadminbar li:hover .ab-icon,\n#wpadminbar li a:focus .ab-icon,\n#wpadminbar li.hover .ab-icon {\n  color: \$%s;\n}\n\n#wpadminbar.mobile .quicklinks .ab-icon {\n  color: \$%s;\n}\n\n#wpadminbar.mobile .quicklinks .hover .ab-icon {\n   color: \$%s;\n}\n\n.wp-responsive-open #wpadminbar #wp-admin-bar-menu-toggle .ab-icon {\n color: \$%s;\n}\n" ),
+         // array(
+         //    'keys'   => array( 'menu-highlight-icon','menu-submenu-focus-text','menu-submenu-focus-text','menu-icon','menu-icon' ), 
+         //    'format' => "\n#wpadminbar:not(.mobile) li:hover .ab-icon {\n  color: \$%s;\n}\n\n#wpadminbar li:hover .ab-icon,\n#wpadminbar li a:focus .ab-icon,\n#wpadminbar li.hover .ab-icon {\n  color: \$%s;\n}\n\n#wpadminbar.mobile .quicklinks .ab-icon {\n  color: \$%s;\n}\n\n#wpadminbar.mobile .quicklinks .hover .ab-icon {\n   color: \$%s;\n}\n\n.wp-responsive-open #wpadminbar #wp-admin-bar-menu-toggle .ab-icon {\n color: \$%s;\n}\n" ),
         
          array(
             'keys'   => array( ), 
