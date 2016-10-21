@@ -1059,9 +1059,9 @@ class Admin_Color_Scheme {
 					$this->{$accessor} = $attr[$thing];
 				}
 			}
-			// if(empty($this->name)){
-			$this->name = get_bloginfo( 'name' );
-			// }
+			if(empty($this->name)){
+				$this->name = get_bloginfo( 'name' );
+			}
 		} else {
 			// set defaults
 			// @todo: make this really set defaults for the items that must have a color - what are those?
