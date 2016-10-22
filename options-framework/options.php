@@ -816,7 +816,7 @@ function wds_base_strings( $key = null ){
 		'on_demand_maintainance_notification' => 
         array(
             'subject' => "WordPress Updates are Available for %s | %s", // site_name, $site_url
-            'message' => "The following updates are available for %s website. \n\rIf you would like WEBDOGS to install these updates, please reply to this email. \n\r%s \n\rIf you would like WEBDOGS to install these updates, please reply to this email.
+            'message' => "The following updates are available for the %s website. \n\r%s \n\rIf you would like WEBDOGS to install these updates, please reply to this email. \n\r*Note: Standard hourly billing rate will apply.
 
  "), // $site_name, $updates
         'acs_selections_preview'		  => __( 'Please make more selections to preview the color scheme.', 'options-framework' ),
