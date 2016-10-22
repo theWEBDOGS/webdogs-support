@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.1.7
+Version:     2.1.8
 */
 
 /*
@@ -783,60 +783,6 @@ if ( ! function_exists( 'wd_get_next_schedule' ) ) {
 }
 
 
-
-if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
-
-    function wd_send_maintenance_notification( $test = false ){
-
-        if( wds_domain_exculded() ) { return; }
-        
-          $new_date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
-         $next_send = wd_get_next_schedule();
-
-        // MATCH THE RULE
-        // $check = ( $mon_date % $freq === 0 && $day == $day_date );
-
-        // PROOF CHECK TO PREVENT DUPLCATES 
-        $proof = ( $new_date !== $next_send[0] );
-
-        // ARE THERE ANY UPDATES
-        $count = WEBDOGS::webdogs_maintenance_updates( true );
-
-        // IF THE DATE IS A MATCH 
-        // AND THE PROOFS DO NOT ->> SEND NOTIFICATION EMAIL
-        if( ( $count &&/* $check &&*/ $proof ) || ( $count && $test && $proof ) ) {
-
-            // SAVE THE PROOF SO IF WE CHECK AGAIN
-            // THE PROOF WILL MATCH AND PASS
-            if( ! $test ) { 
-
-                update_option( 'wd_maintenance_notification_proof', $new_date );
-            }
-
-            // DO NOTIFICATION
-            extract( wd_get_notification( of_get_option( 'active_maintenance_customer', false ) ) );
-            
-            if(!function_exists('wp_mail')) include_once( ABSPATH . 'wp-includes/pluggable.php');
-
-            $message = ( wp_mail( $to, $subject, $message, $headers ) ) ? 'Maintainance notification sent.' : 'Maintainance notification not sent.';
-
-            if( $test ){ wp_die( $message . ": ". date('F j, Y', $next_send[0]) . ": " . $next_send[1]. ": " . $next_send[2]. ": " . $next_send[3]. ": " . $next_send[4]. ": " . date('F j, Y', $new_date ). ": " . print_r($next_send[6], true). ": " . print_r($next_send[5], true) ) ; }
-        }
-
-        $message = 'Maintainance Notification already sent.';
-        
-        if( $test ){ wp_die( $message ); }
-    }
-
-    //////////////////////////////////////////////////////
-    // INLINE TEST////////////////////////////////////////
-    if (isset(  $_GET['wd_send_maintenance_notification'])
-    && "test"===$_GET['wd_send_maintenance_notification']){
-        wd_send_maintenance_notification( true ); }
-}
-add_action( 'wd_create_daily_notification', 'wd_send_maintenance_notification' );
-
-
 if ( ! function_exists( 'optionsframework_load_plugins' ) ) {
     function optionsframework_load_plugins(&$instance){
         unset( $GLOBALS['optionsframeworkpluginactivation'] );
@@ -1157,6 +1103,59 @@ if ( ! function_exists( 'webdogs_maintenace_mode' ) ) {
 
 }
 add_action('get_header', 'webdogs_maintenace_mode');
+
+
+if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
+
+    function wd_send_maintenance_notification( $test = false ){
+
+        if( wds_domain_exculded() ) { return; }
+        
+          $new_date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
+         $next_send = wd_get_next_schedule();
+
+        // MATCH THE RULE
+        // $check = ( $mon_date % $freq === 0 && $day == $day_date );
+
+        // PROOF CHECK TO PREVENT DUPLCATES 
+        $proof = ( $new_date !== $next_send[0] );
+
+        // ARE THERE ANY UPDATES
+        $count = WEBDOGS::webdogs_maintenance_updates( true );
+
+        // IF THE DATE IS A MATCH 
+        // AND THE PROOFS DO NOT ->> SEND NOTIFICATION EMAIL
+        if( ( $count &&/* $check &&*/ $proof ) || ( $count && $test && $proof ) ) {
+
+            // SAVE THE PROOF SO IF WE CHECK AGAIN
+            // THE PROOF WILL MATCH AND PASS
+            if( ! $test ) { 
+
+                update_option( 'wd_maintenance_notification_proof', $new_date );
+            }
+
+            // DO NOTIFICATION
+            extract( wd_get_notification( of_get_option( 'active_maintenance_customer', false ) ) );
+            
+            if(!function_exists('wp_mail')) include_once( ABSPATH . 'wp-includes/pluggable.php');
+
+            $message = ( wp_mail( $to, $subject, $message, $headers ) ) ? 'Maintainance notification sent.' : 'Maintainance notification not sent.';
+
+            if( $test ){ wp_die( $message . ": ". date('F j, Y', $next_send[0]) . ": " . $next_send[1]. ": " . $next_send[2]. ": " . $next_send[3]. ": " . $next_send[4]. ": " . date('F j, Y', $new_date ). ": " . print_r($next_send[6], true). ": " . print_r($next_send[5], true) ) ; }
+        }
+
+        $message = 'Maintainance Notification already sent.';
+        
+        if( $test ){ wp_die( $message ); }
+    }
+
+    //////////////////////////////////////////////////////
+    // INLINE TEST////////////////////////////////////////
+    if (isset(  $_GET['wd_send_maintenance_notification'])
+    && "test"===$_GET['wd_send_maintenance_notification']){
+        wd_send_maintenance_notification( true ); }
+}
+add_action( 'wd_create_daily_notification', 'wd_send_maintenance_notification' );
 
 
 // REMOVE HEADER META TAGS
