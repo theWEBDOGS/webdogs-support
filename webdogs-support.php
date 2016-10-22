@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.1.8
+Version:     2.1.9
 */
 
 /*
@@ -1105,11 +1105,30 @@ if ( ! function_exists( 'webdogs_maintenace_mode' ) ) {
 add_action('get_header', 'webdogs_maintenace_mode');
 
 
+if ( ! function_exists( 'wd_test_send_maintenance_notification' ) ) {
+    //////////////////////////////////////////////////////
+    // INLINE TEST////////////////////////////////////////
+    function wd_test_send_maintenance_notification(){
+        if (isset(  $_GET['wd_send_maintenance_notification'])
+        && "test"===$_GET['wd_send_maintenance_notification'] 
+        && isset(   $_GET['force_send'])
+        && ""  !==  $_GET['force_send'] ) {
+            return 'force';
+        }
+        return isset(   $_GET['wd_send_maintenance_notification'])
+            && "test"===$_GET['wd_send_maintenance_notification'];
+    }
+}
+
+
 if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
 
-    function wd_send_maintenance_notification( $test = false ){
+    function wd_send_maintenance_notification( $test = false, $force = false ){
 
-        if( wds_domain_exculded() ) { return; }
+        if( wds_domain_exculded() && !$force ) { 
+
+            $message = "Maintainance Notification are excluded for this enviroment. \n\nDomain: %s";
+            wp_die( sprintf( $message, implode(',', wds_domain_exculded() ) ) ); }
         
           $new_date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
          $next_send = wd_get_next_schedule();
@@ -1125,7 +1144,7 @@ if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
 
         // IF THE DATE IS A MATCH 
         // AND THE PROOFS DO NOT ->> SEND NOTIFICATION EMAIL
-        if( ( $count &&/* $check &&*/ $proof ) || ( $count && $test && $proof ) ) {
+        if( ( $count &&/* $check &&*/ $proof ) || ( $count && $test && $proof ) || $force ) {
 
             // SAVE THE PROOF SO IF WE CHECK AGAIN
             // THE PROOF WILL MATCH AND PASS
@@ -1144,16 +1163,16 @@ if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
             if( $test ){ wp_die( $message . ": ". date('F j, Y', $next_send[0]) . ": " . $next_send[1]. ": " . $next_send[2]. ": " . $next_send[3]. ": " . $next_send[4]. ": " . date('F j, Y', $new_date ). ": " . print_r($next_send[6], true). ": " . print_r($next_send[5], true) ) ; }
         }
 
-        $message = 'Maintainance Notification already sent.';
+        $message = "Maintainance Notification already sent. \n\nCount: %s\n\nNew date: %s\n\nNext send: %s\n\n%s";
         
-        if( $test ){ wp_die( $message ); }
+        if( $test ){ wp_die( sprintf( $message, $count, date('F j, Y', $new_date ), date('F j, Y', $next_send[0]), ''/* ": ". date('F j, Y', $next_send[0]) . ": " . $next_send[1]. ": " . $next_send[2]. ": " . $next_send[3]. ": " . $next_send[4]. ": " . date('F j, Y', $new_date ). ": " . print_r($next_send[6], true). ": " . print_r($next_send[5], true) */ ) ); }
     }
 
-    //////////////////////////////////////////////////////
-    // INLINE TEST////////////////////////////////////////
-    if (isset(  $_GET['wd_send_maintenance_notification'])
-    && "test"===$_GET['wd_send_maintenance_notification']){
-        wd_send_maintenance_notification( true ); }
+    // ARE WE TESTING THE NOTIFICAITON? 
+    // IS IT FORCED SEND?
+    if( wd_test_send_maintenance_notification() ) {
+        wd_send_maintenance_notification( true, 'force' === wd_test_send_maintenance_notification() );
+    }
 }
 add_action( 'wd_create_daily_notification', 'wd_send_maintenance_notification' );
 
