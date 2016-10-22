@@ -1129,6 +1129,9 @@ if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
 
             $message = "Maintainance Notification are excluded for this enviroment. \n\nDomain: %s";
             wp_die( sprintf( $message, implode(',', wds_domain_exculded() ) ) ); }
+        elseif( wds_domain_exculded() ) {
+            return;
+        }
         
           $new_date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
          $next_send = wd_get_next_schedule();
