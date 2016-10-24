@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.1.9
+Version:     2.2.0
 */
 
 /*
@@ -102,6 +102,14 @@ if(!class_exists('WEBDOGS')) {
 
             add_filter( 'admin_bar_menu',                       array(&$this,'webdogs_howdy'), 25                    );
 
+            if( ( defined('DOING_CRON') && DOING_CRON ) || wd_test_send_maintenance_notification() ) {
+
+                if ( ! function_exists( 'wp_version_check' ) ) include_once ABSPATH . 'wp-includes/update.php'; 
+
+                if ( ! function_exists( 'wp_prepare_themes_for_js' ) ) include_once ABSPATH . 'wp-admin/includes/theme.php';
+
+                if ( ! function_exists( 'get_core_updates' ) ) include_once ABSPATH . 'wp-admin/includes/update.php';
+            }
             
             //  If user can't edit theme options, exit
             if ( current_user_can( 'manage_options' ) ) {
@@ -121,7 +129,20 @@ if(!class_exists('WEBDOGS')) {
          * Load textdomain
          * @return void
          */
-        function webdogs_init() {load_plugin_textdomain( 'webdogs-support', false,  dirname( plugin_basename( __FILE__ ) )  . '/languages' );
+        function webdogs_init() { 
+            load_plugin_textdomain( 'webdogs-support', false,  dirname( plugin_basename( __FILE__ ) )  . '/languages' );
+           
+            // ARE WE TESTING THE NOTIFICAITON? 
+            if( wd_test_send_maintenance_notification() ) {
+                
+                // IS IT FORCED SEND?
+                $force = ('force' === wd_test_send_maintenance_notification() );
+
+                // SEND TEST IN 5 SECONDS
+                wd_send_maintenance_notification( true, $force );
+                // wp_schedule_single_event( time(), 'wd_create_daily_notification', array( true, $force ) );
+            }
+            
         }
         
         /**
@@ -574,9 +595,11 @@ if(!class_exists('WEBDOGS')) {
          * @return void
          */
         static function webdogs_maintenance_updates( $return_count = false ) {
-            if ( ! function_exists( 'get_core_updates' ) ) {
-                include_once ABSPATH . 'wp-admin/includes/update.php';
-            }
+            
+            wp_version_check(  array(), true );
+            wp_update_plugins( array()       );
+            wp_update_themes(  array()       );
+            
             $cor = 0;
             $msg = "";
             $cur = get_preferred_from_update_core();
@@ -585,7 +608,11 @@ if(!class_exists('WEBDOGS')) {
                 $msg = sprintf( __( "Core:\n• WordPress %s" ), $cur->current ? $cur->current : __( 'Latest' ) );
                 $cor++;
             }
-            $updates = array('core'=>$msg, 'plugins' => array_values( wp_list_pluck( get_plugin_updates(), 'Name' ) ), 'themes' => array_values( wp_list_pluck( get_theme_updates(), 'Name' ) ), 'note' => of_get_option('maintenance_notes', '' ) );
+            $updates = array( 
+                'core'    => $msg, 
+                'plugins' => array_values( wp_list_pluck( get_plugin_updates(), 'Name' ) ), 
+                'themes'  => array_values( wp_list_pluck( get_theme_updates(), 'Name' ) ), 
+                'note'    => of_get_option('maintenance_notes', '' ) );
             
              $count  = sizeof($updates['plugins']) + sizeof($updates['themes']) + $cor;
 
@@ -594,7 +621,22 @@ if(!class_exists('WEBDOGS')) {
              }
 
             $report  = sprintf( _n( 'You have %d update…'."\n\r", 'You have %d updates…'."\n\r", $count ), $count );
-            $report .= implode(" \n\r", array_filter( array( $updates['core'], ((is_array($updates['plugins'])&&sizeof($updates['plugins']))?"Plugins:\n• ".implode(",\n• ", $updates['plugins']):""), ((is_array($updates['themes'])&&sizeof($updates['themes']))?"Themes:\n• ".implode(",\n• ", $updates['themes']):""), (!empty($updates['note']))?"Special Maintenance Instructions:\n".$updates['note'] : "") ) );
+            $report .= implode(" \n\r", 
+                array_filter( 
+                    array(
+                        $updates['core'], 
+
+                        ((is_array($updates['plugins'])&&sizeof($updates['plugins']))
+                            ?"Plugins:\n• ".implode(",\n• ", $updates['plugins']):""), 
+
+                        ((is_array($updates['themes']) &&sizeof($updates['themes'])) 
+                            ?"Themes:\n• ". implode(",\n• ", $updates['themes']) :""), 
+
+                        (!empty($updates['note']))
+                            ?"Special Maintenance Instructions:\n".$updates['note'] :""
+                    ) 
+                ) 
+            );
 
             return $report;
         }
@@ -687,7 +729,7 @@ if ( ! function_exists( 'wd_get_notification' ) ) {
 
         $site_name = get_bloginfo( 'name', 'display' );
         $site_url  = trailingslashit( get_bloginfo( 'url', 'display' ) );
-        $updates   = WEBDOGS::webdogs_maintenance_updates();
+        $updates   = WEBDOGS::webdogs_maintenance_updates(false);
         $email_to  = of_get_option( 'on_demand_email', get_bloginfo( 'admin_email' ) );
               $to  = array_map( 'trim', explode(',', $email_to ));
 
@@ -702,7 +744,7 @@ if ( ! function_exists( 'wd_get_notification' ) ) {
             'to' => WEBDOGS_SUPPORT,
             'subject' => wp_specialchars_decode( sprintf( $notice['subject'], $site_name, $site_url ) ),
             'message' => wp_specialchars_decode( sprintf( $notice['message'], $site_name, $updates) ),
-            'headers' => "Reply-To: \"".WEBDOGS_TITLE."\" <".WEBDOGS_SUPPORT.">\r\n" )
+            'headers' => "Reply-To: ".WEBDOGS_TITLE." <".WEBDOGS_SUPPORT.">\r\n" )
 
         
         :// ON DEMAND SUPPORT
@@ -710,7 +752,7 @@ if ( ! function_exists( 'wd_get_notification' ) ) {
             'to' => $to,
             'subject' => wp_specialchars_decode( sprintf( $notice['subject'], $site_name, $site_url ) ),
             'message' => wp_specialchars_decode( sprintf( $notice['message'], $site_name, $updates) ),
-            'headers' => "Reply-To: \"".WEBDOGS_TITLE."\" <".WEBDOGS_SUPPORT.">\r\n" ) ;
+            'headers' => "Reply-To: ".WEBDOGS_TITLE." <".WEBDOGS_SUPPORT.">\r\n" ) ;
 
     }
 }
@@ -1109,6 +1151,7 @@ if ( ! function_exists( 'wd_test_send_maintenance_notification' ) ) {
     //////////////////////////////////////////////////////
     // INLINE TEST////////////////////////////////////////
     function wd_test_send_maintenance_notification(){
+
         if (isset(  $_GET['wd_send_maintenance_notification'])
         && "test"===$_GET['wd_send_maintenance_notification'] 
         && isset(   $_GET['force_send'])
@@ -1121,61 +1164,97 @@ if ( ! function_exists( 'wd_test_send_maintenance_notification' ) ) {
 }
 
 
+if ( ! function_exists( 'wds_admin_notices' ) ) {
+
+    function wds_admin_notices() {
+
+        $message = get_option( 'maintenance_notification_test', false );
+
+        if ( $message ) {
+
+            delete_option( 'maintenance_notification_test' );
+            add_settings_error( 'options-framework', 'maintenance-notification-test', $message, 'update-nag fade' );
+            // settings_errors( 'maintenance-notification-test' );
+        }
+    }
+
+}
+add_action( 'admin_notices', 'wds_admin_notices' );
+
+
 if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
 
     function wd_send_maintenance_notification( $test = false, $force = false ){
+         
+        $report = "\n\nNow: %s\nNext: %s\nUpdates: %s";
 
-        if( wds_domain_exculded() && !$force ) { 
+        if( wds_domain_exculded() && $test && ! $force ) { 
 
-            $message = "Maintainance Notification are excluded for this enviroment. \n\nDomain: %s";
-            wp_die( sprintf( $message, implode(',', wds_domain_exculded() ) ) ); }
-        elseif( wds_domain_exculded() ) {
+            $message = "Maintainance Notification are excluded for this enviroment: %s";
+            $message = sprintf( $message, implode(',', wds_domain_exculded() ) ); 
+            // wp_die( sprintf( $message, implode(',', wds_domain_exculded() ) ) ); 
+        }
+
+        elseif( wds_domain_exculded() && ! $test ) {
+
+            // Bail if excloded
             return;
-        }
         
-          $new_date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
-         $next_send = wd_get_next_schedule();
-
-        // MATCH THE RULE
-        // $check = ( $mon_date % $freq === 0 && $day == $day_date );
-
-        // PROOF CHECK TO PREVENT DUPLCATES 
-        $proof = ( $new_date !== $next_send[0] );
-
-        // ARE THERE ANY UPDATES
-        $count = WEBDOGS::webdogs_maintenance_updates( true );
-
-        // IF THE DATE IS A MATCH 
-        // AND THE PROOFS DO NOT ->> SEND NOTIFICATION EMAIL
-        if( ( $count &&/* $check &&*/ $proof ) || ( $count && $test && $proof ) || $force ) {
-
-            // SAVE THE PROOF SO IF WE CHECK AGAIN
-            // THE PROOF WILL MATCH AND PASS
-            if( ! $test ) { 
-
-                update_option( 'wd_maintenance_notification_proof', $new_date );
-            }
-
-            // DO NOTIFICATION
-            extract( wd_get_notification( of_get_option( 'active_maintenance_customer', false ) ) );
+        } else {
             
-            if(!function_exists('wp_mail')) include_once( ABSPATH . 'wp-includes/pluggable.php');
+              $new_date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
+             $next_send = wd_get_next_schedule();
 
-            $message = ( wp_mail( $to, $subject, $message, $headers ) ) ? 'Maintainance notification sent.' : 'Maintainance notification not sent.';
+            // PROOF CHECK TO PREVENT DUPLCATES 
+            $proof = ( $new_date !== $next_send[0] );
 
-            if( $test ){ wp_die( $message . ": ". date('F j, Y', $next_send[0]) . ": " . $next_send[1]. ": " . $next_send[2]. ": " . $next_send[3]. ": " . $next_send[4]. ": " . date('F j, Y', $new_date ). ": " . print_r($next_send[6], true). ": " . print_r($next_send[5], true) ) ; }
+            // ARE THERE ANY UPDATES
+            $count = WEBDOGS::webdogs_maintenance_updates( true );
+
+            // IF THE DATE IS A MATCH 
+            // AND THE PROOFS DO NOT ->> SEND NOTIFICATION EMAIL
+            if( ( $count && $proof && !$test ) || ( $count && $force ) ) {
+
+                // SAVE THE PROOF SO IF WE CHECK AGAIN
+                // THE PROOF WILL MATCH AND PASS
+                if( ! $test ) { 
+                    update_option( 'wd_maintenance_notification_proof', $new_date );
+                }
+
+                // DO NOTIFICATION
+                extract( wd_get_notification( of_get_option( 'active_maintenance_customer', false ) ) );
+                
+                if(!function_exists('wp_mail')) include_once( ABSPATH . 'wp-includes/pluggable.php');
+
+                $message = ( wp_mail( $to, $subject, $message, $headers ) ) ? 'Maintainance notification sent.' : 'Maintainance notification not sent.';
+
+                $message = nl2br( sprintf( $message.$report, date('F j, Y', $new_date ), date('F j, Y', $next_send[0]), $count ) );
+
+                // if( $test ){ wp_die( $message . ": ". date('F j, Y', $next_send[0]) . ": " . $next_send[1]. ": " . $next_send[2]. ": " . $next_send[3]. ": " . $next_send[4]. ": " . date('F j, Y', $new_date ). ": " . print_r($next_send[6], true). ": " . print_r($next_send[5], true) ) ; }
+
+            } else {
+
+                $prev_date = get_option( 'wd_maintenance_notification_proof', false );
+
+                $message = ( $prev_date ) ? sprintf( "Maintainance Notification last sent: %s.", date('F j, Y',  $prev_date ) ) : "Maintainance Notification pending." ;
+                $message = nl2br( sprintf( $message.$report, date('F j, Y', $new_date ), date('F j, Y', $next_send[0]), $count ) );
+            }
         }
 
-        $message = "Maintainance Notification already sent. \n\nCount: %s\n\nNew date: %s\n\nNext send: %s\n\n%s";
         
-        if( $test ){ wp_die( sprintf( $message, $count, date('F j, Y', $new_date ), date('F j, Y', $next_send[0]), ''/* ": ". date('F j, Y', $next_send[0]) . ": " . $next_send[1]. ": " . $next_send[2]. ": " . $next_send[3]. ": " . $next_send[4]. ": " . date('F j, Y', $new_date ). ": " . print_r($next_send[6], true). ": " . print_r($next_send[5], true) */ ) ); }
+        if( $test ){ 
+
+            if(!function_exists('add_settings_error')) include_once( ABSPATH . 'wp-admin/includes/template.php');
+
+            update_option( 'maintenance_notification_test', $message ); 
+
+            wp_safe_redirect( admin_url( 'admin.php?page=options-framework' ) );
+            exit;
+            // wp_die( sprintf( $message, $count, date('F j, Y', $new_date ), date('F j, Y', $next_send[0]), ''/* ": ". date('F j, Y', $next_send[0]) . ": " . $next_send[1]. ": " . $next_send[2]. ": " . $next_send[3]. ": " . $next_send[4]. ": " . date('F j, Y', $new_date ). ": " . print_r($next_send[6], true). ": " . print_r($next_send[5], true) */ ) ); 
+        }
+
     }
 
-    // ARE WE TESTING THE NOTIFICAITON? 
-    // IS IT FORCED SEND?
-    if( wd_test_send_maintenance_notification() ) {
-        wd_send_maintenance_notification( true, 'force' === wd_test_send_maintenance_notification() );
-    }
 }
 add_action( 'wd_create_daily_notification', 'wd_send_maintenance_notification' );
 

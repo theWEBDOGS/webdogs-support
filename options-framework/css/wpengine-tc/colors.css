@@ -508,6 +508,26 @@ h2.nav-tab-wrapper {
     max-width: 100% !important;
     margin-bottom: 0;
 }
+#activity-widget .subsubsub {
+    border: none;
+    padding:12px 20px 4px;
+    margin:auto
+    
+}
+#activity-widget .subsubsub li {
+    margin:0px;
+    font-size:11px
+}
+
+#activity-widget .subsubsub li a {
+    font-size:11px
+}
+#activity-widget .subsubsub + form {
+    border: none;
+    padding: 7px;
+    margin-top: -4px;
+}
+
 .wrap:after {
     content: " ";
     display: table;
@@ -1621,12 +1641,13 @@ html {
 }
 
 #wp-admin-bar-root-default #wp-admin-bar-site-name > a:after {
-    content: "⌃";
-    transform: rotate(180deg);
+    content: "‹";
+    transform: rotate(-90deg);
     display: inline-block;
     line-height: 1;
-    font-size: 26px;
+    font-size: 28px;
     margin: 0 4px;
+    vertical-align: text-bottom;
 } 
 
 #adminmenu .wp-submenu li > a {

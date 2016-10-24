@@ -810,15 +810,13 @@ function wds_base_strings( $key = null ){
 		'active_maintainance_notification' => 
         array( 
             'subject' => "Scheduled Maintenance for %s | %s", // site_name, $site_url
-            'message' => "The following updates are available for %s website: \n\r%s
-
- "), // $site_name, $updates
+            'message' => "The following updates are available for %s website: \n\r%s\n\r 󠀠"), // $site_name, $updates
+		
 		'on_demand_maintainance_notification' => 
         array(
             'subject' => "WordPress Updates are Available for %s | %s", // site_name, $site_url
-            'message' => "The following updates are available for the %s website. \n\r%s \n\rIf you would like WEBDOGS to install these updates, please reply to this email. \n\r*Note: Standard hourly billing rate will apply.
-
- "), // $site_name, $updates
+            'message' => "The following updates are available for the %s website. \n\r%s \n\rIf you would like WEBDOGS to install these updates, please reply to this email. \n\r*Note: Standard hourly billing rate will apply.\n\r 󠀠"), // $site_name, $updates
+        
         'acs_selections_preview'		  => __( 'Please make more selections to preview the color scheme.', 'options-framework' ),
         'acs_previewing_scheme'		      => __( 'Previewing. Be sure to save if you like the result.', 'options-framework' ),
         'acs_write_compiled_fail'		  => __( 'Could not write compiled CSS file.', 'options-framework' ),

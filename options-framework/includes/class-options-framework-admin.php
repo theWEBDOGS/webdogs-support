@@ -690,6 +690,27 @@ class Options_Framework_Admin {
 
 		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar', $args ) );
 
+		
+		$args = array(
+			'parent' => 'of_theme_options',
+			'id' => 'maintenance_notification_test',
+			'title' => 'Maintenance Notification Test',
+			'href' => add_query_arg( 'wd_send_maintenance_notification', 'test', $href )
+		);
+
+		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar_maintenance_notification_test_submenu', $args ) );
+
+
+		$args = array(
+			'parent' => 'of_theme_options',
+			'id' => 'maintenance_notification_force',
+			'title' => 'Maintenance Notification Email Test',
+			'href' => add_query_arg( array( 'wd_send_maintenance_notification'=>'test', 'force_send'=>'force'), $href )
+		);
+
+		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar_maintenance_notification_force_submenu', $args ) );
+
+
 
 		$plugin_activation = $GLOBALS['optionsframeworkpluginactivation'];
 
@@ -702,7 +723,7 @@ class Options_Framework_Admin {
 			'href' => $href
 		);
 
-		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar_submenu', $args ) );
+		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar_plugin_activation_submenu', $args ) );
 	}
 
 }

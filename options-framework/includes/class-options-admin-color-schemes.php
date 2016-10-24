@@ -176,7 +176,9 @@ class Options_Framework_Admin_Color_Schemes {
 
 		if ( current_user_can( 'webdogs' ) ) {
 
-			$admin_color_scheme = ( wds_is_production_site() ) ? "wpengine_tc" : "webdogs_ds" ;
+			$production = ( function_exists( 'is_wpe' ) && is_wpe() ) ? "wpengine_tc" : "webdogs_wpe" ;
+
+			$admin_color_scheme = ( wds_is_production_site() ) ? $production : "webdogs_ds" ;
 
 		} elseif ( wds_must_use_admin_color() ) {
 
