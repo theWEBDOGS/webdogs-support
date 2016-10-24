@@ -543,8 +543,8 @@
     margin-right: 0 !important;
     max-width: 160px;
 }
-#section-exclude_domain .explain,
-#section-show_domain_flags .explain {
+#section-exclude_domain .explain/* ,
+#section-show_domain_flags .explain */ {
     clear: left;
     max-width: 74% !important;
 }
