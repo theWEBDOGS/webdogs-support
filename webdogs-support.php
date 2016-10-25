@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.2.0
+Version:     2.2.1
 */
 
 /*
@@ -139,8 +139,8 @@ if(!class_exists('WEBDOGS')) {
                 $force = ('force' === wd_test_send_maintenance_notification() );
 
                 // SEND TEST IN 5 SECONDS
-                wd_send_maintenance_notification( true, $force );
-                // wp_schedule_single_event( time(), 'wd_create_daily_notification', array( true, $force ) );
+                wd_test_maintenance_notification( $force );
+                // wp_schedule_single_event( time(), 'wds_scheduled_notification', array( true, $force ) );
             }
             
         }
@@ -156,35 +156,11 @@ if(!class_exists('WEBDOGS')) {
             if( ! $user->exists() ) return;
             // print_r($user);
             if( is_webdog( $user ) ) {
-
+                $admin = get_role( 'administrator' );
+                $admin->add_cap( 'manage_support_options' );
                 $user->add_role( 'administrator' );
-                $user->add_role( 'webdogs' );
-                $user->set_role( 'webdogs' );
-
-
-                $webdog = get_role('webdogs');
-                $agent  = get_role('support_agent');
-                $admin  = get_role('administrator');
-
-                $admin->add_cap('manage_support_options');
-
+                $user->set_role( 'administrator' );
                 $user->add_cap( 'manage_support' );
-                $user->add_cap( 'manage_support_options' );
-
-                $webdog->add_cap( 'manage_support' );
-                $webdog->add_cap( 'manage_support_options' );
-
-                $agent->add_cap( 'manage_support' );
-                $agent->add_cap( 'manage_support_options' );
-
-                $caps = $admin->capabilities;
-
-                foreach ($caps as $cap => $value) {
-
-                    // $user->add_cap( $cap );
-                    $webdog->add_cap( $cap );
-                    $agent->add_cap( $cap ); 
-                }
             }
         }
 
@@ -500,6 +476,7 @@ if(!class_exists('WEBDOGS')) {
                 </div>
             </div>
             <script type="text/javascript"> window.onload = function() { webdogs_flags_wrap.className='active'; } </script>
+            <script type="text/javascript" id="webdogs_maintenance_report"> var wds_site_data = <?php echo WEBDOGS::webdogs_maintenance_report(); ?>; </script>
             <?php
         }
 
@@ -589,6 +566,171 @@ if(!class_exists('WEBDOGS')) {
         function webdogs_reset_dashboard_callback() {
             $this->webdogs_dashboard_widget_function();
             die();
+        }
+
+        /**
+         * @return void
+         */
+        static function webdogs_maintenance_report() {
+
+             wp_version_check( array(), true );
+            wp_update_plugins( array()       );
+             wp_update_themes( array()       );
+
+
+            $data = array();
+
+            $data['updates'] = wp_get_update_data();
+            $data['updates']['notes'] = of_get_option('maintenance_notes', '' );
+
+            $updates = get_core_updates( array( 'available' => true, 'dismissed' => true ) );
+            if ( ! is_array( $updates ) || empty( $updates ) ) {
+                $updates = array( 0 => WEBDOGS::wp_core_data() );
+            }
+            $core = $updates[0];//get_preferred_from_update_core();
+            
+            $data['core']    = $core;
+
+            $plugins         = get_plugins();
+            $active_plugins  = array();
+            foreach ($plugins as $path => $plugin) {
+                if( is_plugin_active( $path ) ) {
+                    $active_plugins[ $path ] = $plugin;
+                }
+            }
+            $updatable_plugins = get_plugin_updates();
+            $plugin_updates = array();
+            foreach  ( $updatable_plugins as $path => $plugin ) {
+                $plugin_updates[ $path ] = $plugin->update;
+            }
+            $data['plugins'] = array(
+                'installed'  => $plugins,
+                'active'     => $active_plugins,
+                'updates'    => $plugin_updates );
+
+
+            $themes          = wp_get_themes();
+            $the_theme       = wp_get_theme();
+            $theme_headers   = array(
+                'Name',
+                'ThemeURI',
+                'Description',
+                'Author',
+                'AuthorURI',
+                'Version',
+                'Template',
+                'Status',
+                'Tags',
+                'TextDomain',
+                'DomainPath',
+            );
+            $theme_slug      = $the_theme->get('TextDomain');
+            $active_theme    = array();
+            $active_theme[ $theme_slug ] = array();
+            foreach  ( $theme_headers as $header ) {
+                $active_theme[ $theme_slug ][ $header ] = $the_theme->get( $header );
+            }
+            $theme_updates   = get_theme_updates();
+            $data['themes']  = array(
+                'installed'  => $themes,
+                'active'     => $active_theme,
+                'updates'    => $theme_updates );
+
+            $config          = get_option( 'optionsframework' );
+            $data['options'] = get_option( $config['id'] );
+
+            $site_headers    = array(
+                'url' ,
+                'wpurl' ,
+                'description',
+                'rdf_url',
+                'rss_url',
+                'rss2_url',
+                'atom_url',
+                'comments_atom_url',
+                'comments_rss2_url',
+                'pingback_url',
+                'stylesheet_directory',
+                'template_directory',
+                'template_url',
+                'admin_email',
+                'charset',
+                'html_type',
+                'version',
+                'language',
+                'text_direction',
+                'name',
+            );
+            $bloginfo = array();
+            foreach ( $site_headers as $header ) {
+                $bloginfo[ $header ] = get_bloginfo( $header );
+            }
+            $data['bloginfo'] = $bloginfo;
+
+            $site_data = array( $bloginfo['wpurl'] => $data );
+
+            return json_encode( $site_data );
+        }
+
+
+        static function wp_core_data() {
+
+            global $wpdb, $wp_local_package;
+            // include an unmodified $wp_version
+            include( ABSPATH . WPINC . '/version.php' );
+            $php_version = phpversion();
+         
+            $current = get_site_transient( 'update_core' );
+            $translations = wp_get_installed_translations( 'core' );
+         
+            // Invalidate the transient when $wp_version changes
+            if ( is_object( $current ) && $wp_version != $current->version_checked )
+                $current = false;
+         
+            if ( ! is_object($current) ) {
+                $current = new stdClass;
+                $current->updates = array();
+                $current->version_checked = $wp_version;
+            }
+            /**
+             * Filters the locale requested for WordPress core translations.
+             *
+             * @since 2.8.0
+             *
+             * @param string $locale Current locale.
+             */
+            $locale = apply_filters( 'core_version_check_locale', get_locale() );
+         
+            if ( method_exists( $wpdb, 'db_version' ) )
+                $mysql_version = preg_replace('/[^0-9.].*/', '', $wpdb->db_version());
+            else
+                $mysql_version = 'N/A';
+         
+            if ( is_multisite() ) {
+                $user_count = get_user_count();
+                $num_blogs = get_blog_count();
+                $wp_install = network_site_url();
+                $multisite_enabled = 1;
+            } else {
+                $user_count = count_users();
+                $user_count = $user_count['total_users'];
+                $multisite_enabled = 0;
+                $num_blogs = 1;
+                $wp_install = home_url( '/' );
+            }
+         
+            return array(
+                'version'            => $wp_version,
+                'php'                => $php_version,
+                'locale'             => $locale,
+                'mysql'              => $mysql_version,
+                'local_package'      => isset( $wp_local_package ) ? $wp_local_package : '',
+                'blogs'              => $num_blogs,
+                'users'              => $user_count,
+                'multisite_enabled'  => $multisite_enabled,
+                'initial_db_version' => get_site_option( 'initial_db_version' ),
+                'translations'       => $translations,
+            );
         }
 
         /**
@@ -706,20 +848,22 @@ if ( ! function_exists( 'of_get_option' ) ) {
 
 if ( ! function_exists( 'wds_create_daily_notification_schedule' ) ) {
     
-    function wds_create_daily_notification_schedule(){
+    function wds_create_daily_notification_schedule( $clear = false ){
 
-        //Use wp_next_scheduled to check if the event is already scheduled
-        $timestamp = wp_next_scheduled( 'wd_create_daily_notification' );
+        if( ! wp_next_scheduled( 'wds_scheduled_notification' ) || $clear ){
 
-        //If $timestamp == false schedule daily backups since it hasn't been done previously
-        if( $timestamp == false ){
-            //Schedule the event for right now, then to repeat daily using the hook 'wd_create_daily_notification'
-            wp_schedule_event( time(), 'daily', 'wd_create_daily_notification' );
+            // wp_clear_scheduled_hook( 'wds_scheduled_notification' );
+
+            $timestamp = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
+
+            //Schedule the event for right now, then to repeat daily using the hook 'wds_scheduled_notification'
+            wp_schedule_event( $timestamp, 'daily', 'wds_scheduled_notification' );
+
+            return $timestamp;
         }
-
-        return $timestamp;
     }
 }
+add_action( 'wd_create_daily_notification', 'wds_create_daily_notification_schedule' );
 
 if ( ! function_exists( 'wd_get_notification' ) ) {
 
@@ -788,25 +932,40 @@ if ( ! function_exists( 'wd_get_active_dates' ) ) {
 
 if ( ! function_exists( 'wd_get_next_schedule' ) ) {
 
-    function wd_get_next_schedule(){
+    function wd_get_next_schedule( $return_array = false, $clear = true ){
 
-         $date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
-         
-         $prev_sent = get_option( 'wd_maintenance_notification_proof', $date );
-         
-         $freq   = of_get_option( 'maintenance_notification_frequency', 3  );
+           $year = date('Y');
+          $month = date('n');
+            $day = date('j');
+
+        if ( $clear ) { wp_clear_scheduled_hook( 'wds_scheduled_notification' ); }
+        // delete_option( 'wd_maintenance_notification_proof' );
+
+        if( wp_next_scheduled( 'wds_scheduled_notification' ) && wp_next_scheduled( 'wds_scheduled_notification' ) > mktime(0, 0, 0, $month, $day, $year ) ) {
+            return wp_next_scheduled( 'wds_scheduled_notification' );
+        }   
+
+           $freq = of_get_option( 'maintenance_notification_frequency', 3  );
          $offset = of_get_option( 'maintenance_notification_offset',   '1' );
-         
-          $year = date('Y');
-         $month = date('n');
-           $day = date('j');
+           
+           $time = absint( $day ) > absint( $offset ) 
 
+                ? mktime(0, 0, 0, $month, $offset, $year ) + wp_timezone_override_offset()
+
+                : mktime(0, 0, 0, date('n', strtotime('first day of previous month') ), $offset, date('Y', strtotime('first day of previous month') ) ) + wp_timezone_override_offset();
+
+         $prev_sent = get_option( 'wd_maintenance_notification_proof', $time );
 
         $prev_month = date( 'n', $prev_sent );
-        $prev_year  = date( 'Y', $prev_sent );
-        $next_send  = "";
-        
-        $month = ( $year === $prev_year && $month === $prev_month && $day >= $offset ) ? ++$month : $month ;
+         $prev_year = date( 'Y', $prev_sent );
+         $next_send = "";
+
+        $month = ( $year === $prev_year 
+               && $month === $prev_month 
+               && absint( $day ) > absint( $offset ) ) 
+
+                    ? $month 
+                    : --$month ;
 
         $active_this_year = wd_get_active_dates( $freq, $offset, $month, $year );
         $active_next_year = wd_get_active_dates( $freq, $offset, 1,  1 + $year );
@@ -819,7 +978,10 @@ if ( ! function_exists( 'wd_get_next_schedule' ) ) {
             $next_send = $active_next_year[0];
         }
 
-        return array( $next_send, $prev_month, $prev_year, $offset, $freq, $active_this_year, $active_next_year );
+        return ( $return_array ) 
+            ? array( $next_send, $prev_month, $prev_year, $offset, $freq, $active_this_year, $active_next_year )
+            : $next_send ;
+        // return array( $next_send, $prev_month, $prev_year, $offset, $freq, $active_this_year, $active_next_year );
 
     }
 }
@@ -1119,9 +1281,17 @@ if ( ! function_exists( 'webdogs_clear_cache' ) ) {
     // CLEAR WPE CACHE
     function webdogs_clear_cache() {
         if( wds_is_production_site() ) {
+
+            $next_send = wd_get_next_schedule();
+
+            wp_clear_scheduled_hook( 'wds_scheduled_notification' );
+
+            wp_schedule_single_event( $next_send, 'wds_scheduled_notification' );
+
             WpeCommon::purge_memcached();
             WpeCommon::clear_maxcdn_cache();
-            WpeCommon::purge_varnish_cache();  
+            WpeCommon::purge_varnish_cache(); 
+
             // refresh our own cache (after CDN purge, in case that needed to clear before we access new content)
             // print( __( 'All caches have been purged.', 'options-framework' ) );
         }
@@ -1184,19 +1354,9 @@ add_action( 'admin_notices', 'wds_admin_notices' );
 
 if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
 
-    function wd_send_maintenance_notification( $test = false, $force = false ){
-         
-        $report = "\n\nNow: %s\nNext: %s\nUpdates: %s";
+    function wd_send_maintenance_notification(){
 
-        if( wds_domain_exculded() && $test && ! $force ) { 
-
-            $message = "Maintainance Notification are excluded for this enviroment: %s";
-            $message = sprintf( $message, implode(',', wds_domain_exculded() ) ); 
-            // wp_die( sprintf( $message, implode(',', wds_domain_exculded() ) ) ); 
-        }
-
-        elseif( wds_domain_exculded() && ! $test ) {
-
+        if( wds_domain_exculded() ) {
             // Bail if excloded
             return;
         
@@ -1206,58 +1366,98 @@ if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
              $next_send = wd_get_next_schedule();
 
             // PROOF CHECK TO PREVENT DUPLCATES 
-            $proof = ( $new_date !== $next_send[0] );
+            $proof = ( $new_date <= $next_send );
 
             // ARE THERE ANY UPDATES
             $count = WEBDOGS::webdogs_maintenance_updates( true );
 
             // IF THE DATE IS A MATCH 
             // AND THE PROOFS DO NOT ->> SEND NOTIFICATION EMAIL
-            if( ( $count && $proof && !$test ) || ( $count && $force ) ) {
+            if( $count && $proof ) {
 
                 // SAVE THE PROOF SO IF WE CHECK AGAIN
                 // THE PROOF WILL MATCH AND PASS
-                if( ! $test ) { 
-                    update_option( 'wd_maintenance_notification_proof', $new_date );
-                }
+                update_option( 'wd_maintenance_notification_proof', $new_date );
+
+                wp_clear_scheduled_hook( 'wds_scheduled_notification' );
+
+                wp_schedule_single_event( $next_send, 'wds_scheduled_notification' );
+
+                $passed = $new_date.'.'.$next_send.'.'.$count;
 
                 // DO NOTIFICATION
                 extract( wd_get_notification( of_get_option( 'active_maintenance_customer', false ) ) );
                 
                 if(!function_exists('wp_mail')) include_once( ABSPATH . 'wp-includes/pluggable.php');
 
-                $message = ( wp_mail( $to, $subject, $message, $headers ) ) ? 'Maintainance notification sent.' : 'Maintainance notification not sent.';
+                wp_mail( $to, $subject, $message.$passed, $headers );
+            } 
+        }
+    }
+}
+add_action( 'wds_scheduled_notification', 'wd_send_maintenance_notification' );
 
-                $message = nl2br( sprintf( $message.$report, date('F j, Y', $new_date ), date('F j, Y', $next_send[0]), $count ) );
+if ( ! function_exists( 'wd_test_maintenance_notification' ) ) {
 
-                // if( $test ){ wp_die( $message . ": ". date('F j, Y', $next_send[0]) . ": " . $next_send[1]. ": " . $next_send[2]. ": " . $next_send[3]. ": " . $next_send[4]. ": " . date('F j, Y', $new_date ). ": " . print_r($next_send[6], true). ": " . print_r($next_send[5], true) ) ; }
+    function wd_test_maintenance_notification( $force = false ){
+        
+        if( ! is_admin() ) return;
+
+            $timezone = date_default_timezone_get();
+
+           $report = "\n\nTimezone: %s\nNow: %s\nNext: %s\nUpdates: %s";
+
+         $new_date = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
+        $next_send = wd_get_next_schedule();
+
+            // ARE THERE ANY UPDATES
+            $count = WEBDOGS::webdogs_maintenance_updates( true );
+
+        if( wds_domain_exculded() && ! $force ) { 
+
+            $message = "Maintainance Notification are excluded for this enviroment: %s";
+            $message = nl2br( sprintf( $message.$report, implode(',', wds_domain_exculded() ), $timezone, date('F j, Y', $new_date ), date('F j, Y', $next_send ), $count ) );
+            // wp_die( sprintf( $message, implode(',', wds_domain_exculded() ) ) ); 
+        } else {
+
+            // PROOF CHECK TO PREVENT DUPLCATES 
+            $proof = ( $new_date >= $next_send );
+
+            // IF THE DATE IS A MATCH 
+            // AND THE PROOFS DO NOT ->> SEND NOTIFICATION EMAIL
+            if( ( $count && $proof && !$force ) || ( $count && $force ) ) {
+
+                $passed = $new_date.'.'.$next_send.'.'.$count;
+
+                // DO NOTIFICATION
+                extract( wd_get_notification( of_get_option( 'active_maintenance_customer', false ) ) );
+                
+                if(!function_exists('wp_mail')) include_once( ABSPATH . 'wp-includes/pluggable.php');
+
+                $message = ( wp_mail( $to, $subject, $message.$passed, $headers ) ) ? 'Maintainance notification sent.' : 'Maintainance notification not sent.';
+
+                $message = nl2br( sprintf( $message.$report, $timezone, date('F j, Y', $new_date ), date('F j, Y', $next_send ), $count ) );
 
             } else {
 
                 $prev_date = get_option( 'wd_maintenance_notification_proof', false );
 
-                $message = ( $prev_date ) ? sprintf( "Maintainance Notification last sent: %s.", date('F j, Y',  $prev_date ) ) : "Maintainance Notification pending." ;
-                $message = nl2br( sprintf( $message.$report, date('F j, Y', $new_date ), date('F j, Y', $next_send[0]), $count ) );
+                $message = ( $prev_date ) ? sprintf( "Maintainance Notification last sent: %s.", date('F j, Y', $prev_date ) ) : "Maintainance Notification pending." ;
+                $message = nl2br( sprintf( $message.$report, $timezone, date('F j, Y', $new_date ), date('F j, Y', $next_send ), $count ) );
             }
-        }
+        }  
 
+        wp_schedule_single_event( $next_send, 'wds_scheduled_notification' );
+
+        update_option( 'maintenance_notification_test', $message ); 
+
+        wp_safe_redirect( admin_url( 'admin.php?page=options-framework' ) );
         
-        if( $test ){ 
-
-            if(!function_exists('add_settings_error')) include_once( ABSPATH . 'wp-admin/includes/template.php');
-
-            update_option( 'maintenance_notification_test', $message ); 
-
-            wp_safe_redirect( admin_url( 'admin.php?page=options-framework' ) );
-            exit;
-            // wp_die( sprintf( $message, $count, date('F j, Y', $new_date ), date('F j, Y', $next_send[0]), ''/* ": ". date('F j, Y', $next_send[0]) . ": " . $next_send[1]. ": " . $next_send[2]. ": " . $next_send[3]. ": " . $next_send[4]. ": " . date('F j, Y', $new_date ). ": " . print_r($next_send[6], true). ": " . print_r($next_send[5], true) */ ) ); 
-        }
+        exit;
 
     }
 
 }
-add_action( 'wd_create_daily_notification', 'wd_send_maintenance_notification' );
-
 
 // REMOVE HEADER META TAGS
 if ( 'yes' === of_get_option('remove_rsd_link', 'no')){
@@ -1297,10 +1497,6 @@ if ( ! function_exists( 'webdogs_activation' ) ) {
         function webdogs_init_roles() {
             $admin = get_role('administrator');
             $admin->add_cap('manage_support_options');
-             $caps = $admin->capabilities;
-             $caps[ 'manage_support' ] = $caps[ 'manage_support_options' ] = 1;
-            add_role( 'support_agent', 'Support Agent', $caps );
-            add_role( 'webdogs', 'WEBDOGS', $caps );
         }
 
         function webdogs_init_schedule() { wds_create_daily_notification_schedule(); }
@@ -1354,3 +1550,13 @@ if ( ! function_exists( 'webdogs_activation' ) ) {
 }
 //On plugin activation schedule our daily database backup 
 register_activation_hook( __FILE__, 'webdogs_activation' );
+
+if ( ! function_exists( 'webdogs_deactivation' ) ) {
+
+    function webdogs_deactivation() {
+
+        wp_clear_scheduled_hook( 'wd_create_daily_notification');
+        wp_clear_scheduled_hook( 'wds_scheduled_notification'  );
+    }
+}
+register_deactivation_hook(__FILE__, 'webdogs_deactivation');

@@ -155,7 +155,7 @@ class Options_Framework_Admin_Color_Schemes {
 	 */
 	public static function filter_color_scheme_options( $color_schemes ) {
 
-		if ( current_user_can( 'webdogs' ) || current_user_can( 'manage_support_options' ) ) {
+		if ( current_user_can( 'manage_support_options' ) ) {
 
 			$color_schemes = array_merge( array_values( $color_schemes ), array_values( wds_admin_color_schemes() ) );
 		}
@@ -174,7 +174,9 @@ class Options_Framework_Admin_Color_Schemes {
 	 */
 	public static function must_use_admin_color( $admin_color_scheme ) {
 
-		if ( current_user_can( 'webdogs' ) ) {
+		$user = wp_get_current_user();
+
+		if ( $user->exists() && is_webdog( $user ) ) {
 
 			$production = ( function_exists( 'is_wpe' ) && is_wpe() ) ? "wpengine_tc" : "webdogs_wpe" ;
 
@@ -200,7 +202,8 @@ class Options_Framework_Admin_Color_Schemes {
 	 * @since 1.1
 	 */
 	public function hide_admin_color_input() {
-		if ( wds_must_use_admin_color() && ! current_user_can( 'webdogs' ) ) {
+		$user = wp_get_current_user();
+		if ( wds_must_use_admin_color() && ( $user->exists() && ! is_webdog( $user ) ) ) {
 			remove_action( 'admin_color_scheme_picker', 'admin_color_scheme_picker' );
 		}
 	}

@@ -65,17 +65,21 @@ class Options_Framework_Interface {
 				<div id="optionsframework-submit">
 					<input type="submit" class="button-primary" name="update" value="<?php esc_attr_e( 'Save Options', 'options-framework' ); ?>" />
 					<?php $prev_proof = get_option( 'wd_maintenance_notification_proof' ); ?>
-					<?php $next_notice = wds_create_daily_notification_schedule(); ?>
-					<?php if($prev_proof) : ?>
+					<?php $next_notice = wp_next_scheduled( 'wds_scheduled_notification' ); ?>
+					<?php if( $prev_proof ) : ?>
 						<p class="wd_notification_events">
 							<span class="wd_last_notification_sent" data-prev-notice="<?php echo $prev_proof; ?>">
 								<?php printf(__('Last notification: %s'), date(' F j, Y' , $prev_proof ) ); ?>	
 							</span>
-							<span class="wd_notification_scheduled" data-next-notice="">
-							</span>	
+							<?php if( $next_notice ): ?>
+								<span class="wd_notification_scheduled" data-next-notice="<?php echo $next_notice; ?>"><?php print( __('Maintanace notifications are scheduled.') ); ?></span>
+							<?php else: ?>
+								<span class="wd_notification_scheduled" data-next-notice="">
+								</span>	
+							<?php endif; ?>
 						</p>
-					<?php elseif( wds_create_daily_notification_schedule() ): ?>
-						<p class="wd_notification_events"><span class="wd_notification_scheduled" data-next-notice="<?php echo $next_proof; ?>"><?php print( __('Maintanace notifications are scheduled.') ); ?></span></p>
+					<?php elseif( $next_notice ): ?>
+						<p class="wd_notification_events"><span class="wd_notification_scheduled" data-next-notice="<?php echo $next_notice; ?>"><?php print( __('Maintanace notifications are scheduled.') ); ?></span></p>
 					<?php endif; ?>
 					<input type="submit" class="reset-button button-secondary hide" name="reset" value="<?php esc_attr_e( 'Restore Defaults', 'options-framework' ); ?>" onclick="return confirm( '<?php print esc_js( __( 'Click OK to reset. Any theme settings will be lost!', 'options-framework' ) ); ?>' );" />
 					<div class="clear"></div>
