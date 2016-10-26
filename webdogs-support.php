@@ -1383,14 +1383,12 @@ if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
 
                 wp_schedule_single_event( $next_send, 'wds_scheduled_notification' );
 
-                $passed = $new_date.'.'.$next_send.'.'.$count;
-
                 // DO NOTIFICATION
                 extract( wd_get_notification( of_get_option( 'active_maintenance_customer', false ) ) );
                 
                 if(!function_exists('wp_mail')) include_once( ABSPATH . 'wp-includes/pluggable.php');
 
-                wp_mail( $to, $subject, $message.$passed, $headers );
+                wp_mail( $to, $subject, $message, $headers );
             } 
         }
     }
@@ -1427,6 +1425,7 @@ if ( ! function_exists( 'wd_test_maintenance_notification' ) ) {
             // AND THE PROOFS DO NOT ->> SEND NOTIFICATION EMAIL
             if( ( $count && $proof && !$force ) || ( $count && $force ) ) {
 
+                $passed = "";
                 $passed = $new_date.'.'.$next_send.'.'.$count;
 
                 // DO NOTIFICATION
