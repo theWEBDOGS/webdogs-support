@@ -807,13 +807,13 @@ function wds_base_strings( $key = null ){
 
 		'active_maintainance_notification' => 
         array( 
-            'subject' => "Scheduled Maintenance for %s | %s", // site_name, $site_url
-            'message' => "The following updates are available for %s website: \n\r%s\n\r 󠀠"), // $site_name, $updates
+            'subject' => "Scheduled Maintenance for %s", // hostname
+            'message' => "The following updates are available for %s website: \n\r%s\n\r🕸🐶"), // hostname, updates
 		
 		'on_demand_maintainance_notification' => 
         array(
-            'subject' => "WordPress Updates are Available for %s | %s", // site_name, $site_url
-            'message' => "The following updates are available for the %s website. \n\r%s \n\rIf you would like WEBDOGS to install these updates, please reply to this email. \n*Note: Standard hourly billing rate will apply.\n\r 󠀠"), // $site_name, $updates
+            'subject' => "WordPress Updates are Available for %s", // hostname
+            'message' => "The following updates are available for the %s website. \n\r%s \n\rIf you would like WEBDOGS to install these updates, please reply to this email. \n*Note: Standard hourly billing rate will apply.\n\r🕸🐶"), // hostname, updates
         
         'acs_selections_preview'		  => __( 'Please make more selections to preview the color scheme.', 'options-framework' ),
         'acs_previewing_scheme'		      => __( 'Previewing. Be sure to save if you like the result.', 'options-framework' ),

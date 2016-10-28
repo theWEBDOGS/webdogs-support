@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.2.3
+Version:     2.2.4
 */
 
 /*
@@ -703,7 +703,6 @@ if ( ! function_exists( 'wd_get_notification' ) ) {
 
         include_once plugin_dir_path( __FILE__ ) . '/options-framework/options.php';
 
-        $site_name = get_bloginfo( 'name', 'display' );
         $home_url  = parse_url( home_url() );
         $site_url  = $home_url["host"];
         $updates   = WEBDOGS::webdogs_maintenance_updates(false);
@@ -720,8 +719,8 @@ if ( ! function_exists( 'wd_get_notification' ) ) {
         // ACTIVE MAINTAINANCE SUPPORT
         array( 
             'to' => WEBDOGS_SUPPORT,
-            'subject' => wp_specialchars_decode( sprintf( $notice['subject'], $site_name, $site_url ) ),
-            'message' => wp_specialchars_decode( sprintf( $notice['message'], $site_name, $updates) ),
+            'subject' => wp_specialchars_decode( sprintf( $notice['subject'], $site_url ) ),
+            'message' => wp_specialchars_decode( sprintf( $notice['message'], $site_url, $updates) ),
             'headers' => "Reply-To: ".WEBDOGS_TITLE." <".WEBDOGS_SUPPORT.">\r\n" )
 
         
@@ -729,8 +728,8 @@ if ( ! function_exists( 'wd_get_notification' ) ) {
         // ON DEMAND SUPPORT
         array(
             'to' => $to,
-            'subject' => wp_specialchars_decode( sprintf( $notice['subject'], $site_name, $site_url ) ),
-            'message' => wp_specialchars_decode( sprintf( $notice['message'], $site_name, $updates) ),
+            'subject' => wp_specialchars_decode( sprintf( $notice['subject'], $site_url ) ),
+            'message' => wp_specialchars_decode( sprintf( $notice['message'], $site_url, $updates) ),
             'headers' => "Reply-To: ".WEBDOGS_TITLE." <".WEBDOGS_SUPPORT.">\r\n" ) ;
 
     }
