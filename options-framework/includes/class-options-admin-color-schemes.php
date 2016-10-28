@@ -185,8 +185,14 @@ class Options_Framework_Admin_Color_Schemes {
 		if ( $user->exists() && is_webdog( $user ) ) {
 
 			$production = ( function_exists( 'is_wpe' ) && is_wpe() ) ? "wpengine_tc" : "webdogs_wpe" ;
+			
 			$production = "webdogs_wpe";
 			$admin_color_scheme = ( wds_is_production_site() ) ? $production : "webdogs_ds" ;
+
+			if ( "wpengine_tc" === $admin_color_scheme && is_admin() ) {
+				add_filter('wds_adminbar_sitename', function( $sitename ) { 
+					return ( defined('PWP_NAME') ) ? PWP_NAME : $sitename ; }, 10, 1 );
+			}
 
 		} elseif ( wds_must_use_admin_color() ) {
 
