@@ -1430,10 +1430,13 @@ ul.subsubsub a.current,
     bottom: 0;
     right: 0;
 }
+ 
 
-.wp-core-ui .button-group >.button:active:hover, 
 .wp-core-ui .button-group >.button.active:hover {
     color:#40bac8 !important;
+}
+.wp-core-ui .button-group >.button:active:hover:not(.active) {
+    color:#f0f0f0 !important;
 }
 
 /* .folded #adminmenu .wp-has-current-submenu .wp-submenu:after,  */

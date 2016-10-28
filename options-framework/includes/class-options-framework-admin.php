@@ -270,7 +270,7 @@ class Options_Framework_Admin {
 	 
 	    $wp_admin_bar->add_menu( array(
 	        'id'    => 'site-name',
-	        'title' => $title,
+	        'title' => apply_filters( 'wds_adminbar_sitename', $title ),
 	        'href'  => ( is_admin() || ! current_user_can( 'read' ) ) ? home_url( '/' ) : admin_url(),
 	    ) );
 	 
