@@ -238,6 +238,10 @@
 #optionsframework .section-scheme.inset,
 #optionsframework .section-scheme.top-border {
 	/* padding-top: 10px; */
+    display: inline;
+}
+#optionsframework #section-admin_color_scheme .option {
+    clear: both;
 }
 #optionsframework .section-scheme .controls .of-scheme-properties .section-color-scheme-pickers {
 
@@ -659,7 +663,6 @@
     -webkit-box-shadow: 0 0 0 1px #5b9dd9,0 0 2px 1px rgba(30,140,190,.8);
     box-shadow: 0 0 0 1px #5b9dd9,0 0 2px 1px rgba(30,140,190,.8);
 }
-
 
 #optionsframework .dashicons-editor-help:after {
     content: attr(title);
