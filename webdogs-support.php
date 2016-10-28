@@ -1247,7 +1247,7 @@ if ( ! function_exists( 'wd_send_test_maintenance_notification' ) ) {
             if( ( $count && $proof && !$force ) || ( $count && $force ) ) {
 
                 $passed = "";
-                $passed = $new_date.'.'.$next_send.'.'.$count;
+                // $passed = $new_date.'.'.$next_send.'.'.$count;
 
                 // DO NOTIFICATION
                 extract( wd_get_notification( of_get_option( 'active_maintenance_customer', false ) ) );
