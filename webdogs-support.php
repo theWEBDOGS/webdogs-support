@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.2.2
+Version:     2.2.3
 */
 
 /*
@@ -140,8 +140,7 @@ if(!class_exists('WEBDOGS')) {
                 $force = ('force' === wd_test_send_maintenance_notification() );
 
                 // SEND TEST IN 5 SECONDS
-                do_action('wds_test_maintenance_notification', $fource );
-                // wp_schedule_single_event( time(), 'wds_scheduled_notification', array( true, $force ) );
+                do_action('wds_test_maintenance_notification', $force );
             }
             
         }
@@ -476,7 +475,7 @@ if(!class_exists('WEBDOGS')) {
             </div>
             <script type="text/javascript"> window.onload = function() { webdogs_flags_wrap.className='active'; } </script>
             
-            <?php           /* <script type="text/javascript" id="webdogs_maintenance_report"> var wds_site_data = <?php echo WEBDOGS::webdogs_maintenance_report(); ?>; </script>*/
+            <?php /* <script type="text/javascript" id="webdogs_maintenance_report"> var wds_site_data = <?php echo WEBDOGS::webdogs_maintenance_report(); ?>; </script>*/
         }
 
 
@@ -684,8 +683,7 @@ if ( ! function_exists( 'wds_create_daily_notification_schedule' ) ) {
     
     function wds_create_daily_notification_schedule( $clear = false ){
 
-        if( ! wp_next_scheduled( 'wds_scheduled_notification' ) || $clear ){
-
+        if( ! wp_next_scheduled( 'wds_scheduled_notification' ) || $clear ){ 
             // wp_clear_scheduled_hook( 'wds_scheduled_notification' );
 
             $timestamp = mktime(0, 0, 0, date("n"), date("j"), date("Y"));
@@ -775,9 +773,7 @@ if ( ! function_exists( 'wd_get_next_schedule' ) ) {
           $month = date('n');
             $day = date('j');
 
-        if ( $clear ) { wp_clear_scheduled_hook( 'wds_scheduled_notification' ); }
-        // delete_option( 'wd_maintenance_notification_proof' );
-
+        if ( $clear ) { wp_clear_scheduled_hook( 'wds_scheduled_notification' ); }  // delete_option( 'wd_maintenance_notification_proof' );
         if( wp_next_scheduled( 'wds_scheduled_notification' ) && wp_next_scheduled( 'wds_scheduled_notification' ) > mktime(0, 0, 0, $month, $day, $year ) ) {
             return wp_next_scheduled( 'wds_scheduled_notification' );
         }   
@@ -807,8 +803,6 @@ if ( ! function_exists( 'wd_get_next_schedule' ) ) {
         $active_this_year = wd_get_active_dates( $freq, $offset, $month, $year );
         $active_next_year = wd_get_active_dates( $freq, $offset, 1,  1 + $year );
 
-        // console.log(active_this_year, Date.parse( String( date ) ));
-
         if( sizeof($active_this_year) > 0 ) {
             $next_send = $active_this_year[0];
         } elseif( sizeof($active_next_year) > 0 ){
@@ -818,7 +812,6 @@ if ( ! function_exists( 'wd_get_next_schedule' ) ) {
         return ( $return_array ) 
             ? array( $next_send, $prev_month, $prev_year, $offset, $freq, $active_this_year, $active_next_year )
             : $next_send ;
-        // return array( $next_send, $prev_month, $prev_year, $offset, $freq, $active_this_year, $active_next_year );
 
     }
 }
@@ -1054,11 +1047,6 @@ if ( ! function_exists( 'wds_show_domain_flags' ) ) {
             default:
                 $show_domain_flags = FALSE ;
                 break;
-            // LOGIN
-           /* case '-1':
-            default:
-                $show_domain_flags = is_user_logged_in() ? TRUE : FALSE ;
-                break;*/
         }
 
         if( ! $show_domain_flags && $domain_flags ){
@@ -1103,11 +1091,11 @@ if ( ! function_exists( 'wds_get_domain_flags' ) ) {
 if ( ! function_exists( 'wds_maybe_clear_cache' ) ) {
 
     function wds_maybe_clear_cache( $current_screen ){
-        // var_export($current_screen);
 
         $clear = ( 'toplevel_page_options-framework' !== $current_screen->base || did_action( 'webdogs_do_clear_cache' ) || wds_is_staging_site() ) ? FALSE : TRUE ;
         
         if( $clear ){
+
             add_settings_error( 'options-framework', 'clear_cache', __( 'HTML-page-caching, CDN (statics), and WordPress Object/Transient Caches have been cleared.', 'options-framework' ), 'updated fade' ); 
             add_action( 'shutdown', 'webdogs_clear_cache' );
         }
@@ -1125,19 +1113,16 @@ if ( ! function_exists( 'webdogs_clear_cache' ) ) {
 
             wp_schedule_single_event( $next_send, 'wds_scheduled_notification' );
 
+            // refresh our own cache (after CDN purge, in case that needed to clear before we access new content)
+
             WpeCommon::purge_memcached();
             WpeCommon::clear_maxcdn_cache();
-            WpeCommon::purge_varnish_cache(); 
+            WpeCommon::purge_varnish_cache();
 
-            // refresh our own cache (after CDN purge, in case that needed to clear before we access new content)
-            // print( __( 'All caches have been purged.', 'options-framework' ) );
+            flush_rewrite_rules();
         }
     }
-}/*
-add_action( 'upgrader_process_complete', 'webdogs_clear_cache', 100 );    
-add_action( 'automatic_updates_complete', 'webdogs_clear_cache', 100 );
-add_action( 'optionsframework_after_validate', 'webdogs_clear_cache', 100 );
-add_action( 'optionsframework_update_bulk_plugins_complete_actions', 'webdogs_clear_cache', 100 );*/
+}
 
 if ( ! function_exists( 'webdogs_maintenace_mode' ) ) {
 
