@@ -17,10 +17,15 @@ function optionsframework_init() {
 
 	// Instantiate the login logo plugin class.
 	// Loads the required Options Framework classes.
-	require plugin_dir_path( __FILE__ ) . 'options.php';
-	require plugin_dir_path( __FILE__ ) . 'includes/class-options-login-logo.php';
-	require plugin_dir_path( __FILE__ ) . 'includes/class-options-admin-color-schemes.php';
+	require_once plugin_dir_path( __FILE__ ) . 'options.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-options-endpoint.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-options-login-logo.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-options-admin-color-schemes.php';
 
+	// Pull in the plugin classes and initialize
+	$options_framework_endpoint = Options_Framework_Endpoint::register();
+
+	// Pull in the plugin classes and initialize
 	$options_framework_login_logo = new Options_Framework_Login_Logo;
 	$options_framework_login_logo->init();
 
@@ -33,13 +38,12 @@ function optionsframework_init() {
 	//  If user can't edit theme options, exit
 	if ( ! current_user_can( 'manage_options' ) ) return;
 
-	require plugin_dir_path( __FILE__ ) . 'includes/class-options-plugin-activation.php';
-
-	require plugin_dir_path( __FILE__ ) . 'includes/class-options-framework.php';
-	require plugin_dir_path( __FILE__ ) . 'includes/class-options-framework-admin.php';
-	require plugin_dir_path( __FILE__ ) . 'includes/class-options-interface.php';
-	require plugin_dir_path( __FILE__ ) . 'includes/class-options-media-uploader.php';
-	require plugin_dir_path( __FILE__ ) . 'includes/class-options-sanitization.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-options-plugin-activation.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-options-framework.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-options-framework-admin.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-options-interface.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-options-media-uploader.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-options-sanitization.php';
 
 	// Instantiate the plugin activation class.
 	// Ensure only one instance of the class is ever invoked.

@@ -7,7 +7,7 @@ html { background: #d6d6d6; }
  */
 a { color: #377a9f; }
 a:hover, a:active, a:focus { color: #31353f; }
-#media-upload a.del-link:hover, div.dashboard-widget-submit input:hover, .subsubsub a:hover, .subsubsub a.current:hover { color: #d0f2fc; }
+#media-upload a.del-link:hover, div.dashboard-widget-submit input:hover { color: #d0f2fc; }
 
 /*
  * Forms

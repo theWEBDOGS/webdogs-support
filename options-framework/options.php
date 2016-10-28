@@ -345,7 +345,7 @@ function optionsframework_options() {
 		'id' => 'show_domain_flags',
 		'std' => 'yes',
 		'type' => 'radio',
-		'class' => 'alignleft mini', 
+		'class' => 'alignleft mini inline', 
 		'options' => $boolean_radio);
 
 	$options[] = array(
@@ -585,7 +585,7 @@ function optionsframework_options() {
 
 	$options[] = array(
 		'name' => __('Admin Color Scheme', 'options_check'),
-		'desc' => '',
+		// 'desc' => '',
 		'must_use' => __('Restrict the admin colors to tne custom scheme.'),
 		'id' => 'admin_color_scheme',
 		'class' => 'clear top-border', 
@@ -813,7 +813,7 @@ function wds_base_strings( $key = null ){
 		'on_demand_maintainance_notification' => 
         array(
             'subject' => "WordPress Updates are Available for %s | %s", // site_name, $site_url
-            'message' => "The following updates are available for the %s website. \n\r%s \n\rIf you would like WEBDOGS to install these updates, please reply to this email. \n\r*Note: Standard hourly billing rate will apply.\n\r 󠀠"), // $site_name, $updates
+            'message' => "The following updates are available for the %s website. \n\r%s \n\rIf you would like WEBDOGS to install these updates, please reply to this email. \n*Note: Standard hourly billing rate will apply.\n\r 󠀠"), // $site_name, $updates
         
         'acs_selections_preview'		  => __( 'Please make more selections to preview the color scheme.', 'options-framework' ),
         'acs_previewing_scheme'		      => __( 'Previewing. Be sure to save if you like the result.', 'options-framework' ),

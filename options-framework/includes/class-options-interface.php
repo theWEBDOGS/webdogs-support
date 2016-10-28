@@ -129,16 +129,24 @@ class Options_Framework_Interface {
 				$id = 'section-' . $value['id'];
 
 				$class = 'section';
+
+				$help_text = '';
+				$help = '';
+
 				if ( isset( $value['type'] ) ) {
 					$class .= ' section-' . $value['type'];
 				}
 				if ( isset( $value['class'] ) ) {
 					$class .= ' ' . $value['class'];
 				}
+				if ( isset( $value['desc'] ) ) {
+					$help_text .= ' title="' . strip_tags( $value['desc'] ) . '"';
+					$help = '<button type="button" class="dashicons dashicons-editor-help"'.$help_text.'><span class="screen-reader-text">'. esc_html( $value['desc'] )  .'</span></button>';
+				}
 
 				$output .= '<div id="' . esc_attr( $id ) .'" class="' . esc_attr( $class ) . '">'."\n";
 				if ( isset( $value['name'] ) ) {
-					$output .= '<h4 class="heading">' . esc_html( $value['name'] ) . '</h4>' . "\n";
+					$output .= '<h4 class="heading">' . esc_html( $value['name'] ). $help . '</h4>' . "\n";
 				}
 				if ( $value['type'] == 'scheme' ) {
 

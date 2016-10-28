@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.2.1
+Version:     2.2.2
 */
 
 /*
@@ -90,6 +90,7 @@ if(!class_exists('WEBDOGS')) {
             add_action( 'admin_enqueue_scripts',                array(&$this,'webdogs_enqueue_scripts'              ));
 
             add_action( 'admin_enqueue_scripts',                array(&$this,'webdogs_enqueue_domain_flags'         ));
+
             add_action( 'wp_enqueue_scripts',                   array(&$this,'webdogs_enqueue_domain_flags'         ));
         
             add_action( 'wp_ajax_webdogs_result_dashboard',     array(&$this,'webdogs_result_dashboard_callback'    )); 
@@ -139,7 +140,7 @@ if(!class_exists('WEBDOGS')) {
                 $force = ('force' === wd_test_send_maintenance_notification() );
 
                 // SEND TEST IN 5 SECONDS
-                wd_test_maintenance_notification( $force );
+                do_action('wds_test_maintenance_notification', $fource );
                 // wp_schedule_single_event( time(), 'wds_scheduled_notification', array( true, $force ) );
             }
             
@@ -154,6 +155,7 @@ if(!class_exists('WEBDOGS')) {
 
             // Bail early
             if( ! $user->exists() ) return;
+            
             // print_r($user);
             if( is_webdog( $user ) ) {
                 $admin = get_role( 'administrator' );
@@ -283,9 +285,6 @@ if(!class_exists('WEBDOGS')) {
                 overflow: visible;
                 border-bottom: 5px solid #9bb567;
                 opacity: 0.334;
-            /*     -webkit-transition: all 1s linear 1s;
-                -moz-transition: all 1s linear 2s;
-                transition: all 1s linear 2s; */
             }
 
             #webdogs_flags {
@@ -476,8 +475,8 @@ if(!class_exists('WEBDOGS')) {
                 </div>
             </div>
             <script type="text/javascript"> window.onload = function() { webdogs_flags_wrap.className='active'; } </script>
-            <script type="text/javascript" id="webdogs_maintenance_report"> var wds_site_data = <?php echo WEBDOGS::webdogs_maintenance_report(); ?>; </script>
-            <?php
+            
+            <?php           /* <script type="text/javascript" id="webdogs_maintenance_report"> var wds_site_data = <?php echo WEBDOGS::webdogs_maintenance_report(); ?>; </script>*/
         }
 
 
@@ -566,171 +565,6 @@ if(!class_exists('WEBDOGS')) {
         function webdogs_reset_dashboard_callback() {
             $this->webdogs_dashboard_widget_function();
             die();
-        }
-
-        /**
-         * @return void
-         */
-        static function webdogs_maintenance_report() {
-
-             wp_version_check( array(), true );
-            wp_update_plugins( array()       );
-             wp_update_themes( array()       );
-
-
-            $data = array();
-
-            $data['updates'] = wp_get_update_data();
-            $data['updates']['notes'] = of_get_option('maintenance_notes', '' );
-
-            $updates = get_core_updates( array( 'available' => true, 'dismissed' => true ) );
-            if ( ! is_array( $updates ) || empty( $updates ) ) {
-                $updates = array( 0 => WEBDOGS::wp_core_data() );
-            }
-            $core = $updates[0];//get_preferred_from_update_core();
-            
-            $data['core']    = $core;
-
-            $plugins         = get_plugins();
-            $active_plugins  = array();
-            foreach ($plugins as $path => $plugin) {
-                if( is_plugin_active( $path ) ) {
-                    $active_plugins[ $path ] = $plugin;
-                }
-            }
-            $updatable_plugins = get_plugin_updates();
-            $plugin_updates = array();
-            foreach  ( $updatable_plugins as $path => $plugin ) {
-                $plugin_updates[ $path ] = $plugin->update;
-            }
-            $data['plugins'] = array(
-                'installed'  => $plugins,
-                'active'     => $active_plugins,
-                'updates'    => $plugin_updates );
-
-
-            $themes          = wp_get_themes();
-            $the_theme       = wp_get_theme();
-            $theme_headers   = array(
-                'Name',
-                'ThemeURI',
-                'Description',
-                'Author',
-                'AuthorURI',
-                'Version',
-                'Template',
-                'Status',
-                'Tags',
-                'TextDomain',
-                'DomainPath',
-            );
-            $theme_slug      = $the_theme->get('TextDomain');
-            $active_theme    = array();
-            $active_theme[ $theme_slug ] = array();
-            foreach  ( $theme_headers as $header ) {
-                $active_theme[ $theme_slug ][ $header ] = $the_theme->get( $header );
-            }
-            $theme_updates   = get_theme_updates();
-            $data['themes']  = array(
-                'installed'  => $themes,
-                'active'     => $active_theme,
-                'updates'    => $theme_updates );
-
-            $config          = get_option( 'optionsframework' );
-            $data['options'] = get_option( $config['id'] );
-
-            $site_headers    = array(
-                'url' ,
-                'wpurl' ,
-                'description',
-                'rdf_url',
-                'rss_url',
-                'rss2_url',
-                'atom_url',
-                'comments_atom_url',
-                'comments_rss2_url',
-                'pingback_url',
-                'stylesheet_directory',
-                'template_directory',
-                'template_url',
-                'admin_email',
-                'charset',
-                'html_type',
-                'version',
-                'language',
-                'text_direction',
-                'name',
-            );
-            $bloginfo = array();
-            foreach ( $site_headers as $header ) {
-                $bloginfo[ $header ] = get_bloginfo( $header );
-            }
-            $data['bloginfo'] = $bloginfo;
-
-            $site_data = array( $bloginfo['wpurl'] => $data );
-
-            return json_encode( $site_data );
-        }
-
-
-        static function wp_core_data() {
-
-            global $wpdb, $wp_local_package;
-            // include an unmodified $wp_version
-            include( ABSPATH . WPINC . '/version.php' );
-            $php_version = phpversion();
-         
-            $current = get_site_transient( 'update_core' );
-            $translations = wp_get_installed_translations( 'core' );
-         
-            // Invalidate the transient when $wp_version changes
-            if ( is_object( $current ) && $wp_version != $current->version_checked )
-                $current = false;
-         
-            if ( ! is_object($current) ) {
-                $current = new stdClass;
-                $current->updates = array();
-                $current->version_checked = $wp_version;
-            }
-            /**
-             * Filters the locale requested for WordPress core translations.
-             *
-             * @since 2.8.0
-             *
-             * @param string $locale Current locale.
-             */
-            $locale = apply_filters( 'core_version_check_locale', get_locale() );
-         
-            if ( method_exists( $wpdb, 'db_version' ) )
-                $mysql_version = preg_replace('/[^0-9.].*/', '', $wpdb->db_version());
-            else
-                $mysql_version = 'N/A';
-         
-            if ( is_multisite() ) {
-                $user_count = get_user_count();
-                $num_blogs = get_blog_count();
-                $wp_install = network_site_url();
-                $multisite_enabled = 1;
-            } else {
-                $user_count = count_users();
-                $user_count = $user_count['total_users'];
-                $multisite_enabled = 0;
-                $num_blogs = 1;
-                $wp_install = home_url( '/' );
-            }
-         
-            return array(
-                'version'            => $wp_version,
-                'php'                => $php_version,
-                'locale'             => $locale,
-                'mysql'              => $mysql_version,
-                'local_package'      => isset( $wp_local_package ) ? $wp_local_package : '',
-                'blogs'              => $num_blogs,
-                'users'              => $user_count,
-                'multisite_enabled'  => $multisite_enabled,
-                'initial_db_version' => get_site_option( 'initial_db_version' ),
-                'translations'       => $translations,
-            );
         }
 
         /**
@@ -872,7 +706,8 @@ if ( ! function_exists( 'wd_get_notification' ) ) {
         include_once plugin_dir_path( __FILE__ ) . '/options-framework/options.php';
 
         $site_name = get_bloginfo( 'name', 'display' );
-        $site_url  = trailingslashit( get_bloginfo( 'url', 'display' ) );
+        $home_url  = parse_url( home_url() );
+        $site_url  = $home_url["host"];
         $updates   = WEBDOGS::webdogs_maintenance_updates(false);
         $email_to  = of_get_option( 'on_demand_email', get_bloginfo( 'admin_email' ) );
               $to  = array_map( 'trim', explode(',', $email_to ));
@@ -883,7 +718,8 @@ if ( ! function_exists( 'wd_get_notification' ) ) {
 
         return ( $active )
 
-        ?// ACTIVE MAINTAINANCE SUPPORT
+        ?
+        // ACTIVE MAINTAINANCE SUPPORT
         array( 
             'to' => WEBDOGS_SUPPORT,
             'subject' => wp_specialchars_decode( sprintf( $notice['subject'], $site_name, $site_url ) ),
@@ -891,7 +727,8 @@ if ( ! function_exists( 'wd_get_notification' ) ) {
             'headers' => "Reply-To: ".WEBDOGS_TITLE." <".WEBDOGS_SUPPORT.">\r\n" )
 
         
-        :// ON DEMAND SUPPORT
+        :
+        // ON DEMAND SUPPORT
         array(
             'to' => $to,
             'subject' => wp_specialchars_decode( sprintf( $notice['subject'], $site_name, $site_url ) ),
@@ -1395,9 +1232,9 @@ if ( ! function_exists( 'wd_send_maintenance_notification' ) ) {
 }
 add_action( 'wds_scheduled_notification', 'wd_send_maintenance_notification' );
 
-if ( ! function_exists( 'wd_test_maintenance_notification' ) ) {
+if ( ! function_exists( 'wd_send_test_maintenance_notification' ) ) {
 
-    function wd_test_maintenance_notification( $force = false ){
+    function wd_send_test_maintenance_notification( $force = false ){
         
         if( ! is_admin() ) return;
 
@@ -1457,6 +1294,7 @@ if ( ! function_exists( 'wd_test_maintenance_notification' ) ) {
     }
 
 }
+add_action( 'wds_test_maintenance_notification', 'wd_send_test_maintenance_notification', 10, 1 );
 
 // REMOVE HEADER META TAGS
 if ( 'yes' === of_get_option('remove_rsd_link', 'no')){
