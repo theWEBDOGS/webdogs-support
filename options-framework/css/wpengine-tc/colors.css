@@ -1428,9 +1428,13 @@ ul.subsubsub a.current,
     -ms-transform: rotate(180deg);
     transform: rotate(180deg);
     bottom: 0;
-    right: 0
+    right: 0;
 }
 
+.wp-core-ui .button-group >.button:active:hover, 
+.wp-core-ui .button-group >.button.active:hover {
+    color:#40bac8 !important;
+}
 
 /* .folded #adminmenu .wp-has-current-submenu .wp-submenu:after,  */
 /* .folded #adminmenu .wp-has-current-submenu.opensub .wp-submenu:after, */
@@ -1448,6 +1452,7 @@ ul.subsubsub a.current,
     top: 10px;
     z-index: 10000;
 }
+
 
 html {
     padding-top:100px!important;
@@ -1724,21 +1729,21 @@ html {
 }
 
 
-    .plugin-card:nth-child(odd) {
-        clear: left;
-        margin-left: 0 !important;
-        margin-right: 8px !important;
-    }
-    .plugin-card:nth-child(even) {
-        margin-right: 0;
-        margin-left: 8px !important;
-        clear: none;
-    }
-    .plugin-card-top {
-        min-height: 260px;
-    }
-    .plugin-card {
-        width: 50%;
-        width: -webkit-calc(50% - 8px);
-        width: calc(50% - 8px);
-    }
+.plugin-card:nth-child(odd) {
+    clear: left;
+    margin-left: 0 !important;
+    margin-right: 8px !important;
+}
+.plugin-card:nth-child(even) {
+    margin-right: 0;
+    margin-left: 8px !important;
+    clear: none;
+}
+.plugin-card-top {
+    min-height: 260px;
+}
+.plugin-card {
+    width: 50%;
+    width: -webkit-calc(50% - 8px);
+    width: calc(50% - 8px);
+}
