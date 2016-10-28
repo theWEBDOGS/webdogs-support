@@ -317,16 +317,11 @@ class Options_Framework_Admin {
 	function enqueue_admin_styles( $hook ) {  ?>
 <style type="text/css">
 
-	/* body, html {
-	    height: 100%;
-	    margin: 0;
-	    padding: 0;
-	    display: table;
-	    position: relative;
-	    width: 100%;
-	} */
 	body {
 		background-color: transparent !important;
+	}
+	#wpadminbar .ab-top-menu>.menupop>.ab-sub-wrapper {
+	    min-width: initial !important;
 	}
 	#adminmenu #toplevel_page_options-framework div.wp-menu-image.svg {
 	    -webkit-background-size: 26px 26px;
@@ -339,30 +334,6 @@ class Options_Framework_Admin {
 	    padding-top: 2px;
 	    margin-left: -3px;
 	}
-/* 	#wpadminbar #wp-admin-bar-site-name a.ab-item .ab-icon {
-	    // padding-bottom: 2px;
-	    width: 22px;
-	    height: 22px;
-	    vertical-align: middle;
-	    background-repeat:no-repeat; 
-	    background-position:center !important;
-	} */
-/* 
-	#wpadminbar #wp-admin-bar-site-name a.ab-item svg {
-	    padding-bottom: 2px;
-	    width: 26px;
-	    height: 20px;
-	    vertical-align: middle;
-	    display: none;
-	} */
-
-	/* #wpadminbar #wp-admin-bar-site-name a.ab-item:before {
-	    content: none !important;
-	    display: none;
-	} */
-	/* #wpadminbar #wp-admin-bar-site-name a.ab-item .ab-icon:not([src*=".svg"]) {
-	    background-size:contain;
-	} */
 	.webdogs-nag, 
 	.webdogs-nag.notice {
 	    color: #FFFFFF;
@@ -430,16 +401,7 @@ class Options_Framework_Admin {
 	    line-height: 28px;
 	    margin-top: 0;
 	}
-	/* @media screen and (max-width: 782px){
-    	#wpadminbar>#wp-toolbar > #wp-admin-bar-root-default > #wp-admin-bar-site-name .ab-item.ab-icon.svg {
-	        margin: 0;
-	        padding: 0;
-	        width: 52px;
-	        height: 46px;
-	        text-align: center;
-	        background-size:62%;
-	    }
-	} */
+	
 </style>
 <style type="text/css" id="logo_icon_style">
 <?php //echo html_entity_decode(of_get_option('logo_icon_css','')); ?>	
@@ -671,6 +633,14 @@ class Options_Framework_Admin {
 
 	function optionsframework_admin_bar() {
 
+		// Don't show for logged out users.
+	    if ( ! is_user_logged_in() )
+	        return;
+	 
+	    // Show only when the user is a member of this site, or they're a super admin.
+	    if ( ( ! is_user_member_of_blog() && ! is_super_admin() ) || ! current_user_can( 'manage_support' ) )
+	        return;
+
 		$menu = Self::menu_settings();
 
 		global $wp_admin_bar;
@@ -681,30 +651,84 @@ class Options_Framework_Admin {
 			$href = admin_url( 'themes.php?page=' . $menu['menu_slug'] );
 		}
 
+
+        // $wp_admin_bar->add_groupp( array( 'id' => 'of_theme_options', 'title' => $menu['menu_title'], ) );
+
+
 		$args = array(
-			// 'parent' => 'appearance',
+			'parent' => 'top-secondary',
 			'id' => 'of_theme_options',
 			'title' => $menu['menu_title'],
 			'href' => $href
 		);
 
 		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar', $args ) );
+		
 
+		global $wpengine_platform_config;
+
+		if( class_exists('WpeCommon') && ! empty($wpengine_platform_config['all_domains'][0]) ) {
+
+			$wpecommon      = WpeCommon::instance();
+			$snapshot_info  = $wpecommon->get_staging_status();
+
+			$url = "$_SERVER[REQUEST_URI]";
+			$qry = (!empty($_SERVER['QUERY_STRING'])) ? "?$_SERVER[QUERY_STRING]" : "";
+
+			$production_url = 'http://' . $wpengine_platform_config['all_domains'][0];
+			$staging_url    =  @$snapshot_info['staging_url'];
+
+			$args = array();
+
+			if( ! is_wpe_snapshot() && $snapshot_info['have_snapshot'] && $snapshot_info['is_ready'] && $staging_url ) {
+				
+				$args = array(
+					'parent' => 'of_theme_options',
+					'id' => 'wpe_environment',
+					'title' => "View Page on Staging",
+					'href' => $this->maybe_ssl( "$staging_url$url$qry" ),
+					'meta'=>array('target' => '_blank')
+				);
+			}
+			elseif ( is_wpe_snapshot() ) {
+
+				$args = array(
+					'parent' => 'of_theme_options',
+					'id' => 'wpe_environment',
+					'title' => "Open page on Production",
+					'href' => $this->maybe_ssl( "$production_url$url$qry" ),
+					'meta'=>array('target' => '_blank')
+				);
+			}
+
+			if( !empty( $args ) ) {
+
+				$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar_environment_submenu', $args ) );
+
+			}
+		}
+
+
+		$args = array(
+			'id'     => 'maintenance_notification',
+			'parent' => 'of_theme_options',
+			'meta'   => array( 'class' => 'first-toolbar-group' )
+		);
+		$wp_admin_bar->add_group( $args );
 		
 		$args = array(
-			'parent' => 'of_theme_options',
+			'parent' => 'maintenance_notification',
 			'id' => 'maintenance_notification_test',
-			'title' => 'Maintenance Notification Test',
+			'title' => 'Test Maintenance Notification',
 			'href' => add_query_arg( 'wd_send_maintenance_notification', 'test', $href )
 		);
 
 		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar_maintenance_notification_test_submenu', $args ) );
 
-
 		$args = array(
-			'parent' => 'of_theme_options',
+			'parent' => 'maintenance_notification',
 			'id' => 'maintenance_notification_force',
-			'title' => 'Maintenance Notification Email Test',
+			'title' => 'Test Maintenance Notification Email',
 			'href' => add_query_arg( array( 'wd_send_maintenance_notification'=>'test', 'force_send'=>'force'), $href )
 		);
 
@@ -712,18 +736,33 @@ class Options_Framework_Admin {
 
 
 
+
+		$args = array(
+			'id'     => 'plugin_recomendation',
+			'parent' => 'of_theme_options',
+			'meta'   => array( 'class' => 'second-toolbar-group' )
+		);
+		$wp_admin_bar->add_group( $args );
+
 		$plugin_activation = $GLOBALS['optionsframeworkpluginactivation'];
 
 		$href = $plugin_activation->get_optionsframework_url();
 		
 		$args = array(
-			'parent' => 'of_theme_options',
+			'parent' => 'plugin_recomendation',
 			'id' => $plugin_activation->slug,
 			'title' => $plugin_activation->strings['menu_title'],
 			'href' => $href
 		);
 
 		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar_plugin_activation_submenu', $args ) );
+			
+	}
+
+	private function maybe_ssl( $url ) {
+		if ( is_ssl() )
+			$url = preg_replace( '#^http://#', 'https://', $url );
+		return $url;
 	}
 
 }

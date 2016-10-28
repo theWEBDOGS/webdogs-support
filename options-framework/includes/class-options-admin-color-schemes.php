@@ -42,7 +42,7 @@ class Options_Framework_Admin_Color_Schemes {
 		self::$instance = $this;
 		$this->base = WEBDOGS_SUPPORT_DIR . '/options-framework';
 		add_action( 'init', array( $this, 'init' ) );
-		// add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_init', array( $this, 'admin_init' ) );
 	}
 
 	public static function get_instance() {
@@ -120,10 +120,10 @@ class Options_Framework_Admin_Color_Schemes {
 		 * Note: not bothering with preventing users from being able to save a value for admin_color
 		 * since it's not really a big deal if they do.
 		 */
-	/*
-	}
+		
+	} 
 
-	public function admin_init() {*/
+	public function admin_init() {
 
 		$schemes = apply_filters( 'get_color_scheme_options', $this->get_option( 'schemes', array() ) );
 
@@ -142,6 +142,7 @@ class Options_Framework_Admin_Color_Schemes {
 				array( 'base' => $scheme['menu_icon'], 'focus' => $scheme['menu_highlight_icon'], 'current' => $scheme['menu_current_icon'] )
 			);
 		}
+
 	}
 
 	private function maybe_ssl( $url ) {
@@ -184,14 +185,17 @@ class Options_Framework_Admin_Color_Schemes {
 		if ( $user->exists() && is_webdog( $user ) ) {
 
 			$production = ( function_exists( 'is_wpe' ) && is_wpe() ) ? "wpengine_tc" : "webdogs_wpe" ;
-
+			$production = "webdogs_wpe";
 			$admin_color_scheme = ( wds_is_production_site() ) ? $production : "webdogs_ds" ;
 
-			if ( "wpengine_tc" === $admin_color_scheme ) {
+			if ( in_array( $admin_color_scheme, array("wpengine_tc", "webdogs_wpe"))  && is_admin() ) {
 
 				add_filter('wds_adminbar_sitename', function( $sitename ) { 
-					return ( defined('PWP_NAME') ) ? PWP_NAME : $sitename; }, 10, 1 );
+					return ( defined('PWP_NAME') ) ? PWP_NAME : $sitename ; }, 10, 1 );
 			}
+			add_filter('wds_adminbar_sitename', function( $sitename ) { 
+					$flags = ( wds_is_staging_site() ) ? ' | staging' : '';
+					return $sitename . $flags ; }, 12, 1 );
 
 		} elseif ( wds_must_use_admin_color() ) {
 
