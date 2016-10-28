@@ -234,6 +234,14 @@ class Options_Framework_Admin {
 
 		global $wp_admin_bar;
 
+		if ( wds_is_production_site() && is_admin() ) {
+			add_filter('wds_adminbar_sitename', function( $sitename ) { 
+			return ( defined('PWP_NAME') ) ? PWP_NAME : $sitename ; }, 10, 1 );
+		}
+		add_filter('wds_adminbar_sitename', function( $sitename ) { 
+			$flags = ( wds_is_staging_site() ) ? ' | staging' : '';
+			return $sitename . $flags ; }, 12, 1 );
+
 		// $wp_admin_bar->remove_menu('site-name');
 
 	    // Don't show for logged out users.

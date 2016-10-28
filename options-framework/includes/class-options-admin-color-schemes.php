@@ -188,15 +188,6 @@ class Options_Framework_Admin_Color_Schemes {
 			$production = "webdogs_wpe";
 			$admin_color_scheme = ( wds_is_production_site() ) ? $production : "webdogs_ds" ;
 
-			if ( in_array( $admin_color_scheme, array("wpengine_tc", "webdogs_wpe"))  && is_admin() ) {
-
-				add_filter('wds_adminbar_sitename', function( $sitename ) { 
-					return ( defined('PWP_NAME') ) ? PWP_NAME : $sitename ; }, 10, 1 );
-			}
-			add_filter('wds_adminbar_sitename', function( $sitename ) { 
-					$flags = ( wds_is_staging_site() ) ? ' | staging' : '';
-					return $sitename . $flags ; }, 12, 1 );
-
 		} elseif ( wds_must_use_admin_color() ) {
 
 			// If a forced admin color has been configured, use it.
