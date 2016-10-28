@@ -137,13 +137,18 @@ class Options_Framework_Admin_Color_Schemes {
 			wp_admin_css_color(
 				$scheme['slug'],
 				$scheme['name'],
-				esc_url( $scheme['uri'] ),
+				esc_url( $this->maybe_ssl( $scheme['uri'] ) ),
 				array( $scheme['base_color'], $scheme['icon_color'], $scheme['highlight_color'], $scheme['notification_color'] ),
 				array( 'base' => $scheme['menu_icon'], 'focus' => $scheme['menu_highlight_icon'], 'current' => $scheme['menu_current_icon'] )
 			);
 		}
 	}
 
+	private function maybe_ssl( $url ) {
+		if ( is_ssl() )
+			$url = preg_replace( '#^http://#', 'https://', $url );
+		return $url;
+	}
 	/**
 	 * Overrides the user's admin color scheme with the forced admin color
 	 * scheme, if set.
@@ -679,7 +684,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 
 		if ( $doing_ajax ) {
 			$response = array(
-				'uri' => $scheme->uri,
+				'uri' => $this->maybe_ssl( $scheme->uri ), 
 				'message' => wds_base_strings( 'acs_previewing_scheme' )
 			);
 
@@ -800,7 +805,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 		}
 
 		// add the URI of the sheet to the settings array
-		$scheme->uri = $uri;
+		$scheme->uri =  $this->maybe_ssl($uri);
 
 		$this->set_option( 'schemes', array( $scheme->slug => $scheme->to_array() ) );
 

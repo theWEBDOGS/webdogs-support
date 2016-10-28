@@ -101,7 +101,7 @@ jQuery(document).ready(function($){
 
 				optionsframework_upload.close();
 
-				optionsframework_selector.find('.upload').val( attachment.attributes.url ).trigger('change');
+				optionsframework_selector.find('.upload').val( String( attachment.attributes.url ).replace("http://","//") ).trigger('change');
 				
 
 				if ( attachment.attributes.type == 'image' ) {
@@ -138,11 +138,11 @@ jQuery(document).ready(function($){
 						
 
 					} else {*/
-						optionsframework_selector.find('.screenshot').empty().hide().append('<img src="' + attachment.attributes.url + '"><a class="remove-image">Remove</a>');
+						optionsframework_selector.find('.screenshot').empty().hide().append('<img src="' + attachment.attributes.url.replace("http://","//") + '"><a class="remove-image">Remove</a>');
 
 						// IF this is the section-logo_icon
 						if ( optionsframework_selector.attr('id') === "section-logo_icon" ) {
-							optionsframework_adminbar_show_preview( attachment.attributes.url );
+							optionsframework_adminbar_show_preview( attachment.attributes.url.replace("http://","//") );
 						} else {
 
 							optionsframework_show_preveiw( optionsframework_selector );
@@ -201,7 +201,7 @@ jQuery(document).ready(function($){
 
 		var screenshot_background = {
 			              "opacity": "1",
-			     "background-image": "url(" + selector.find('.upload:input').val() + ")",
+			     "background-image": "url(" + String( selector.find('.upload:input').val() ).replace("http://","//") + ")",
 		        "background-repeat": selector.find('.of-background-repeat:input').val(),
 		      "background-position": selector.find('.of-background-position:input').val(),
 		    "background-attachment": selector.find('.of-background-attachment:input').val()
