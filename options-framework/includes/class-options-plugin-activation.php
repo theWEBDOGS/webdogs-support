@@ -1208,15 +1208,15 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			// If we have notices to display, we move forward.
 			if ( ! empty( $message ) ) {
 				krsort( $message ); // Sort messages.
-				$rendered = '';
+				$rendered = array();
 
 				// As add_settings_error() wraps the final message in a <p> and as the final message can't be
 				// filtered, using <p>'s in our html would render invalid html output.
-				$line_template = '<span style="display: block; margin: 0.5em 0.5em 0 0; clear: both;">%s</span>' . "\n";
+				$line_template = /*<span style="display: block; margin: 0.5em 0.5em 0 0; clear: both;">*/'%s'/*</span>'*/ . "\n";
 
 				// If dismissable is false and a message is set, output it now.
 				if ( ! $this->dismissable && ! empty( $this->dismiss_msg ) ) {
-					$rendered .= sprintf( $line_template, wp_kses_post( $this->dismiss_msg ) );
+					$rendered[] = sprintf( $line_template, wp_kses_post( $this->dismiss_msg ) );
 				}
 
 				// Render the individual message lines for the notice.
@@ -1230,11 +1230,11 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 					unset( $plugin_slug );
 
 					$count          = count( $plugin_group );
-					$linked_plugins = array_map( array( 'Options_Framework_Utils', 'wrap_in_em' ), $linked_plugins );
+					$linked_plugins = /*array_map( array( 'Options_Framework_Utils', 'wrap_in_em' ),*/ $linked_plugins /*)*/;
 					// $last_plugin    = array_pop( $linked_plugins ); // Pop off last name to prep for readability.
 					$imploded       = /*empty( $linked_plugins ) ? $last_plugin :(*/  implode( ', ', $linked_plugins );/* . ' ' . esc_html_x( 'and', 'plugin A *and* plugin B', 'optionsframework' ) . ' ' . $last_plugin );*/
 
-					$rendered .= sprintf(
+					$rendered[] = sprintf(
 						$line_template,
 						sprintf(
 							translate_nooped_plural( $this->strings[ $type ], $count, 'optionsframework' ),
@@ -1244,9 +1244,11 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 					);
 
 					if ( 0 === strpos( $type, 'notice_cannot' ) ) {
-						$rendered .= $this->strings['contact_admin'];
+						$rendered[] = $this->strings['contact_admin'];
 					}
 				}
+				$rendered = implode( '<br/>', $rendered );
+
 				unset( $type, $plugin_group, $linked_plugins, $count, $last_plugin, $imploded );
 
 				// Setup action links.
@@ -1290,6 +1292,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 
 				if ( ! empty( $action_links ) && is_array( $action_links ) ) {
 					$action_links = sprintf( $line_template, implode( ' | ', $action_links ) );
+					$rendered    .= "<br/><br/>";
 					$rendered    .= apply_filters( 'optionsframework_notice_rendered_action_links', $action_links );
 				}
 
@@ -2186,7 +2189,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			    if(!empty($error)){
 			    	$error_message ="";
 			    	foreach ($error as $messsage ) {
-				    	$line_template = '<span style="display: block; margin: 0.5em 0.5em 0 0; clear: both;">%s</span>' . "\n";
+				    	$line_template = /*'<span style="display: block; margin: 0.5em 0.5em 0 0; clear: both;">*/'%s'/*</span>'*/ . "\n";
 			    		$error_message .= $messsage;
 			    	}
 			    	add_settings_error( 'options-framework', 'theme_deletion', $error_message, 'webdogs-nag' );

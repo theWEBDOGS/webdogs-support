@@ -689,7 +689,7 @@ class Options_Framework_Admin {
 					'parent' => 'of_theme_options',
 					'id' => 'wpe_environment',
 					'title' => "View Page on Staging",
-					'href' => $this->maybe_ssl( "$staging_url$url$qry" ),
+					'href' => $this->maybe_ssl( "$staging_url$url" ),
 					'meta'=>array('target' => '_blank')
 				);
 			}
@@ -699,7 +699,7 @@ class Options_Framework_Admin {
 					'parent' => 'of_theme_options',
 					'id' => 'wpe_environment',
 					'title' => "Open page on Production",
-					'href' => $this->maybe_ssl( "$production_url$url$qry" ),
+					'href' => $this->maybe_ssl( "$production_url$url" ),
 					'meta'=>array('target' => '_blank')
 				);
 			}

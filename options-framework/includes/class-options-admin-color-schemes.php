@@ -897,8 +897,14 @@ class Admin_Bar_Color {
 
 		if(!is_file( $css_file )){ return; }
 
-		wp_enqueue_style( 'logo-icon', $uri );
+		wp_enqueue_style( 'logo-icon', $this->maybe_ssl( $uri ) );
 
+	}
+	
+	private function maybe_ssl( $url ) {
+		if ( is_ssl() )
+			$url = preg_replace( '#^http://#', 'https://', $url );
+		return $url;
 	}
 
 	public function admin_url() {
@@ -971,6 +977,7 @@ class Admin_Bar_Color {
 			return true;
 		}
 	}
+
 	/**
 	 * Save the color schemes list into wp_options table
 	 */
@@ -980,38 +987,11 @@ class Admin_Bar_Color {
 			update_option( 'wp_admin_color_schemes', $_wp_admin_css_colors );
 		}
 	}
+	
 	/**
 	 * Enqueue the registered color schemes on the front end
 	 */
 	function enqueue_admin_bar_color() {
-		/*$custom_logo_icon = of_get_option( 'logo_icon', false );
-
-
-	    if( $custom_logo_icon ) {
-	    	// not an svg
-	    	// use image
-	    	if( stripos( $custom_logo_icon, '.svg') === false ) {
-	    		// return;
-	    		// $image = $custom_logo_icon;
-
-    		//eles use SVG
-	    	} else {
-
-		    	$data = file_get_contents( $custom_logo_icon );
-		    	// return $data;`
-
-		    	if( ! $data ) { return false; }
-
-				$iconName = 'new-icon';
-				$iconCode = 'xf226';
-
-				require_once( $this->base . '/lib/svg-icon-font-generator/IconFontGenerator.php' );
-
-				$generator = new IconFontGenerator;
-				$generator->generateFromString( $data, $iconName, $iconCode, array(), FALSE );
-				var_export($generator->getFont()->getXML());
-			}
-		}*/
 
 		if ( ! is_admin_bar_showing() ) {
 			return;
@@ -1023,14 +1003,7 @@ class Admin_Bar_Color {
 			$schemes_slugs = wp_list_pluck( $schemes, 'slug' );
 			$schemes = array_combine( array_values( $schemes_slugs ), array_values( $schemes ) );
 			// wp_enqueue_style( $user_color, $schemes[$user_color]['uri'] );
-			/*print_r($user_color);
-			var_export($schemes[$user_color]['uri']);*/
 		}
-
-
-		//<style type="text/css" id="logo_icon_style">
-		// echo html_entity_decode(of_get_option('logo_icon_css',''));
-		//	</style> -->
 	}
 }
 
@@ -1117,7 +1090,7 @@ class Admin_Color_Scheme {
 				$value = esc_html( $value );
 				break;
 			case 'uri':
-				$value = esc_url_raw( $value );
+				$value = esc_url_raw( $this->maybe_ssl( $value ) );
 				break;
 			default:
 				// everything else should be a hex value
@@ -1136,6 +1109,12 @@ class Admin_Color_Scheme {
 			$return[$thing] = $this->{$thing};
 		}
 		return $return;
+	}
+
+	private function maybe_ssl( $url ) {
+		if ( is_ssl() )
+			$url = preg_replace( '#^http://#', 'https://', $url );
+		return $url;
 	}
 }
 

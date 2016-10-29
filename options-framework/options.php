@@ -829,7 +829,7 @@ function wds_base_strings( $key = null ){
 		'complete'                        => __( 'All plugins and themes have been installed and activated successfully. %1$s', 'webdogs-support' ), // %s = dashboard link.
 		'contact_admin'                   => __( 'Please contact WEBDOGS for support.', 'webdogs-support' ),
 
-		'nag_type'                        => 'webdogs-nag', // Determines admin notice type - can only be 'updated', 'update-nag' or 'error'.
+		'nag_type'                        => 'update-nag', // Determines admin notice type - can only be 'updated', 'update-nag' or 'error'.
 	);
 
     if( isset($key) && array_key_exists( $key, $strings ) ){
