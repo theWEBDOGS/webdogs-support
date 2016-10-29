@@ -740,8 +740,8 @@ function wds_base_strings( $key = null ){
 			'webdogs-support'
 		), // %1$s = plugin name(s).
 		'notice_can_install_recommended'  => _n_noop(
-			'Recommended plugin: %1$s.',
-			'Recommended plugins: %1$s.',
+			'WEBDOGS recommends the following plugin: %1$s.',
+			'WEBDOGS recommends the following plugins: %1$s.',
 			'webdogs-support'
 		), // %1$s = plugin name(s).
 		'notice_cannot_install'           => _n_noop(
