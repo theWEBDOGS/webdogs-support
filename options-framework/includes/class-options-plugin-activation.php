@@ -2144,7 +2144,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			if ( empty( $delete ) ) return true;
 			$delete_result = delete_plugins( $delete ); //var_export($delete_result);
 			if( is_wp_error( $delete_result ) ) {
-			    add_settings_error( 'options-framework', 'plugin_deletion', $return->get_error_message(), 'error webdogs-nag' );
+			    add_settings_error( 'options-framework', 'plugin_deletion', $return->get_error_message(), 'error update-nag' );
 			} else {
 				$imploded = implode(', ', $deleted_names);
 				$rendered = sprintf(
@@ -2152,7 +2152,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 							$imploded,
 							count($delete)
 						);
-				add_settings_error( 'options-framework', 'plugin_deletion', $rendered, 'webdogs-nag' );
+				add_settings_error( 'options-framework', 'plugin_deletion', $rendered, 'update-nag' );
 			}
 		}
 
@@ -2192,7 +2192,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 				    	$line_template = /*'<span style="display: block; margin: 0.5em 0.5em 0 0; clear: both;">*/'%s'/*</span>'*/ . "\n";
 			    		$error_message .= $messsage;
 			    	}
-			    	add_settings_error( 'options-framework', 'theme_deletion', $error_message, 'webdogs-nag' );
+			    	add_settings_error( 'options-framework', 'theme_deletion', $error_message, 'update-nag' );
 			    }		
 			    if(!empty($deleted_names)){
 				    $imploded = implode(', ', $deleted_names);
@@ -2202,7 +2202,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 								$imploded,
 								count($delete)
 							);
-					add_settings_error( 'options-framework', 'theme_deletion', $rendered, 'webdogs-nag' );
+					add_settings_error( 'options-framework', 'theme_deletion', $rendered, 'update-nag' );
 				}
 			}
 		}

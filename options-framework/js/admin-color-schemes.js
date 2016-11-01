@@ -190,7 +190,7 @@
 						$('<link rel="stylesheet" id="colors-css" type="text/css" media="all"/>').appendTo('head');
 					} 
 					$('#colors-css').attr('href', r.uri);
-					$('h1').after( '<div class="webdogs-nag notice">' + r.message + '</div>' );
+					$('h1').after( '<div class="update-nag notice">' + r.message + '</div>' );
 				}
 				sync_svg_painter();
 			}

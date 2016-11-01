@@ -184,15 +184,17 @@ class Options_Framework_Admin_Color_Schemes {
 
 		if ( $user->exists() && is_webdog( $user ) ) {
 
-			$production = ( function_exists( 'is_wpe' ) && is_wpe() ) ? "wpengine_tc" : "webdogs_wpe" ;
+			// $production = ( function_exists( 'is_wpe' ) && is_wpe() ) ? "wpengine_tc" : "webdogs_wpe" ;
 			
-			$production = "webdogs_wpe";
+			// OVERRIDE 
+			$production = "webdogs_hs";
 			$admin_color_scheme = ( wds_is_production_site() ) ? $production : "webdogs_ds" ;
 
-			if ( "wpengine_tc" === $admin_color_scheme && is_admin() ) {
-				add_filter('wds_adminbar_sitename', function( $sitename ) { 
-					return ( defined('PWP_NAME') ) ? PWP_NAME : $sitename ; }, 10, 1 );
-			}
+			// CUSTOM FILTER FOR WEP CUSTOM THEME
+			// if ( "wpengine_tc" === $admin_color_scheme && is_admin() ) {
+			// 	add_filter('wds_adminbar_sitename', function( $sitename ) { 
+			// 		return ( defined('PWP_NAME') ) ? PWP_NAME : $sitename ; }, 10, 1 );
+			// }
 
 		} elseif ( wds_must_use_admin_color() ) {
 
@@ -813,7 +815,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 		// switch to the scheme
 		// update_user_meta( get_current_user_id(), 'admin_color', $scheme->slug );
 
-		// add_settings_error( 'options-framework', 'color_css', 'the admin color scheme has been updated.', 'webdogs-nag' );
+		// add_settings_error( 'options-framework', 'color_css', 'the admin color scheme has been updated.', 'update-nag' );
 	}
 
 	public function maybe_copy_core_files( $upload_dir ) {

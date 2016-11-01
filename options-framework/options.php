@@ -1006,8 +1006,45 @@ function wds_admin_color_schemes( $scheme = null ) {
 			'menu_collapse_icon' => '#919191',
 			'menu_collapse_focus_text' => '#9CB4BC',
 			'menu_collapse_focus_icon' => '#9CB4BC',
-			'adminbar_avatar_frame' => 'TRANSPARENT',
+			'adminbar_avatar_frame' => 'transparent',
 			'adminbar_input_background' => '',
+		),
+
+		'webdogs_hs' => array(
+
+			'id' => 5,
+			'slug' => 'webdogs_hs',
+			'name' => 'Webdogs HS',
+			'uri' => plugins_url( "css/webdogs-hs/colors$suffix.css", __FILE__ ),
+			'icon_focus' => '#002347',
+			'icon_current' => '#ffffff',
+			'base_color' => '#dbe9f0',
+			'icon_color' => '#0c5b90',
+			'highlight_color' => '#1274a8',
+			'notification_color' => '#ef8f00',
+			'button_color' => '#40bac8',
+			'text_color' => '#0c5b90',
+			'body_background' => '#f4f4f4',
+			'form_checked' => '#ef8f00',
+			'menu_text' => '#0c5b90',
+			'menu_icon' => '#0c5b90',
+			'menu_current_background' => '#0c5b90',
+			'menu_current_text' => '#ffffff',
+			'menu_submenu_background' => '#eff2f4',
+			'menu_submenu_text' => '#1274a8',
+			'menu_submenu_background_alt' => '#1be28f',
+			'menu_submenu_focus_text' => '#002347',
+			'menu_submenu_current_text' => '#002347',
+			'menu_bubble_background' => '#ef8f00',
+			'menu_bubble_text' => '#ffffff',
+			'menu_bubble_current_background' => '#ef8f00',
+			'menu_bubble_current_text' => '#ffffff',
+			'menu_highlight_text' => '#ffffff',
+			'menu_highlight_icon' => '#002347',
+			'menu_current_icon' => '#ffffff',
+			'adminbar_avatar_frame' => 'transparent',
+			'adminbar_input_background' => '',
+			'button_color' => '#ef8f00',
 		),
 
 		'webdogs_ds' => array(
@@ -1132,7 +1169,16 @@ function wds_admin_color_schemes( $scheme = null ) {
 }
 
 function wds_filter_admin_color_schemes( $schemes ) {
-	unset($schemes['webdogs_ps']);
-	return $schemes;
+	// ALT DEV DOMAINS
+	unset( $schemes['webdogs_ps'], $schemes['webdogs_wpe'], $schemes['wpengine_tc'] );
+
+	//return webdogs schemes
+	if( is_user_logged_in() && is_webdog( get_current_user() ) ) {
+		return $schemes;
+
+	} else {
+	// nothing for you.
+		return array();
+	}
 }
 add_filter( 'admin_color_schemes', 'wds_filter_admin_color_schemes', 10, 1 );
