@@ -684,7 +684,7 @@ class Options_Framework_Admin {
 				$production_url = 'http://' . $wpengine_platform_config['all_domains'][0];
 			}
 
-			$staging_url     =  @$snapshot_info['staging_url'];
+			$staging_url     = @$snapshot_info['staging_url'];
 
 			$request_uri     = "$_SERVER[REQUEST_URI]";
 
@@ -696,7 +696,7 @@ class Options_Framework_Admin {
 					'parent' => 'of_theme_options',
 					'id' => 'wpe_environment',
 					'title' => "View Page on Staging",
-					'href' => $this->maybe_ssl( "$staging_url$url" ),
+					'href' => $this->maybe_ssl( "$staging_url$request_uri" ),
 					'meta'=>array('target' => '_blank')
 				);
 			}
@@ -706,7 +706,7 @@ class Options_Framework_Admin {
 					'parent' => 'of_theme_options',
 					'id' => 'wpe_environment',
 					'title' => "Open page on Production",
-					'href' => $this->maybe_ssl( "$production_url$url" ),
+					'href' => $this->maybe_ssl( "$production_url$request_uri" ),
 					'meta'=>array('target' => '_blank')
 				);
 			}
