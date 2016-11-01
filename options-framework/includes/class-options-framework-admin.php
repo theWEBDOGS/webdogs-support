@@ -670,18 +670,25 @@ class Options_Framework_Admin {
 
 		global $wpengine_platform_config;
 
-		if( class_exists('WpeCommon') && ! empty($wpengine_platform_config['all_domains'][0]) ) {
+		if( class_exists( 'WpeCommon' ) && ( $wpengine_platform_config['all_domains'][0] || ( defined('PWP_NAME') && PWP_NAME ) ) ) {
+		    
+		    // Format string for sprintf( 'Go to %1$s', $environment )
+		    $meun_title      = apply_filters( 'wpees_quicklink_title', 'Go to %1$s' );
 
-			$wpecommon      = WpeCommon::instance();
-			$snapshot_info  = $wpecommon->get_staging_status();
+			$wpecommon       = WpeCommon::instance();
+			$snapshot_info   = $wpecommon->get_staging_status();
 
-			$url = "$_SERVER[REQUEST_URI]";
-			$qry = (!empty($_SERVER['QUERY_STRING'])) ? "?$_SERVER[QUERY_STRING]" : "";
+			if( empty( $wpengine_platform_config['all_domains'][0] ) && defined('PWP_NAME') && PWP_NAME ) {
+				$production_url = sprintf( 'http://%1$s.wpengine.com', PWP_NAME );
+			} else {
+				$production_url = 'http://' . $wpengine_platform_config['all_domains'][0];
+			}
 
-			$production_url = 'http://' . $wpengine_platform_config['all_domains'][0];
-			$staging_url    =  @$snapshot_info['staging_url'];
+			$staging_url     =  @$snapshot_info['staging_url'];
 
-			$args = array();
+			$request_uri     = "$_SERVER[REQUEST_URI]";
+
+			$args            = array();
 
 			if( ! is_wpe_snapshot() && $snapshot_info['have_snapshot'] && $snapshot_info['is_ready'] && $staging_url ) {
 				
