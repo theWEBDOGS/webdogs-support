@@ -131,7 +131,8 @@ class Options_Framework_Admin {
             'parent_slug' => 'admin.php',
 
             // Menu default settings
-            'icon_url' => wd_get_icon_logo( '#FFFFFF', true, true ), 
+            'icon_url' => wd_get_icon_logo( '#FFFFFF', true, true ),
+            'dashicon' => 'dashicons-sos',
             'position' => '61'
 
 		);
@@ -396,6 +397,14 @@ class Options_Framework_Admin {
 	    background-size: 26px 26px;
 	    height: 34px;
 	}
+	#wpadminbar .ab-top-secondary #wp-admin-bar-of_theme_options.menupop .ab-sub-wrapper {
+	    right: auto;
+	    left: -75%;
+	}
+	#wpadminbar #wp-admin-bar-of_theme_options .ab-icon:before {
+		top:3px;
+	}
+
 	#toplevel_page_options-framework .wp-menu-image.dashicons-before img {
 		height: 28px;
 	    width: 28px;
@@ -739,14 +748,14 @@ class Options_Framework_Admin {
 			$href = admin_url( 'themes.php?page=' . $menu['menu_slug'] );
 		}
 
+		$icon_format = '<span class="ab-icon %s"></span><span class="ab-label">%s</span>';
 
-        // $wp_admin_bar->add_groupp( array( 'id' => 'of_theme_options', 'title' => $menu['menu_title'], ) );
-
+		$menu_title = ( !empty( $menu['dashicon'] ) ) ? sprintf($icon_format, $menu['dashicon'], $menu['menu_title']) : $menu['menu_title'];
 
 		$args = array(
 			'parent' => 'top-secondary',
 			'id' => 'of_theme_options',
-			'title' => $menu['menu_title'],
+			'title' => $menu_title,
 			'href' => $href
 		);
 
