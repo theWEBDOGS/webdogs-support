@@ -402,7 +402,7 @@ class Options_Framework_Admin {
 	    left: -75%;
 	}
 	#wpadminbar #wp-admin-bar-of_theme_options .ab-icon:before {
-		top:3px;
+		top:2px;
 	}
 
 	#toplevel_page_options-framework .wp-menu-image.dashicons-before img {
