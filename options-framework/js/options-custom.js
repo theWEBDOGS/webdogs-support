@@ -33,6 +33,21 @@ jQuery(document).ready(function($) {
 		});
 	}
 
+	function get_url_param( sParam ) {
+
+	    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+	        sURLVariables = sPageURL.split('&'),
+	        sParameterName,
+	        i;
+
+	    for (i = 0; i < sURLVariables.length; i++) {
+	        sParameterName = sURLVariables[i].split('=');
+
+	        if (sParameterName[0] === sParam) {
+	            return sParameterName[1] === undefined ? false : sParameterName[1];
+	        }
+	    }
+	}
 
 
 	function get_active_dates( freq, day, month, year ) {
@@ -111,40 +126,50 @@ jQuery(document).ready(function($) {
 		// Hides all the .group sections to start
 		$group.hide();
 
+		$(window).on('hashchange', function () {
+		  
+			$navtabs.each(function (index, a) {
+
+			    if ( $(a).attr('href') == location.hash ) {
+
+			    	$navtabs.removeClass('nav-tab-active');
+
+					$(a).addClass('nav-tab-active').blur();
+
+					if ( typeof( localStorage ) != 'undefined' ) {
+						localStorage.setItem('active_tab', $(a).attr('href') );
+					}
+
+			      	var selected = $(a).attr('href');
+
+					$group.hide();
+					$(selected).fadeIn();
+			    }
+			});
+		});
+		
+		// Find if a selected tab is saved in localStorage
+		if ( typeof(options_framework_tab) != 'undefined' ) {
+			active_tab = options_framework_tab;
+		} else
+		// Find if a selected tab is saved in localStorage
+		if ( location.hash != "" ) {
+			active_tab = location.hash;
+		} else
 		// Find if a selected tab is saved in localStorage
 		if ( typeof(localStorage) != 'undefined' ) {
 			active_tab = localStorage.getItem('active_tab');
 		}
-
+		// console.log( active_tab );
 		// If active tab is saved and exists, load it's .group
-		if ( active_tab != '' && $(active_tab).length ) {
-			$(active_tab).fadeIn();
-			$(active_tab + '-tab').addClass('nav-tab-active');
+		if ( active_tab != '' && $(active_tab).length/* && active_tab != location.hash*/ ) {
+			location.hash = active_tab;
+			$( active_tab ).fadeIn();
+			$( active_tab.replace( 'section', 'tab' ) ).addClass('nav-tab-active');
 		} else {
 			$('.group:first').fadeIn();
 			$('.nav-tab-wrapper a:first').addClass('nav-tab-active');
 		}
-
-		// Bind tabs clicks
-		$navtabs.click(function(e) {
-
-			e.preventDefault();
-
-			// Remove active class from all tabs
-			$navtabs.removeClass('nav-tab-active');
-
-			$(this).addClass('nav-tab-active').blur();
-
-			if (typeof(localStorage) != 'undefined' ) {
-				localStorage.setItem('active_tab', $(this).attr('href') );
-			}
-
-			var selected = $(this).attr('href');
-
-			$group.hide();
-			$(selected).fadeIn();
-
-		});
 	}
 
 });

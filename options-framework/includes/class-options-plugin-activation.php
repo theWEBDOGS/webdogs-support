@@ -2248,6 +2248,20 @@ if ( ! function_exists( 'Options_Framework_Install_Plugins_Page' ) ) {
 		$instance->install_plugins_page();
 	}
 }
+if ( ! function_exists( 'Is_Options_Framework_Plugins_Page' ) ) {
+	/**
+	 * Helper function to register a collection of required plugins.
+	 *
+	 * @since 2.0.0
+	 * @api
+	 *
+	 * @param array $plugins An array of plugin arrays.
+	 * @param array $config  Optional. An array of configuration values.
+	 */
+	function Is_Options_Framework_Plugins_Page( $boolval ) {
+		return ( ! empty( $_GET['plugin_status'] ) );
+	}
+}
 
 if ( ! function_exists( 'Options_Framework_Register_Plugins' ) ) {
 	/**
@@ -2639,7 +2653,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 
 					$status_links[ $type ] = sprintf(
 						'<a href="%s"%s>%s</a>',
-						esc_url( str_replace( 'page=optionsframework-'.$type.'-plugins', 'page=options-framework', $this->optionsframework->get_optionsframework_status_url( $type ) ) ),
+						esc_url( str_replace( 'page=optionsframework-install-plugins', 'page='.$_GET['page'], $this->optionsframework->get_optionsframework_status_url( $type ) ) ),
 						( $type === $this->view_context ) ? ' class="current"' : '',
 						sprintf( $text, number_format_i18n( $count ) )
 					);

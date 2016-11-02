@@ -157,10 +157,18 @@ class Options_Framework_Admin {
                 	$menu['menu_title'],
                 	$menu['capability'],
                 	$menu['menu_slug'],
+                	// null,
                 	array( $this, 'options_page' ),
                 	$menu['icon_url'],
                 	$menu['position']
                 );
+                /*$this->options_screen = add_submenu_page(
+                	$menu['menu_slug'],
+                	$menu['page_title'],
+                	$menu['menu_title'],
+                	$menu['capability'],
+                	$menu['menu_slug'],
+                	array( $this, 'options_page' ) );*/
                 break;
 
             default:
@@ -174,6 +182,63 @@ class Options_Framework_Admin {
                 	array( $this, 'options_page' ) );
                 break;
         }
+
+        /*$submenus = Self::optionsframework_tabs();
+        foreach ( $submenus as $submenu ) {
+			$this->options_screen = add_submenu_page(
+				$menu['menu_slug'],
+            	// add_query_arg( 'page', $menu['menu_slug'], $menu['parent_slug'] ),
+            	$menu['page_title'],
+            	$submenu['name'],
+            	$submenu['capability'],
+            	$menu['menu_slug'] . '&sub_section=' . $submenu['menu_slug'],
+            	array( $this, 'options_page' ) );
+        }*/
+	}
+
+	/**
+	 * Generates the tabs that are used in the options menu
+	 */
+	static function optionsframework_tabs() {
+		$counter = 0;
+		$options = & Options_Framework::_optionsframework_options();
+		$options = apply_filters( 'of_options', $options );
+		$menu = array();
+
+		$indexes = array_values( array_map( 'absint', wp_list_pluck( array_values($options), 'order' ) ) );
+
+		foreach ( $options as $value ) {
+			// Heading for Navigation
+			if ( $value['type'] == "heading" ) {
+
+				$counter++;
+
+				if( isset( $value['order'] ) ) {
+					$index = $value['order'];
+
+				} elseif( !in_array( $counter, $indexes ) ) {
+					$index = $counter;
+					$indexes[] = $counter;
+
+				} else {
+					while ( in_array( $counter, $indexes )) {
+						$counter++; }
+					$index = $counter;
+					$indexes[] = $counter;
+				}
+		
+				$class = '';
+				$class = $value['name'];
+				$class = preg_replace( '/[^a-zA-Z0-9._\-]/', '', strtolower($class) );
+				$menu[ $index ] = array_merge( $value, array('menu_slug' => $class, 'options_framework_tab' => '#'. $class ."-section" ) );
+			}
+		}
+		// sort numeric 
+		// for custom ordering. 
+		// from disordered source.
+		ksort( $menu, SORT_NUMERIC );
+
+		return $menu;
 	}
 
 
@@ -422,7 +487,22 @@ class Options_Framework_Admin {
 	}
 
 
+	public function get_current_tab(){
+		$tabs = Self::optionsframework_tabs();
 
+        foreach ( $tabs as $tab ) {
+        	if( ! empty( $tab['active_tab'] ) && function_exists( $tab['active_tab'] ) ) {
+        		add_filter( 'of_filter_active_tab', $tab['active_tab'], 10, 1 );
+
+        		$is_current = apply_filters( 'of_filter_active_tab', false );
+
+        		if( $is_current ) {
+        			return $tab['options_framework_tab'];
+        		}
+        	}
+		}
+		return false;
+	}
 
 
 	/**
@@ -442,6 +522,11 @@ class Options_Framework_Admin {
 		
 		// Enqueue custom option panel JS
 		wp_enqueue_script( 'options-custom', plugin_dir_url( dirname(__FILE__) ) . 'js/options-custom.js', array( 'jquery','wp-color-picker' ), Options_Framework::VERSION, true );
+
+		if( $this->get_current_tab() ) {
+			$current = $this->get_current_tab();
+			wp_localize_script( 'options-custom', 'options_framework_tab', $current );
+		}
 
 		wp_enqueue_script( 'admin-color-schemes', plugin_dir_url( dirname(__FILE__) ) . 'js/admin-color-schemes.js', array( 'jquery', 'wp-color-picker' ), Options_Framework::VERSION, true );
 		
@@ -670,10 +755,10 @@ class Options_Framework_Admin {
 
 		global $wpengine_platform_config;
 
-		if( class_exists( 'WpeCommon' ) && ( $wpengine_platform_config['all_domains'][0] || ( defined('PWP_NAME') && PWP_NAME ) ) ) {
+		if( ! class_exists('WPE_Environment_Switch') && class_exists( 'WpeCommon' ) && ( $wpengine_platform_config['all_domains'][0] || ( defined('PWP_NAME') && PWP_NAME ) ) ) {
 		    
 		    // Format string for sprintf( 'Go to %1$s', $environment )
-		    $meun_title      = apply_filters( 'wpees_quicklink_title', 'Go to %1$s' );
+		    $meun_title      = apply_filters( 'wds_quicklink_title', 'Go to %1$s' );
 
 			$wpecommon       = WpeCommon::instance();
 			$snapshot_info   = $wpecommon->get_staging_status();

@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.2.11
+Version:     2.2.12
 */
 
 /*
@@ -1118,7 +1118,6 @@ if ( ! function_exists( 'webdogs_clear_cache' ) ) {
             WpeCommon::clear_maxcdn_cache();
             WpeCommon::purge_varnish_cache();
 
-            flush_rewrite_rules();
         }
     }
 }
@@ -1322,6 +1321,12 @@ if ( ! function_exists( 'webdogs_activation' ) ) {
 
         function webdogs_init_schedule() { wds_create_daily_notification_schedule(); }
 
+        function webdogs_init_endpoint() { 
+            if(!class_exists('Options_Framework_Endpoint') ) {
+                require_once plugin_dir_path( __FILE__ ) . '/options-framework/includes/class-options-endpoint.php'; }
+            $endpoint = new Options_Framework_Endpoint; $endpoint->add_endpoint(); flush_rewrite_rules();
+        }
+
         function webdogs_init_watchdog() {
             if(!defined( 'WATCHDOG_DIR' )) { $WATCHDOG_FROM = trailingslashit( __DIR__ ) . 'watchdog.zip'; $WATCHDOG_TO = trailingslashit( __DIR__ ) .'watchdog/' ; 
             if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO ) ) { $WATCHDOG_ZIP = new ZipArchive; 
@@ -1351,6 +1356,12 @@ if ( ! function_exists( 'webdogs_activation' ) ) {
         //                           
         /////////////////////////////
         webdogs_init_schedule();/////
+        /////////////////////////////
+        //                           
+        //   REWRITE API ENDPOINTS   
+        //                           
+        /////////////////////////////
+        webdogs_init_endpoint();/////
         /////////////////////////////
         //                           
         //   UNPACK WATCHDOG TO MU   

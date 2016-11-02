@@ -607,7 +607,8 @@ function optionsframework_options() {
 		'order' => 4,
 		'type' => 'heading',
 		'class' => 'inset bottom-pad',
-		'function' => 'Options_Framework_Install_Plugins_Page' ); 
+		'function' => 'Options_Framework_Install_Plugins_Page',
+		'active_tab' => 'Is_Options_Framework_Plugins_Page' ); 
 		
 
 

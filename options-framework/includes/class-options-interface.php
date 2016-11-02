@@ -43,8 +43,8 @@ class Options_Framework_Interface {
 		
 				$class = '';
 				$class = ! empty( $value['id'] ) ? $value['id'] : $value['name'];
-				$class = preg_replace( '/[^a-zA-Z0-9._\-]/', '', strtolower($class) ) . '-tab';
-				$menu[ $index ] = '<a id="options-group-'. $index . '-tab" class="nav-tab ' . $class .'" title="' . esc_attr( $value['name'] ) . '" href="' . esc_attr( '#options-group-'. $index ) . '">' . esc_html( $value['name'] ) . '</a>';
+				$class = preg_replace( '/[^a-zA-Z0-9._\-]/', '', strtolower($class) );
+				$menu[ $index ] = '<a id="'. $class . '-tab" class="nav-tab ' . $class . '-tab" title="' . esc_attr( $value['name'] ) . '" href="' . esc_attr( '#'. $class . '-section' ) . '">' . esc_html( $value['name'] ) . '</a>';
 			}
 		}
 		// sort numeric 
@@ -623,7 +623,7 @@ class Options_Framework_Interface {
 					$class = '';
 					$class = ! empty( $value['id'] ) ? $value['id'] : $value['name'];
 					$class = preg_replace('/[^a-zA-Z0-9._\-]/', '', strtolower($class) );
-					$output .= '<div id="options-group-' . $value['order'] . '" class="group ' . $class . '">';
+					$output .= '<div id="' . $class . '-section" class="group ' . $class . '">';
 					$output .= '<h3>' . esc_html( $value['name'] ) . '</h3>' . "\n";
 					
 					if ( isset( $value['function'] ) ) {
