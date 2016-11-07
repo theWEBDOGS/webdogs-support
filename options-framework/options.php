@@ -200,7 +200,7 @@ function wds_options() {
 		'name' => __('Notification Frequency', 'webdogs-support' ),
 		'id' => 'maintenance_notification_frequency',
 		'std' => '1',
-		'desc' => $next_maintainance_notification,
+		// 'desc' => $next_maintainance_notification,
 		'type' => 'radio',
 		'class' => 'alignleft inline', 
 		'options' => $frequency_array,
