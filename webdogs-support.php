@@ -9,7 +9,7 @@ Text Domain: webdogs-support
 Domain Path: /languages
 License:     GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version:     2.2.13
+Version:     2.3.0
 */
 
 /*
@@ -373,8 +373,8 @@ if ( ! function_exists( 'webdogs_deactivation' ) ) {
 
     function webdogs_deactivation() {
 
-        wp_clear_scheduled_hook( 'wdw_create_daily_notification' );
-        wp_clear_scheduled_hook( 'wds_scheduled_notification'  );
+        wp_clear_scheduled_hook( 'wds_create_daily_notification' );
+        wp_clear_scheduled_hook( 'wds_scheduled_notification'    );
     }
 }
 register_deactivation_hook(__FILE__, 'webdogs_deactivation');
