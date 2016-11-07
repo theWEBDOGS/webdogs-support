@@ -178,7 +178,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 *
 		 * @var string
 		 */
-		protected $menu = 'webdogs-support';
+		protected $menu = 'wds-plugins';
 
 		/**
 		 * Parent menu file slug.
@@ -756,7 +756,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 				<?php $plugin_table->views(); ?>
 
 				<?php //if( ! $included ) : ?>
-				<form id="wds-plugins" action="<?php echo ( ! $included ) ? $this->get_wds_url() : str_replace( 'plugins.php?page=options-framework', 'plugins.php?page=optionsframework', $this->get_wds_url() ); ?>" method="post">
+				<form id="wds-plugins" action="<?php echo ( ! $included ) ? $this->get_wds_url() : str_replace( 'plugins.php?page=webdogs-support', 'plugins.php?page=wds-plugins', $this->get_wds_url() ); ?>" method="post">
 				<?php// endif; ?>
 					<input type="hidden" name="wds-page" value="<?php echo esc_attr( $this->menu ); ?>" />
 					<input type="hidden" name="plugin_status" value="<?php echo esc_attr( $plugin_table->view_context ); ?>" />
@@ -3050,7 +3050,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 
 				// Sanitize the received input.
 				$plugins_to_install = array_map( 'urldecode', $plugins_to_install );
-				$plugins_to_install = array_map( array( $this->optionsframework, 'sanitize_key' ), $plugins_to_install );
+				$plugins_to_install = array_map( array( $this->wds_plugin_activation, 'sanitize_key' ), $plugins_to_install );
 
 				// Validate the received input.
 				foreach ( $plugins_to_install as $key => $slug ) {
@@ -3152,7 +3152,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 					'<h1>', esc_html( get_admin_page_title() ), '</h1>';
 
 				// Process the bulk installation submissions.
-				add_filter( 'upgrader_source_selection', array( $this->optionsframework, 'maybe_adjust_source_dir' ), 1, 3 );
+				add_filter( 'upgrader_source_selection', array( $this->wds_plugin_activation, 'maybe_adjust_source_dir' ), 1, 3 );
 
 				if ( 'wds-bulk-update' === $this->current_action() ) {
 					// Inject our info into the update transient.
@@ -3163,7 +3163,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 					$installer->bulk_install( $sources );
 				}
 
-				remove_filter( 'upgrader_source_selection', array( $this->optionsframework, 'maybe_adjust_source_dir' ), 1, 3 );
+				remove_filter( 'upgrader_source_selection', array( $this->wds_plugin_activation, 'maybe_adjust_source_dir' ), 1, 3 );
 
 				echo '</div>';
 
@@ -3185,7 +3185,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 				$plugins = array();
 				if ( isset( $_POST['plugin'] ) ) {
 					$plugins = array_map( 'urldecode', (array) $_POST['plugin'] );
-					$plugins = array_map( array( $this->optionsframework, 'sanitize_key' ), $plugins );
+					$plugins = array_map( array( $this->wds_plugin_activation, 'sanitize_key' ), $plugins );
 				}
 
 				$plugins_to_activate = array();
@@ -3408,7 +3408,7 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 							$this->activate_strings();
 						}
 
-						add_action( 'upgrader_process_complete', array( $this->optionsframework, 'populate_file_path' ) );
+						add_action( 'upgrader_process_complete', array( $this->wds_plugin_activation, 'populate_file_path' ) );
 					}
 
 					/**

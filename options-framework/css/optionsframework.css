@@ -565,6 +565,9 @@
 #section-maintenance_notification_frequency .explain {
     max-width:100% !important;
 }
+#section-maintenance_notification_offset .explain {
+    display: none;
+}
 
 #maintenance_message,
 #maintenance_notes {
