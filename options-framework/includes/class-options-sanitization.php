@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   Options_Framework
+ * @package   Webdogs
  * @author    Devin Price <devin@wptheming.com>
  * @license   GPL-2.0+
  * @link      http://wptheming.com
@@ -12,35 +12,35 @@
  *
  * @link http://developer.wordpress.org/reference/functions/sanitize_text_field/
  */
-add_filter( 'of_sanitize_text', 'sanitize_text_field' );
+add_filter( 'wds_sanitize_text', 'sanitize_text_field' );
 
 /**
  * Sanitization for password input
  *
  * @link http://developer.wordpress.org/reference/functions/sanitize_text_field/
  */
-add_filter( 'of_sanitize_password', 'sanitize_text_field' );
+add_filter( 'wds_sanitize_password', 'sanitize_text_field' );
 
 /**
  * Sanitization for select input
  *
  * Validates that the selected option is a valid option.
  */
-add_filter( 'of_sanitize_select', 'of_sanitize_enum', 10, 2 );
+add_filter( 'wds_sanitize_select', 'wds_sanitize_enum', 10, 2 );
 
 /**
  * Sanitization for radio input
  *
  * Validates that the selected option is a valid option.
  */
-add_filter( 'of_sanitize_radio', 'of_sanitize_enum', 10, 2 );
+add_filter( 'wds_sanitize_radio', 'wds_sanitize_enum', 10, 2 );
 
 /**
  * Sanitization for image selector
  *
  * Validates that the selected option is a valid option.
  */
-add_filter( 'of_sanitize_images', 'of_sanitize_enum', 10, 2 );
+add_filter( 'wds_sanitize_images', 'wds_sanitize_enum', 10, 2 );
 
 /**
  * Sanitization for textarea field
@@ -48,12 +48,12 @@ add_filter( 'of_sanitize_images', 'of_sanitize_enum', 10, 2 );
  * @param $input string
  * @return $output sanitized string
  */
-function of_sanitize_textarea( $input ) {
+function wds_sanitize_textarea( $input ) {
 	global $allowedposttags;
 	$output = wp_kses( $input, $allowedposttags );
 	return $output;
 }
-add_filter( 'of_sanitize_textarea', 'of_sanitize_textarea' );
+add_filter( 'wds_sanitize_textarea', 'wds_sanitize_textarea' );
 
 /**
  * @since 1.0
@@ -61,10 +61,10 @@ add_filter( 'of_sanitize_textarea', 'of_sanitize_textarea' );
  * @param  string $logo_icon_css The logo icon css.
  * @return string
  */
-function of_sanitize_logo_icon_css( $logo_icon_css ) {
+function wds_sanitize_logo_icon_css( $logo_icon_css ) {
 	return str_replace('f102', '\f102', html_entity_decode( $logo_icon_css ) );
 }
-add_filter( 'of_logo_icon_css', 'of_sanitize_logo_icon_css' );
+add_filter( 'wds_logo_icon_css', 'wds_sanitize_logo_icon_css' );
 
 /**
  * Sanitization for checkbox input
@@ -72,7 +72,7 @@ add_filter( 'of_logo_icon_css', 'of_sanitize_logo_icon_css' );
  * @param $input string (1 or empty) checkbox state
  * @return $output '1' or false
  */
-function of_sanitize_checkbox( $input ) {
+function wds_sanitize_checkbox( $input ) {
 	if ( $input ) {
 		$output = '1';
 	} else {
@@ -80,7 +80,7 @@ function of_sanitize_checkbox( $input ) {
 	}
 	return $output;
 }
-add_filter( 'of_sanitize_checkbox', 'of_sanitize_checkbox' );
+add_filter( 'wds_sanitize_checkbox', 'wds_sanitize_checkbox' );
 
 /**
  * Sanitization for multicheck
@@ -88,7 +88,7 @@ add_filter( 'of_sanitize_checkbox', 'of_sanitize_checkbox' );
  * @param array of checkbox values
  * @return array of sanitized values ('1' or false)
  */
-function of_sanitize_multicheck( $input, $option ) {
+function wds_sanitize_multicheck( $input, $option ) {
 	$output = '';
 	if ( is_array( $input ) ) {
 		foreach( $option['options'] as $key => $value ) {
@@ -102,7 +102,7 @@ function of_sanitize_multicheck( $input, $option ) {
 	}
 	return $output;
 }
-add_filter( 'of_sanitize_multicheck', 'of_sanitize_multicheck', 10, 2 );
+add_filter( 'wds_sanitize_multicheck', 'wds_sanitize_multicheck', 10, 2 );
 
 /**
  * File upload sanitization.
@@ -112,7 +112,7 @@ add_filter( 'of_sanitize_multicheck', 'of_sanitize_multicheck', 10, 2 );
  * @param string $input filepath
  * @returns string $output filepath
  */
-function of_sanitize_upload( $input ) {
+function wds_sanitize_upload( $input ) {
 	$output = '';
 	$filetype = wp_check_filetype( $input );
 	if ( $filetype["ext"] ) {
@@ -120,7 +120,7 @@ function of_sanitize_upload( $input ) {
 	}
 	return $output;
 }
-add_filter( 'of_sanitize_upload', 'of_sanitize_upload' );
+add_filter( 'wds_sanitize_upload', 'wds_sanitize_upload' );
 
 /**
  * Sanitization for editor input.
@@ -130,7 +130,7 @@ add_filter( 'of_sanitize_upload', 'of_sanitize_upload' );
  * @param string $input
  * @returns string $output
  */
-function of_sanitize_editor( $input ) {
+function wds_sanitize_editor( $input ) {
 	if ( current_user_can( 'unfiltered_html' ) ) {
 		$output = $input;
 	}
@@ -140,7 +140,7 @@ function of_sanitize_editor( $input ) {
 	}
 	return $output;
 }
-add_filter( 'of_sanitize_editor', 'of_sanitize_editor' );
+add_filter( 'wds_sanitize_editor', 'wds_sanitize_editor' );
 
 /**
  * Sanitization of input with allowed tags and wpautotop.
@@ -150,7 +150,7 @@ add_filter( 'of_sanitize_editor', 'of_sanitize_editor' );
  * @param string $input
  * @returns string $output
  */
-function of_sanitize_allowedtags( $input ) {
+function wds_sanitize_allowedtags( $input ) {
 	global $allowedtags;
 	$output = wpautop( wp_kses( $input, $allowedtags ) );
 	return $output;
@@ -164,7 +164,7 @@ function of_sanitize_allowedtags( $input ) {
  * @param string $input
  * @returns string $output
  */
-function of_sanitize_allowedposttags( $input ) {
+function wds_sanitize_allowedposttags( $input ) {
 	global $allowedposttags;
 	$output = wpautop( wp_kses( $input, $allowedposttags) );
 	return $output;
@@ -177,7 +177,7 @@ function of_sanitize_allowedposttags( $input ) {
  * @param string $input
  * @returns string $output
  */
-function of_sanitize_enum( $input, $option ) {
+function wds_sanitize_enum( $input, $option ) {
 	$output = '';
 	if ( array_key_exists( $input, $option['options'] ) ) {
 		$output = $input;
@@ -190,7 +190,7 @@ function of_sanitize_enum( $input, $option ) {
  *
  * @returns array $output
  */
-function of_sanitize_background( $input ) {
+function wds_sanitize_background( $input ) {
 
 	$output = wp_parse_args( $input, array(
 		'color' => '',
@@ -200,24 +200,24 @@ function of_sanitize_background( $input ) {
 		'attachment' => 'scroll'
 	) );
 
-	$output['color'] = apply_filters( 'of_sanitize_hex', $input['color'] );
-	$output['image'] = apply_filters( 'of_sanitize_upload', $input['image'] );
-	$output['repeat'] = apply_filters( 'of_background_repeat', $input['repeat'] );
-	$output['position'] = apply_filters( 'of_background_position', $input['position'] );
-	$output['attachment'] = apply_filters( 'of_background_attachment', $input['attachment'] );
+	$output['color'] = apply_filters( 'wds_sanitize_hex', $input['color'] );
+	$output['image'] = apply_filters( 'wds_sanitize_upload', $input['image'] );
+	$output['repeat'] = apply_filters( 'wds_background_repeat', $input['repeat'] );
+	$output['position'] = apply_filters( 'wds_background_position', $input['position'] );
+	$output['attachment'] = apply_filters( 'wds_background_attachment', $input['attachment'] );
 
 	return $output;
 }
-add_filter( 'of_sanitize_background', 'of_sanitize_background' );
+add_filter( 'wds_sanitize_background', 'wds_sanitize_background' );
 
 /**
  * Sanitization for scheme option.
  *
  * @returns array $output
  */
-function of_sanitize_scheme( $input ) {
+function wds_sanitize_scheme( $input ) {
 
-	$admin_schemes = Options_Framework_Admin_Color_Schemes::get_instance();
+	$admin_schemes = Webdogs_Admin_Color_Schemes::get_instance();
 
 	$output = array();
 
@@ -225,72 +225,72 @@ function of_sanitize_scheme( $input ) {
 		$input['must_use'] = "";
 	}
 
-	$output['must_use'] = apply_filters( 'of_sanitize_checkbox(', $input['must_use'] );
+	$output['must_use'] = apply_filters( 'wds_sanitize_checkbox(', $input['must_use'] );
 
 	$loops = $admin_schemes->get_colors( 'basic' );
 	foreach ( $loops as $handle => $nicename ):
 
-		$output[$handle] = apply_filters( 'of_sanitize_hex', $input[ $handle ] );
+		$output[$handle] = apply_filters( 'wds_sanitize_hex', $input[ $handle ] );
 
 	endforeach;
 
 	$loops = $admin_schemes->get_colors( 'advanced' );
 	foreach ( $loops as $handle => $nicename ):
 
-		$output[$handle] = apply_filters( 'of_sanitize_hex', $input[ $handle ] );
+		$output[$handle] = apply_filters( 'wds_sanitize_hex', $input[ $handle ] );
 
 	endforeach;
 
 	return $output;
 }
-add_filter( 'of_sanitize_scheme', 'of_sanitize_scheme' );
+add_filter( 'wds_sanitize_scheme', 'wds_sanitize_scheme' );
 
 /**
  * Sanitization for background repeat
  *
  * @returns string $value if it is valid
  */
-function of_sanitize_background_repeat( $value ) {
-	$recognized = of_recognized_background_repeat();
+function wds_sanitize_background_repeat( $value ) {
+	$recognized = wds_recognized_background_repeat();
 	if ( array_key_exists( $value, $recognized ) ) {
 		return $value;
 	}
-	return apply_filters( 'of_default_background_repeat', current( $recognized ) );
+	return apply_filters( 'wds_default_background_repeat', current( $recognized ) );
 }
-add_filter( 'of_background_repeat', 'of_sanitize_background_repeat' );
+add_filter( 'wds_background_repeat', 'wds_sanitize_background_repeat' );
 
 /**
  * Sanitization for background position
  *
  * @returns string $value if it is valid
  */
-function of_sanitize_background_position( $value ) {
-	$recognized = of_recognized_background_position();
+function wds_sanitize_background_position( $value ) {
+	$recognized = wds_recognized_background_position();
 	if ( array_key_exists( $value, $recognized ) ) {
 		return $value;
 	}
-	return apply_filters( 'of_default_background_position', current( $recognized ) );
+	return apply_filters( 'wds_default_background_position', current( $recognized ) );
 }
-add_filter( 'of_background_position', 'of_sanitize_background_position' );
+add_filter( 'wds_background_position', 'wds_sanitize_background_position' );
 
 /**
  * Sanitization for background attachment
  *
  * @returns string $value if it is valid
  */
-function of_sanitize_background_attachment( $value ) {
-	$recognized = of_recognized_background_attachment();
+function wds_sanitize_background_attachment( $value ) {
+	$recognized = wds_recognized_background_attachment();
 	if ( array_key_exists( $value, $recognized ) ) {
 		return $value;
 	}
-	return apply_filters( 'of_default_background_attachment', current( $recognized ) );
+	return apply_filters( 'wds_default_background_attachment', current( $recognized ) );
 }
-add_filter( 'of_background_attachment', 'of_sanitize_background_attachment' );
+add_filter( 'wds_background_attachment', 'wds_sanitize_background_attachment' );
 
 /**
  * Sanitization for typography option.
  */
-function of_sanitize_typography( $input, $option ) {
+function wds_sanitize_typography( $input, $option ) {
 
 	$output = wp_parse_args( $input, array(
 		'size'  => '',
@@ -305,66 +305,66 @@ function of_sanitize_typography( $input, $option ) {
 		}
 	}
 	else {
-		$output['face']  = apply_filters( 'of_font_face', $output['face'] );
+		$output['face']  = apply_filters( 'wds_font_face', $output['face'] );
 	}
 
-	$output['size']  = apply_filters( 'of_font_size', $output['size'] );
-	$output['style'] = apply_filters( 'of_font_style', $output['style'] );
-	$output['color'] = apply_filters( 'of_sanitize_color', $output['color'] );
+	$output['size']  = apply_filters( 'wds_font_size', $output['size'] );
+	$output['style'] = apply_filters( 'wds_font_style', $output['style'] );
+	$output['color'] = apply_filters( 'wds_sanitize_color', $output['color'] );
 	return $output;
 }
-add_filter( 'of_sanitize_typography', 'of_sanitize_typography', 10, 2 );
+add_filter( 'wds_sanitize_typography', 'wds_sanitize_typography', 10, 2 );
 
 /**
  * Sanitization for font size
  */
-function of_sanitize_font_size( $value ) {
-	$recognized = of_recognized_font_sizes();
+function wds_sanitize_font_size( $value ) {
+	$recognized = wds_recognized_font_sizes();
 	$value_check = preg_replace('/px/','', $value);
 	if ( in_array( (int) $value_check, $recognized ) ) {
 		return $value;
 	}
-	return apply_filters( 'of_default_font_size', $recognized );
+	return apply_filters( 'wds_default_font_size', $recognized );
 }
-add_filter( 'of_font_size', 'of_sanitize_font_size' );
+add_filter( 'wds_font_size', 'wds_sanitize_font_size' );
 
 /**
  * Sanitization for font style
  */
-function of_sanitize_font_style( $value ) {
-	$recognized = of_recognized_font_styles();
+function wds_sanitize_font_style( $value ) {
+	$recognized = wds_recognized_font_styles();
 	if ( array_key_exists( $value, $recognized ) ) {
 		return $value;
 	}
-	return apply_filters( 'of_default_font_style', current( $recognized ) );
+	return apply_filters( 'wds_default_font_style', current( $recognized ) );
 }
-add_filter( 'of_font_style', 'of_sanitize_font_style' );
+add_filter( 'wds_font_style', 'wds_sanitize_font_style' );
 
 /**
  * Sanitization for font face
  */
-function of_sanitize_font_face( $value ) {
-	$recognized = of_recognized_font_faces();
+function wds_sanitize_font_face( $value ) {
+	$recognized = wds_recognized_font_faces();
 	if ( array_key_exists( $value, $recognized ) ) {
 		return $value;
 	}
-	return apply_filters( 'of_default_font_face', current( $recognized ) );
+	return apply_filters( 'wds_default_font_face', current( $recognized ) );
 }
-add_filter( 'of_font_face', 'of_sanitize_font_face' );
+add_filter( 'wds_font_face', 'wds_sanitize_font_face' );
 
 /**
  * Get recognized background repeat settings
  *
  * @return   array
  */
-function of_recognized_background_repeat() {
+function wds_recognized_background_repeat() {
 	$default = array(
-		'no-repeat' => __( 'No Repeat', 'options-framework' ),
-		'repeat-x'  => __( 'Repeat Horizontally', 'options-framework' ),
-		'repeat-y'  => __( 'Repeat Vertically', 'options-framework' ),
-		'repeat'    => __( 'Repeat All', 'options-framework' ),
+		'no-repeat' => __( 'No Repeat', 'webdogs-support' ),
+		'repeat-x'  => __( 'Repeat Horizontally', 'webdogs-support' ),
+		'repeat-y'  => __( 'Repeat Vertically', 'webdogs-support' ),
+		'repeat'    => __( 'Repeat All', 'webdogs-support' ),
 		);
-	return apply_filters( 'of_recognized_background_repeat', $default );
+	return apply_filters( 'wds_recognized_background_repeat', $default );
 }
 
 /**
@@ -372,19 +372,19 @@ function of_recognized_background_repeat() {
  *
  * @return   array
  */
-function of_recognized_background_position() {
+function wds_recognized_background_position() {
 	$default = array(
-		'top left'      => __( 'Top Left', 'options-framework' ),
-		'top center'    => __( 'Top Center', 'options-framework' ),
-		'top right'     => __( 'Top Right', 'options-framework' ),
-		'center left'   => __( 'Middle Left', 'options-framework' ),
-		'center center' => __( 'Middle Center', 'options-framework' ),
-		'center right'  => __( 'Middle Right', 'options-framework' ),
-		'bottom left'   => __( 'Bottom Left', 'options-framework' ),
-		'bottom center' => __( 'Bottom Center', 'options-framework' ),
-		'bottom right'  => __( 'Bottom Right', 'options-framework')
+		'top left'      => __( 'Top Left', 'webdogs-support' ),
+		'top center'    => __( 'Top Center', 'webdogs-support' ),
+		'top right'     => __( 'Top Right', 'webdogs-support' ),
+		'center left'   => __( 'Middle Left', 'webdogs-support' ),
+		'center center' => __( 'Middle Center', 'webdogs-support' ),
+		'center right'  => __( 'Middle Right', 'webdogs-support' ),
+		'bottom left'   => __( 'Bottom Left', 'webdogs-support' ),
+		'bottom center' => __( 'Bottom Center', 'webdogs-support' ),
+		'bottom right'  => __( 'Bottom Right', 'webdogs-support')
 		);
-	return apply_filters( 'of_recognized_background_position', $default );
+	return apply_filters( 'wds_recognized_background_position', $default );
 }
 
 /**
@@ -392,12 +392,12 @@ function of_recognized_background_position() {
  *
  * @return   array
  */
-function of_recognized_background_attachment() {
+function wds_recognized_background_attachment() {
 	$default = array(
-		'scroll' => __( 'Scroll Normally', 'options-framework' ),
-		'fixed'  => __( 'Fixed in Place', 'options-framework')
+		'scroll' => __( 'Scroll Normally', 'webdogs-support' ),
+		'fixed'  => __( 'Fixed in Place', 'webdogs-support')
 		);
-	return apply_filters( 'of_recognized_background_attachment', $default );
+	return apply_filters( 'wds_recognized_background_attachment', $default );
 }
 
 /**
@@ -408,13 +408,13 @@ function of_recognized_background_attachment() {
  * @return   string
  */
 
-function of_sanitize_hex( $hex, $default = '' ) {
-	if ( of_validate_hex( $hex ) ) {
+function wds_sanitize_hex( $hex, $default = '' ) {
+	if ( wds_validate_hex( $hex ) ) {
 		return $hex;
 	}
 	return $default;
 }
-add_filter( 'of_sanitize_color', 'of_sanitize_hex' );
+add_filter( 'wds_sanitize_color', 'wds_sanitize_hex' );
 
 /**
  * Get recognized font sizes.
@@ -426,9 +426,9 @@ add_filter( 'of_sanitize_color', 'of_sanitize_hex' );
  * @return   array
  */
 
-function of_recognized_font_sizes() {
+function wds_recognized_font_sizes() {
 	$sizes = range( 9, 71 );
-	$sizes = apply_filters( 'of_recognized_font_sizes', $sizes );
+	$sizes = apply_filters( 'wds_recognized_font_sizes', $sizes );
 	$sizes = array_map( 'absint', $sizes );
 	return $sizes;
 }
@@ -442,7 +442,7 @@ function of_recognized_font_sizes() {
  *
  * @return   array
  */
-function of_recognized_font_faces() {
+function wds_recognized_font_faces() {
 	$default = array(
 		'arial'     => 'Arial',
 		'verdana'   => 'Verdana, Geneva',
@@ -453,7 +453,7 @@ function of_recognized_font_faces() {
 		'palatino'  => 'Palatino',
 		'helvetica' => 'Helvetica*'
 		);
-	return apply_filters( 'of_recognized_font_faces', $default );
+	return apply_filters( 'wds_recognized_font_faces', $default );
 }
 
 /**
@@ -465,14 +465,14 @@ function of_recognized_font_faces() {
  *
  * @return   array
  */
-function of_recognized_font_styles() {
+function wds_recognized_font_styles() {
 	$default = array(
-		'normal'      => __( 'Normal', 'options-framework' ),
-		'italic'      => __( 'Italic', 'options-framework' ),
-		'bold'        => __( 'Bold', 'options-framework' ),
-		'bold italic' => __( 'Bold Italic', 'options-framework' )
+		'normal'      => __( 'Normal', 'webdogs-support' ),
+		'italic'      => __( 'Italic', 'webdogs-support' ),
+		'bold'        => __( 'Bold', 'webdogs-support' ),
+		'bold italic' => __( 'Bold Italic', 'webdogs-support' )
 		);
-	return apply_filters( 'of_recognized_font_styles', $default );
+	return apply_filters( 'wds_recognized_font_styles', $default );
 }
 
 /**
@@ -481,7 +481,7 @@ function of_recognized_font_styles() {
  * @param    string    Color in hexidecimal notation. "#" may or may not be prepended to the string.
  * @return   bool
  */
-function of_validate_hex( $hex ) {
+function wds_validate_hex( $hex ) {
 	$hex = trim( $hex );
 	/* Strip recognized prefixes. */
 	if ( 0 === strpos( $hex, '#' ) ) {

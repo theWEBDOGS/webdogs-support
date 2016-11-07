@@ -27,7 +27,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-class Options_Framework_Login_Logo {
+class Webdogs_Login_Logo {
 	static $instance;
 	const CUTOFF = 312;
 	var $logo_locations;
@@ -36,7 +36,7 @@ class Options_Framework_Login_Logo {
 	var $height = 0;
 	var $original_width;
 	var $original_height;
-	var $logo_types = array('.svg','.png');
+	var $logo_types = array('.svg','.png','.jpg','.jpeg','.gif');
 	var $logo_size;
 	var $logo_file_exists;
 
@@ -64,13 +64,13 @@ class Options_Framework_Login_Logo {
 					'url' => $this->maybe_ssl( content_url( 'login-logo-network-' . $site->id ) )
 					);
 			}
-		} elseif( ! is_null( of_get_option('login_logo_css', null ) ) && is_array( of_get_option('login_logo_css', null ) ) ) {
+		} elseif( ! is_null( wds_get_option('login_logo_css', null ) ) && is_array( wds_get_option('login_logo_css', null ) ) ) {
 			
-			$background = of_get_option('login_logo_css', null );
+			$background = wds_get_option('login_logo_css', null );
 			$image = (isset($background['image'])) ? $background['image'] : "";
 			$uploads = wp_upload_dir();
 
-			$image = str_replace('.png', '', str_replace('.svg', '', $image ) );
+			$image = str_replace( $this->logo_types, '', $image );
 
 			$path = (isset($image)) ? str_replace( $this->maybe_ssl( WP_CONTENT_URL ), WP_CONTENT_DIR, $this->maybe_ssl( $image ) ) : "";
 			
@@ -172,9 +172,9 @@ class Options_Framework_Login_Logo {
 
 		$login_background  = $body_background = "";
 
-		$background        = of_get_option('login_logo_css', array( 'color' => '', 'image' => '', 'repeat' => 'no-repeat', 'position' => 'bottom center', 'attachment' => 'scroll' ) );
-		$background_height = of_get_option('login_logo_height', 100 );
-		$margin_bottom     = of_get_option('login_logo_bottom_margin', '10' );
+		$background        = wds_get_option('login_logo_css', array( 'color' => '', 'image' => '', 'repeat' => 'no-repeat', 'position' => 'bottom center', 'attachment' => 'scroll' ) );
+		$background_height = wds_get_option('login_logo_height', 100 );
+		$margin_bottom     = wds_get_option('login_logo_bottom_margin', '10' );
 
         if ($background) :
 	    	$background = wp_parse_args( $background, $background_defaults );
@@ -224,4 +224,4 @@ class Options_Framework_Login_Logo {
 }
 
 // Bootstrap
-// new Options_Framework_Login_Logo;
+// new Webdogs_Login_Logo;

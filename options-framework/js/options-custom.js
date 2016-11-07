@@ -26,10 +26,10 @@ jQuery(document).ready(function($) {
 	// calculate next maintenance notification
 	if ( $('#section-maintenance_notification_frequency').length > 0 ) {
 
-		$('.wd_notification_events > .wd_notification_scheduled').text( get_next_schedule() );
+		$('.wds_notification_events > .wds_notification_scheduled').text( get_next_schedule() );
 
 		$('#section-maintenance_notification_frequency :input, #section-maintenance_notification_offset :input').on('change', function(){
-			$('.wd_notification_events > .wd_notification_scheduled').text( get_next_schedule() );
+			$('.wds_notification_events > .wds_notification_scheduled').text( get_next_schedule() );
 		});
 	}
 
@@ -63,7 +63,6 @@ jQuery(document).ready(function($) {
 	 			var m = ( i < 12 ) ? i+1 : 1 ;
 	 			var y = ( i < 12 ) ? year : year + 1 ;
 
-
 	 			parsed = ( freq > 1 ) ? Date.parse( m+"-"+day+"-"+y ) : parsed;
 
 	 			active[n] = parsed;
@@ -85,7 +84,7 @@ jQuery(document).ready(function($) {
 	         day = date.getDate();
 
 
-	    var prev_sent = ( $('.wd_notification_events > .wd_last_notification_sent').length > 0 ) ? new Date( Number( $('.wd_notification_events > .wd_last_notification_sent').attr('data-prev-notice') )*1000 ) : new Date(0);
+	    var prev_sent = ( $('.wds_notification_events > .wds_last_notification_sent').length > 0 ) ? new Date( Number( $('.wds_notification_events > .wds_last_notification_sent').attr('data-prev-notice') )*1000 ) : new Date(0);
 		var next_send = "";
 		var next_date = "";
 

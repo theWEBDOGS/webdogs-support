@@ -567,7 +567,7 @@ h2.nav-tab-wrapper {
 .toplevel_page_wpengine-common .wrap #wpe-dify-plugin {
     display: none;
 }
-#optionsframework-submit {
+#wds-submit {
     padding: 10px 15px !important;
     background-color: whitesmoke !important;
     border-top: 1px solid #dddddd !important;
@@ -650,7 +650,7 @@ p.search-box,
     padding-top: 0;
 }
 /* .group.options:before, */
-#optionsframework-submit {
+#wds-submit {
     left: -12px !important;
     right: -12px !important;
 }

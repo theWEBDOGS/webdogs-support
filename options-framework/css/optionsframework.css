@@ -6,10 +6,10 @@
     padding-bottom: 20px;
     position: relative;
 }
-#optionsframework-metabox {
+#wds-metabox {
     padding-top: 0 !important;
 }
-#optionsframework-wrap h2.nav-tab-wrapper {
+#wds-wrap h2.nav-tab-wrapper {
     max-width: 842px;
 }
 #optionsframework form {
@@ -211,6 +211,11 @@
 #optionsframework .section-upload .upload-button,
 #optionsframework .section-background .remove-file,
 #optionsframework .section-background .upload-button {
+    height: 24px;
+    line-height: 22px;
+    padding: 0 8px 1px;
+    font-size: 11px;
+    margin-top:3px;
     margin-left: 5px;
 }
 #optionsframework .section-background .controls {
@@ -440,6 +445,18 @@
 #section-login_logo_css #wpadminbar * {
     z-index: 0 !important;
 }
+#section-login_logo_css #wpadminbar.adminbar-preview.default #wp-admin-bar-site-name>.ab-item:before {
+    content: "\f324";
+    position: relative;
+    float: left;
+    font: 400 20px/1 dashicons;
+    speak: none;
+    padding: 4px 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-image: none!important;
+    margin-right: 6px;
+}
 #optionsframework #section-login_logo_css {
     padding-top: 5px !important;
 }
@@ -541,6 +558,17 @@
     display: inline-block;
     max-width: 700px;
 }
+
+#section-maintenance_notification_frequency {
+    width: 42.625%;
+}
+#section-maintenance_notification_frequency .explain {
+    max-width:100% !important;
+}
+#section-maintenance_notification_offset .explain {
+    display: none;
+}
+
 #maintenance_message,
 #maintenance_notes {
     width: 584px !important;
@@ -588,7 +616,7 @@
 }
 /* Bottom Section */
 
-#optionsframework-submit {
+#wds-submit {
     padding: 7px 10px;
     border-top: 1px solid #ddd;
     background-color: #f1f1f1;
@@ -600,7 +628,7 @@
     z-index: 10;
     width: auto;
 }
-#optionsframework #optionsframework-submit p.wd_notification_events {
+#optionsframework #wds-submit p.wds_notification_events {
     white-space: nowrap;
     text-overflow: ellipsis;
     position: absolute;
@@ -608,6 +636,11 @@
     left: 1em;
     right: 9em;
     width: auto;
+}
+#optionsframework p.wds_notification_events {
+    padding: 0 !important;
+    line-height: 28px;
+    margin-top: 0;
 }
 #optionsframework .button-primary {
     float:right;

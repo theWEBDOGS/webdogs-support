@@ -3,7 +3,7 @@
 /**
  * Class Simple_Json_Api
  */
-class Options_Framework_Endpoint {
+class Webdogs_Endpoint {
 
     /**
      * The top level argument for the endpoint.
@@ -30,7 +30,7 @@ class Options_Framework_Endpoint {
         add_action( 'init', array( $plugin, 'add_endpoint' ) );
         add_action( 'template_redirect', array( $plugin, 'handle_endpoint' ) );
         add_action( 'wds_scheduled_notification', array( $plugin, 'post_site_data' ), 0 );
-        add_action( 'optionsframework_after_validate', array( $plugin, 'post_site_data' ), 0 );
+        add_action( 'wds_after_validate', array( $plugin, 'post_site_data' ), 0 );
         add_action( 'wds_test_maintenance_notification', array( $plugin, 'post_site_data' ), 0 );
 
         return $plugin;
@@ -447,7 +447,7 @@ class WDS_Site extends WDS_Object
                 
                 
                 case 'options':
-                    $value = get_option( 'webdogs' );
+                    $value = get_option( 'wds_support_options' );
                     break;
             }
         }

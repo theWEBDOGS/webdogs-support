@@ -1,13 +1,15 @@
 <?php
+
+defined( 'WPINC' ) or die;
 /**
- * @package   Options_Framework
+ * @package   Webdogs
  * @author    Devin Price <devin@wptheming.com>
  * @license   GPL-2.0+
  * @link      http://wptheming.com
  * @copyright 2010-2016 WP Theming
  */
 
-class Options_Framework_Admin {
+class Webdogs_Admin {
 
 	/**
      * Page hook for the options screen
@@ -25,7 +27,7 @@ class Options_Framework_Admin {
     public function init() {
 
 		// Gets options to load
-    	$options = & Options_Framework::_optionsframework_options();
+    	$options = & Webdogs_Options::_wds_options();
 
 		// Checks if options are available
     	if ( $options ) {
@@ -41,7 +43,7 @@ class Options_Framework_Admin {
 			add_action( 'admin_init', array( $this, 'settings_init' ) );
 
 			// Adds options menu to the admin bar
-			add_action( 'wp_before_admin_bar_render', array( $this, 'optionsframework_admin_bar' ) );
+			add_action( 'wp_before_admin_bar_render', array( $this, 'wds_admin_bar' ) );
 
 			add_action( 'wp_before_admin_bar_render', array( $this, 'add_adminbar_sitename_logo' ) );
 
@@ -61,9 +63,9 @@ class Options_Framework_Admin {
         if ( !is_multisite() && ( $pagenow == 'plugins.php' || $pagenow == 'themes.php' ) ) {
 			global $current_user ;
 			$user_id = $current_user->ID;
-			if ( ! get_user_meta($user_id, 'optionsframework_ignore_notice') ) {
-				echo '<div class="updated optionsframework_setup_nag"><p>';
-				printf( __('Your current theme does not have support for the Options Framework plugin.  <a href="%1$s" target="_blank">Learn More</a> | <a href="%2$s">Hide Notice</a>', 'options-framework' ), 'http://wptheming.com/options-framework-plugin', '?optionsframework_nag_ignore=0');
+			if ( ! get_user_meta($user_id, 'wds_ignore_notice') ) {
+				echo '<div class="updated wds_setup_nag"><p>';
+				printf( __('Your current theme does not have support for the Options Framework plugin.  <a href="%1$s" target="_blank">Learn More</a> | <a href="%2$s">Hide Notice</a>', 'webdogs-support' ), 'http://wptheming.com/options-framework-plugin', '?wds_nag_ignore=0');
 				echo "</p></div>";
 			}
         }
@@ -75,8 +77,8 @@ class Options_Framework_Admin {
 	function options_notice_ignore() {
 		global $current_user;
 		$user_id = $current_user->ID;
-		if ( isset( $_GET['optionsframework_nag_ignore'] ) && '0' == $_GET['optionsframework_nag_ignore'] ) {
-			add_user_meta( $user_id, 'optionsframework_ignore_notice', 'true', true );
+		if ( isset( $_GET['wds_nag_ignore'] ) && '0' == $_GET['wds_nag_ignore'] ) {
+			add_user_meta( $user_id, 'wds_ignore_notice', 'true', true );
 		}
 	}
 
@@ -88,13 +90,24 @@ class Options_Framework_Admin {
     function settings_init() {
 
     	// Load Options Framework Settings
-        $optionsframework_settings = get_option( 'optionsframework' );
+        $wds_settings = get_option( 'webdogs_support' );
+
+        // Update options name for compatibility
+        $previous_options = get_option( 'webdogs', false );
+        
+        // If there are options here, 
+        // save them with the new name 
+        // and delete the previous options.
+        if( $previous_options ) {
+        	update_option( $wds_settings['id'], $previous_options );
+        	delete_option( 'webdogs' );
+        }
 
 		// Registers the settings fields and callback
-		register_setting( 'optionsframework', $optionsframework_settings['id'],  array ( $this, 'validate_options' ) );
+		register_setting( 'webdogs-support', $wds_settings['id'],  array( $this, 'validate_options' ) );
 
 		// Displays notice after options save
-		add_action( 'optionsframework_after_validate', array( $this, 'save_options_notice' ) );
+		add_action( 'wds_after_validate', array( $this, 'save_options_notice' ) );
 
 		if ( isset( $_GET['settings-updated'] ) && 'true' == $_GET['settings-updated'] ) {
 			add_action( 'current_screen', 'wds_maybe_clear_cache', 10, 1 );
@@ -107,7 +120,7 @@ class Options_Framework_Admin {
 	 *
 	 * Examples usage:
 	 *
-	 * add_filter( 'optionsframework_menu', function( $menu ) {
+	 * add_filter( 'wds_menu', function( $menu ) {
 	 *     $menu['page_title'] = 'The Options';
 	 *	   $menu['menu_title'] = 'The Options';
 	 *     return $menu;
@@ -124,10 +137,10 @@ class Options_Framework_Admin {
             'mode' => 'menu',
 
             // Submenu default settings
-            'page_title' => __('Support', 'options-framework'),
-			'menu_title' => __('Support', 'options-framework'),
+            'page_title' => __('Support', 'webdogs-support'),
+			'menu_title' => __('Support', 'webdogs-support'),
 			'capability' => 'manage_options',
-			'menu_slug' => 'options-framework',
+			'menu_slug' => 'webdogs-support',
             'parent_slug' => 'admin.php',
 
             // Menu default settings
@@ -137,7 +150,7 @@ class Options_Framework_Admin {
 
 		);
 
-		return apply_filters( 'optionsframework_menu', $menu );
+		return apply_filters( 'wds_menu', $menu );
 	}
 
 	/**
@@ -163,13 +176,6 @@ class Options_Framework_Admin {
                 	$menu['icon_url'],
                 	$menu['position']
                 );
-                /*$this->options_screen = add_submenu_page(
-                	$menu['menu_slug'],
-                	$menu['page_title'],
-                	$menu['menu_title'],
-                	$menu['capability'],
-                	$menu['menu_slug'],
-                	array( $this, 'options_page' ) );*/
                 break;
 
             default:
@@ -183,27 +189,15 @@ class Options_Framework_Admin {
                 	array( $this, 'options_page' ) );
                 break;
         }
-
-        /*$submenus = Self::optionsframework_tabs();
-        foreach ( $submenus as $submenu ) {
-			$this->options_screen = add_submenu_page(
-				$menu['menu_slug'],
-            	// add_query_arg( 'page', $menu['menu_slug'], $menu['parent_slug'] ),
-            	$menu['page_title'],
-            	$submenu['name'],
-            	$submenu['capability'],
-            	$menu['menu_slug'] . '&sub_section=' . $submenu['menu_slug'],
-            	array( $this, 'options_page' ) );
-        }*/
 	}
 
 	/**
 	 * Generates the tabs that are used in the options menu
 	 */
-	static function optionsframework_tabs() {
+	static function wds_tabs() {
 		$counter = 0;
-		$options = & Options_Framework::_optionsframework_options();
-		$options = apply_filters( 'of_options', $options );
+		$options = & Webdogs_Options::_wds_options();
+		$options = apply_filters( 'wds_options', $options );
 		$menu = array();
 
 		$indexes = array_values( array_map( 'absint', wp_list_pluck( array_values($options), 'order' ) ) );
@@ -245,7 +239,7 @@ class Options_Framework_Admin {
 
 	public function get_logo_icon() {
 
-	    $custom_logo_icon = of_get_option( 'logo_icon', false );
+	    $custom_logo_icon = wds_get_option( 'logo_icon', false );
 
 	    // return $custom_logo_icon;
 	    $color = 'currentColor';
@@ -292,6 +286,7 @@ class Options_Framework_Admin {
 	    }
 	    return false;
 	}
+
 	/*
 	 * Change the WP Logo Icon within the My Sites Menu to any icon you want
 	 * Update the NEW-ICON-HERE.png name to match the proper file name.
@@ -384,126 +379,60 @@ class Options_Framework_Admin {
      * @since 1.7.0
      */
 	function enqueue_admin_styles( $hook ) {  ?>
-<style type="text/css">
-
-	body {
-		background-color: transparent !important;
-	}
-	#wpadminbar .ab-top-menu>.menupop>.ab-sub-wrapper {
-	    min-width: initial !important;
-	}
-	#adminmenu #toplevel_page_options-framework div.wp-menu-image.svg {
-	    -webkit-background-size: 26px 26px;
-	    background-size: 26px 26px;
-	    height: 34px;
-	}
-	#wpadminbar .ab-top-secondary #wp-admin-bar-of_theme_options.menupop .ab-sub-wrapper {
-	    right: auto;
-	    left: -75%;
-	}
-	#wpadminbar #wp-admin-bar-of_theme_options .ab-icon:before {
-		top:2px;
-	}
-
-	#toplevel_page_options-framework .wp-menu-image.dashicons-before img {
-		height: 28px;
-	    width: 28px;
-	    padding-top: 2px;
-	    margin-left: -3px;
-	}
-	.webdogs-nag, 
-	.webdogs-nag.notice {
-	    color: #FFFFFF;
-	    text-align: left;
-	    vertical-align: middle;
-	    background-color: #666666;
-	    border-left-color: #377A9F;
-	    padding-left: 12px;
-	}
-	.webdogs-nag .webdogs-logo,
-	.webdogs-nag:before {
-		content: "WEBDOGS";
-		color:#FFFFFF;
-		background:url('<?php echo wd_get_icon_logo( '#FFFFFF', true, true ); ?>') no-repeat 0px 3px;
-		background-size: 36px;
-	    text-decoration: none;
-	    font-weight: bold;
-	    text-transform: uppercase;
-	    padding-right: 20px;
-	    padding-left: 42px;
-	    padding-top: 0px;
-	    padding-bottom: 2px;
-	    border-right: 1px solid #bbb;
-	    margin-top: 18px;
-	    margin-bottom: 16px;
-	    margin-right: 20px;
-	    height: 100% !important;
-	    line-height: 42px !important;
-	    overflow: visible;
-	    display: inline-block;
-	}
-	.webdogs-nag .webdogs-logo span {
-		text-decoration:none;
-		color:#FFFFFF;
-		vertical-align:middle;
-	}
-	.webdogs-nag p {
-		color: #FFFFFF;
-	    text-decoration: none;
-	    display: inline-block;
-	    vertical-align: middle;
-        max-width: 68%;
-        min-width: 280px;
-	}
-	.webdogs-nag p a {
-		color: #D0F2FC;
-		text-decoration: none;
-	}
-	.webdogs-nag p a:hover {
-		color: #fff;
-		border-bottom:1px dotted #D0F2FC;
-	} 
-	.webdogs-nag p strong,
-	.webdogs-nag p em {
-		font-weight:400;
-		font-style: normal;
-	}
-	.webdogs-nag p span {
-	    display: block;
-	    margin: 0.5em 0.5em 0.5em 0 !important;
-	    clear: both;
-	}
-	p.wd_notification_events {
-	    padding: 0 !important;
-	    line-height: 28px;
-	    margin-top: 0;
-	}
-	
-</style>
-<style type="text/css" id="logo_icon_style">
-<?php //echo html_entity_decode(of_get_option('logo_icon_css','')); ?>	
-</style>
-<?php
-
-		if ( $this->options_screen != $hook )
-	        return;
 
 
-		wp_enqueue_style('login');
-		wp_enqueue_style('forms');
-		wp_enqueue_style( 'optionsframework', plugin_dir_url( dirname(__FILE__) ) . 'css/optionsframework.css', array(),  Options_Framework::VERSION );
+		<style type="text/css">
+			body {
+				background-color: transparent !important;
+			}
+			#wpadminbar .ab-top-menu>.menupop>.ab-sub-wrapper {
+			    min-width: initial !important;
+			}
+			#adminmenu #toplevel_page_webdogs-support div.wp-menu-image.svg {
+			    -webkit-background-size: 26px 26px;
+			    background-size: 26px 26px;
+			    height: 34px;
+			}
+			#wpadminbar .ab-top-secondary #wp-admin-bar-wds_theme_options.menupop .ab-sub-wrapper {
+			    right: auto;
+			    left: -75%;
+			}
+			#wpadminbar #wp-admin-bar-wds_theme_options .ab-icon:before {
+				top:2px;
+			}
+			#toplevel_page_webdogs-support .wp-menu-image.dashicons-before img {
+				height: 28px;
+			    width: 28px;
+			    padding-top: 2px;
+			    margin-left: -3px;
+			}
+			#update-nag, .update-nag {
+				display: block !important;
+			}
+			
+		</style>
+
+
+		<?php
+
+		if ( $this->options_screen != $hook ) return;
+
+
+		wp_enqueue_style( 'login' );
+		wp_enqueue_style( 'forms' );
+		wp_enqueue_style( 'webdogs-support', plugin_dir_url( dirname(__FILE__) ) . 'css/optionsframework.css', array(),  Webdogs_Options::VERSION );
 		wp_enqueue_style( 'wp-color-picker' );
 	}
 
 
 	public function get_current_tab(){
-		$tabs = Self::optionsframework_tabs();
+		$tabs = Self::wds_tabs();
 
         foreach ( $tabs as $tab ) {
         	if( ! empty( $tab['active_tab'] ) && function_exists( $tab['active_tab'] ) ) {
-        		add_filter( 'of_filter_active_tab', $tab['active_tab'], 10, 1 );
+        		add_filter( 'wds_filter_active_tab', $tab['active_tab'], 10, 1 );
 
-        		$is_current = apply_filters( 'of_filter_active_tab', false );
+        		$is_current = apply_filters( 'wds_filter_active_tab', false );
 
         		if( $is_current ) {
         			return $tab['options_framework_tab'];
@@ -524,30 +453,30 @@ class Options_Framework_Admin {
 		if ( $this->options_screen != $hook )
 	        return;
 
-		wp_enqueue_script( 'svg-icon-font', plugin_dir_url( dirname(__FILE__) ) . 'js/svgiconfont.js', array(), Options_Framework::VERSION, true );
+		wp_enqueue_script( 'svg-icon-font', plugin_dir_url( dirname(__FILE__) ) . 'js/svgiconfont.js', array(), Webdogs_Options::VERSION, true );
 
-		// wp_enqueue_script( 'jquery-parallaxify', plugin_dir_url( dirname(__FILE__) ) . 'js/jquery.parallaxify.min.js', array( 'jquery' ), Options_Framework::VERSION, false );
-		// wp_enqueue_script( 'wds_sass', plugin_dir_url( dirname(__FILE__) ) . 'js/sass.js', array(), false, Options_Framework::VERSION );
+		// wp_enqueue_script( 'jquery-parallaxify', plugin_dir_url( dirname(__FILE__) ) . 'js/jquery.parallaxify.min.js', array( 'jquery' ), Webdogs_Options::VERSION, false );
+		// wp_enqueue_script( 'wds_sass', plugin_dir_url( dirname(__FILE__) ) . 'js/sass.js', array(), false, Webdogs_Options::VERSION );
 		
 		// Enqueue custom option panel JS
-		wp_enqueue_script( 'options-custom', plugin_dir_url( dirname(__FILE__) ) . 'js/options-custom.js', array( 'jquery','wp-color-picker' ), Options_Framework::VERSION, true );
+		wp_enqueue_script( 'options-custom', plugin_dir_url( dirname(__FILE__) ) . 'js/options-custom.js', array( 'jquery','wp-color-picker' ), Webdogs_Options::VERSION, true );
 
 		if( $this->get_current_tab() ) {
 			$current = $this->get_current_tab();
 			wp_localize_script( 'options-custom', 'options_framework_tab', $current );
 		}
 
-		wp_enqueue_script( 'admin-color-schemes', plugin_dir_url( dirname(__FILE__) ) . 'js/admin-color-schemes.js', array( 'jquery', 'wp-color-picker' ), Options_Framework::VERSION, true );
+		wp_enqueue_script( 'admin-color-schemes', plugin_dir_url( dirname(__FILE__) ) . 'js/admin-color-schemes.js', array( 'jquery', 'wp-color-picker' ), Webdogs_Options::VERSION, true );
 		
 		// Inline scripts from options-interface.php
-		add_action( 'admin_head', array( $this, 'of_admin_head' ) );
+		add_action( 'admin_head', array( $this, 'wds_admin_head' ) );
 
 
 	}
 
-	function of_admin_head() {
+	function wds_admin_head() {
 		// Hook to add custom scripts
-		do_action( 'optionsframework_custom_scripts' );
+		do_action( 'wds_custom_scripts' );
 	}
 
 
@@ -559,7 +488,7 @@ class Options_Framework_Admin {
      *
 	 * If we were using the Settings API as it was intended we would use
 	 * do_settings_sections here.  But as we don't want the settings wrapped in a table,
-	 * we'll call our own custom optionsframework_fields.  See options-interface.php
+	 * we'll call our own custom wds_fields.  See options-interface.php
 	 * for specifics on how each individual field is generated.
 	 *
 	 * Nonces are provided using the settings_fields()
@@ -568,28 +497,28 @@ class Options_Framework_Admin {
      */
 	function options_page() { ?>
 
-	<div id="optionsframework-wrap" class="wrap">
+	<div id="wds-wrap" class="wrap">
 		
-		<?php Options_Framework_Admin_Color_Schemes::get_Sass_JS(); ?>
+		<?php Webdogs_Admin_Color_Schemes::get_Sass_JS(); ?>
 
 		<?php $menu = Self::menu_settings(); ?>
 
 		<h1><?php echo esc_html( $menu['page_title'] ); ?> <span class="subtitle alignright">v<?php print WEBDOGS_VERSION; ?></span></h1>
 
-	    <?php settings_errors( 'options-framework' ); ?>
+	    <?php //settings_errors( 'webdogs-support' ); ?>
 
 	    <h2 class="nav-tab-wrapper">
-	        <?php echo Options_Framework_Interface::optionsframework_tabs(); ?>
+	        <?php echo Webdogs_Interface::wds_tabs(); ?>
 	    </h2>
-	    <div id="optionsframework-metabox" class="metabox-holder">
+	    <div id="wds-metabox" class="metabox-holder">
 		    <div id="optionsframework" class="postbox">
-				<?php /*settings_fields( 'optionsframework' );*/ ?>
-				<?php Options_Framework_Interface::optionsframework_fields(); /* Settings */ ?>
+				<?php /*settings_fields( 'webdogs-support' );*/ ?>
+				<?php Webdogs_Interface::wds_fields(); /* Settings */ ?>
 				
 				
 			</div> <!-- / #container -->
 		</div>
-		<?php do_action( 'optionsframework_after' ); ?>
+		<?php do_action( 'wds_after' ); ?>
 	</div> <!-- / .wrap -->
 
 	<?php
@@ -614,7 +543,7 @@ class Options_Framework_Admin {
 		 */
 
 		if ( isset( $_POST['reset'] ) ) {
-			add_settings_error( 'options-framework', 'restore_defaults', __( 'Default options restored.', 'options-framework' ), 'updated fade' );
+			add_settings_error( 'webdogs-support', 'restore_defaults', __( 'Default options restored.', 'webdogs-support' ), 'updated fade' );
 			return $this->get_default_values();
 		}
 
@@ -626,9 +555,11 @@ class Options_Framework_Admin {
 		 */
 
 
-		$config = get_option( 'optionsframework' );
+		$config = get_option( 'webdogs_support' );
+
 		$clean  = isset( $config['id'] ) ? get_option( $config['id'] ) : array() ;
-		$options = & Options_Framework::_optionsframework_options();
+
+		$options = & Webdogs_Options::_wds_options();
 		foreach ( $options as $option ) {
 
 			if ( ! isset( $option['id'] ) ) {
@@ -659,13 +590,13 @@ class Options_Framework_Admin {
 			}
 
 			// For a value to be submitted to database it must pass through a sanitization filter
-			if ( has_filter( 'of_sanitize_' . $option['type'] ) ) {
-				$clean[$id] = apply_filters( 'of_sanitize_' . $option['type'], $input[$id], $option );
+			if ( has_filter( 'wds_sanitize_' . $option['type'] ) ) {
+				$clean[$id] = apply_filters( 'wds_sanitize_' . $option['type'], $input[$id], $option );
 			}
 		}
 
 		// Hook to run after validation
-		do_action( 'optionsframework_after_validate', $clean );
+		do_action( 'wds_after_validate', $clean );
 
 		return $clean;
 	}
@@ -688,7 +619,7 @@ class Options_Framework_Admin {
 	 */
 
 	function save_options_notice() {
-		add_settings_error( 'options-framework', 'save_options', __( 'Options saved.', 'options-framework' ), 'updated fade' );
+		add_settings_error( 'webdogs-support', 'save_options', __( 'Options saved.', 'webdogs-support' ), 'updated fade' );
 	}
 
 	/**
@@ -706,7 +637,7 @@ class Options_Framework_Admin {
 
 	function get_default_values() {
 		$output = array();
-		$config = & Options_Framework::_optionsframework_options();
+		$config = & Webdogs_Options::_wds_options();
 		foreach ( (array) $config as $option ) {
 			if ( ! isset( $option['id'] ) ) {
 				continue;
@@ -717,8 +648,8 @@ class Options_Framework_Admin {
 			if ( ! isset( $option['type'] ) ) {
 				continue;
 			}
-			if ( has_filter( 'of_sanitize_' . $option['type'] ) ) {
-				$output[$option['id']] = apply_filters( 'of_sanitize_' . $option['type'], $option['std'], $option );
+			if ( has_filter( 'wds_sanitize_' . $option['type'] ) ) {
+				$output[$option['id']] = apply_filters( 'wds_sanitize_' . $option['type'], $option['std'], $option );
 			}
 		}
 		return $output;
@@ -728,7 +659,7 @@ class Options_Framework_Admin {
 	 * Add options menu item to admin bar
 	 */
 
-	function optionsframework_admin_bar() {
+	function wds_admin_bar() {
 
 		// Don't show for logged out users.
 	    if ( ! is_user_logged_in() )
@@ -743,7 +674,7 @@ class Options_Framework_Admin {
 		global $wp_admin_bar;
 
 		if ( 'menu' == $menu['mode'] ) {
-			$href = admin_url( 'admin.php?page=' . $menu['menu_slug'] );
+			$href = admin_url(  'admin.php?page=' . $menu['menu_slug'] );
 		} else {
 			$href = admin_url( 'themes.php?page=' . $menu['menu_slug'] );
 		}
@@ -754,12 +685,12 @@ class Options_Framework_Admin {
 
 		$args = array(
 			'parent' => 'top-secondary',
-			'id' => 'of_theme_options',
+			'id' => 'wds_theme_options',
 			'title' => $menu_title,
 			'href' => $href
 		);
 
-		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar', $args ) );
+		$wp_admin_bar->add_menu( apply_filters( 'wds_admin_bar', $args ) );
 		
 
 		global $wpengine_platform_config;
@@ -787,7 +718,7 @@ class Options_Framework_Admin {
 			if( ! is_wpe_snapshot() && $snapshot_info['have_snapshot'] && $snapshot_info['is_ready'] && $staging_url ) {
 				
 				$args = array(
-					'parent' => 'of_theme_options',
+					'parent' => 'wds_theme_options',
 					'id' => 'wpe_environment',
 					'title' => "View Page on Staging",
 					'href' => $this->maybe_ssl( "$staging_url$request_uri" ),
@@ -797,7 +728,7 @@ class Options_Framework_Admin {
 			elseif ( is_wpe_snapshot() ) {
 
 				$args = array(
-					'parent' => 'of_theme_options',
+					'parent' => 'wds_theme_options',
 					'id' => 'wpe_environment',
 					'title' => "Open page on Production",
 					'href' => $this->maybe_ssl( "$production_url$request_uri" ),
@@ -807,7 +738,7 @@ class Options_Framework_Admin {
 
 			if( !empty( $args ) ) {
 
-				$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar_environment_submenu', $args ) );
+				$wp_admin_bar->add_menu( apply_filters( 'wds_admin_bar_environment_submenu', $args ) );
 
 			}
 		}
@@ -815,7 +746,7 @@ class Options_Framework_Admin {
 
 		$args = array(
 			'id'     => 'maintenance_notification',
-			'parent' => 'of_theme_options',
+			'parent' => 'wds_theme_options',
 			'meta'   => array( 'class' => 'first-toolbar-group' )
 		);
 		$wp_admin_bar->add_group( $args );
@@ -824,33 +755,33 @@ class Options_Framework_Admin {
 			'parent' => 'maintenance_notification',
 			'id' => 'maintenance_notification_test',
 			'title' => 'Test Maintenance Notification',
-			'href' => add_query_arg( 'wd_send_maintenance_notification', 'test', $href )
+			'href' => add_query_arg( 'wds_send_maintenance_notification', 'test', $href )
 		);
 
-		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar_maintenance_notification_test_submenu', $args ) );
+		$wp_admin_bar->add_menu( apply_filters( 'wds_admin_bar_maintenance_notification_test_submenu', $args ) );
 
 		$args = array(
 			'parent' => 'maintenance_notification',
 			'id' => 'maintenance_notification_force',
 			'title' => 'Test Maintenance Notification Email',
-			'href' => add_query_arg( array( 'wd_send_maintenance_notification'=>'test', 'force_send'=>'force'), $href )
+			'href' => add_query_arg( array( 'wds_send_maintenance_notification'=>'test', 'force_send'=>'force'), $href )
 		);
 
-		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar_maintenance_notification_force_submenu', $args ) );
+		$wp_admin_bar->add_menu( apply_filters( 'wds_admin_bar_maintenance_notification_force_submenu', $args ) );
 
 
 
 
 		$args = array(
 			'id'     => 'plugin_recomendation',
-			'parent' => 'of_theme_options',
+			'parent' => 'wds_theme_options',
 			'meta'   => array( 'class' => 'second-toolbar-group' )
 		);
 		$wp_admin_bar->add_group( $args );
 
-		$plugin_activation = $GLOBALS['optionsframeworkpluginactivation'];
+		$plugin_activation = $GLOBALS['wds_plugin_activation'];
 
-		$href = $plugin_activation->get_optionsframework_url();
+		$href = $plugin_activation->get_wds_url();
 		
 		$args = array(
 			'parent' => 'plugin_recomendation',
@@ -859,7 +790,7 @@ class Options_Framework_Admin {
 			'href' => $href
 		);
 
-		$wp_admin_bar->add_menu( apply_filters( 'optionsframework_admin_bar_plugin_activation_submenu', $args ) );
+		$wp_admin_bar->add_menu( apply_filters( 'wds_admin_bar_plugin_activation_submenu', $args ) );
 			
 	}
 
