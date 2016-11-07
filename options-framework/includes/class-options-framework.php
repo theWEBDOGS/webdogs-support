@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   Webdogs
+ * @package   Options Framework
  * @author    Devin Price <devin@wptheming.com>
  * @license   GPL-2.0+
  * @link      http://wptheming.com
@@ -37,7 +37,7 @@ class Webdogs_Options {
 	function set_support_option() {
 
 		// Load settings
-        $wds_settings = get_option( 'webdogs_support', get_option( 'optionsframework' ) );
+        $wds_settings = get_option( 'webdogs_support' );
 
         // Updates the unique option id in the database if it has changed
         if ( function_exists( 'wds_option_name' ) ) {

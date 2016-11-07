@@ -92,8 +92,19 @@ class Webdogs_Admin {
     	// Load Options Framework Settings
         $wds_settings = get_option( 'webdogs_support' );
 
+        // Update options name for compatibility
+        $previous_options = get_option( 'webdogs', false );
+        
+        // If there are options here, 
+        // save them with the new name 
+        // and delete the previous options.
+        if( $previous_options ) {
+        	update_option( $wds_settings['id'], $previous_options );
+        	delete_option( 'webdogs' );
+        }
+
 		// Registers the settings fields and callback
-		register_setting( 'webdogs-support', $wds_settings['id'],  array ( $this, 'validate_options' ) );
+		register_setting( 'webdogs-support', $wds_settings['id'],  array( $this, 'validate_options' ) );
 
 		// Displays notice after options save
 		add_action( 'wds_after_validate', array( $this, 'save_options_notice' ) );
@@ -165,13 +176,6 @@ class Webdogs_Admin {
                 	$menu['icon_url'],
                 	$menu['position']
                 );
-                /*$this->options_screen = add_submenu_page(
-                	$menu['menu_slug'],
-                	$menu['page_title'],
-                	$menu['menu_title'],
-                	$menu['capability'],
-                	$menu['menu_slug'],
-                	array( $this, 'options_page' ) );*/
                 break;
 
             default:
@@ -185,18 +189,6 @@ class Webdogs_Admin {
                 	array( $this, 'options_page' ) );
                 break;
         }
-
-        /*$submenus = Self::wds_tabs();
-        foreach ( $submenus as $submenu ) {
-			$this->options_screen = add_submenu_page(
-				$menu['menu_slug'],
-            	// add_query_arg( 'page', $menu['menu_slug'], $menu['parent_slug'] ),
-            	$menu['page_title'],
-            	$submenu['name'],
-            	$submenu['capability'],
-            	$menu['menu_slug'] . '&sub_section=' . $submenu['menu_slug'],
-            	array( $this, 'options_page' ) );
-        }*/
 	}
 
 	/**
@@ -564,7 +556,9 @@ class Webdogs_Admin {
 
 
 		$config = get_option( 'webdogs_support' );
+
 		$clean  = isset( $config['id'] ) ? get_option( $config['id'] ) : array() ;
+
 		$options = & Webdogs_Options::_wds_options();
 		foreach ( $options as $option ) {
 

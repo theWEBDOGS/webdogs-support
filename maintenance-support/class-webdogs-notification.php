@@ -363,8 +363,8 @@ class Webdogs_Maintenance_Notification
           $month = date('n');
             $day = date('j');
 
-           $freq = wds_get_option( 'maintenance_notification_frequency', 3  );
-         $offset = wds_get_option( 'maintenance_notification_offset',   '1' );
+           $freq = absint( wds_get_option( 'maintenance_notification_frequency', 3 ) );
+         $offset = absint( wds_get_option( 'maintenance_notification_offset',    1 ) );
            
            $time = absint( $day ) > absint( $offset ) 
 
@@ -385,6 +385,8 @@ class Webdogs_Maintenance_Notification
                     ?   $month 
                     : --$month ;
 
+        $freq = ( 0 === $freq ) ? 3 : $freq ;
+        
         $active_this_year = Self::get_active_dates( $freq, $offset, $month, $year );
         $active_next_year = Self::get_active_dates( $freq, $offset, 1,  1 + $year );
 
@@ -466,7 +468,7 @@ class Webdogs_Maintenance_Notification
         $n = 0;
         for ($i = $month; $i <= 12; $i++) {
 
-            $parsed = mktime(0, 0, 0, $i, $day, $year  );
+            $parsed = mktime(0, 0, 0, $i, $day, $year );
 
             if( $i % $freq === 0 && $parsed > $date ) {
                 $m = ( $i < 12 ) ? $i+1 : 1 ;

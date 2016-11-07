@@ -1,25 +1,40 @@
 <?php
 
 defined( 'WPINC' ) or die;
+
 /**
- * @package   Webdogs
+ * @package   Options Framework
  * @author    Devin Price <devin@wptheming.com>
  * @license   GPL-2.0+
  * @link      http://wptheming.com
  * @copyright 2010-2016 WP Theming
  */
 
-
 class Webdogs_Interface {
 
-	
+	private static $filtered_options = array();
+
 	/**
 	 * Generates the tabs that are used in the options menu
 	 */
-	static function wds_tabs() {
-		$counter = 0;
+	static private function wds_get_filtered_options() {
+
+		if( ! empty( Self::$filtered_options ) ) return Self::$filtered_options;
+
 		$options = & Webdogs_Options::_wds_options();
-		$options = apply_filters( 'wds_options', $options );
+		Self::$filtered_options = apply_filters( 'wds_options', $options );
+
+		return Self::$filtered_options;
+	}
+
+	/**
+	 * Generates the index ordered tabs that are used in the options menu
+	 */
+	static function wds_tabs() {
+
+		$options = Self::wds_get_filtered_options();
+
+		$counter = 0;
 		$menu = array();
 
 		$indexes = array_values( array_map( 'absint', wp_list_pluck( array_values($options), 'order' ) ) );
@@ -118,20 +133,17 @@ class Webdogs_Interface {
 	static function wds_fields() {
 
 		global $allowedtags;
-		$wds_settings = get_option( 'webdogs_support' );
 
-		// Gets the unique option id
+		$wds_settings = get_option( 'webdogs_support'  );
+
 		if ( isset( $wds_settings['id'] ) ) {
 			$option_name = $wds_settings['id'];
-		}
-		else {
-			$option_name = 'webdogs-support';
+		} else {
+			$option_name = 'wds_support_options';
 		};
 
-		$settings = get_option($option_name);
-		$options = & Webdogs_Options::_wds_options();
-
-		$options = apply_filters( 'wds_options', $options );
+		$settings = get_option( $option_name );
+		$options  = Self::wds_get_filtered_options();
 
 		$counter = 0;
 		$wrapper = 0;
@@ -488,7 +500,6 @@ class Webdogs_Interface {
 					
 					// $output .= '<p class="explain">' . esc_html( $explain_value ) . '</p>';
 
-
 					$output .= wp_nonce_field( Webdogs_Admin_Color_Schemes::NONCE, '_acs_ofnonce', null, false );
 
 					$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][name]' ) . '" id="' . esc_attr( $value['id'] . '_name' ) . '" class="of-hidden of-scheme"  type="hidden" value="' . esc_attr( get_bloginfo( 'name' ) ) . '" />';
@@ -790,9 +801,6 @@ class Webdogs_Interface {
 		// OUTPUT DYNAMIC JS 
 		// FOR CONDITIONAL FIEILD UX 
 		Self::wds_rules();
-
-		// var_export(Webdogs_Login_Logo::$instance);
-
 	}
 
 	/**
@@ -800,8 +808,7 @@ class Webdogs_Interface {
 	 */
 	static function wds_rules() {
 		$counter = 0;
-		$options = &Webdogs_Options::_wds_options();
-		$options = apply_filters( 'wds_options', $options );
+		$options  = Self::wds_get_filtered_options();
 
 		/////////////////
 		// JQUERY SCRIPT 
@@ -864,7 +871,6 @@ class Webdogs_Interface {
 			if ( isset( $rule['set'] ) ) {
 
 				$el     = sprintf( $format['this'],  $rule['id']);
-				// $on     = sprintf( $format['on'],    $rule['on']);
 				$val    = sprintf( $format['val'],   $rule['id'], $filter, $not);
 				$field  = sprintf( $format['field'], $id, $find);
 
@@ -958,7 +964,6 @@ class Webdogs_Interface {
 			if( isset( $rule['exe'] ) ) {
 
 				$el     = sprintf( $format['this'],   $id);
-				// $on     = sprintf( $format['on'],     $rule['on']);
 				$val    = sprintf( $format['val'],    $id, $filter, $not );
 				$target = sprintf( $format['target'], $rule['id'], $find );
 
@@ -1087,8 +1092,5 @@ var wds_options = {
 	<?php echo $conditions; ?>
 
 </script>
-<?
-
-		return $allrulez;
-	}
+<? }
 }

@@ -9,7 +9,7 @@ defined( 'WPINC' ) or die;
 function wds_option_name() {
 
 						$id = 'wds_support_options';
-	      $optionsframework = get_option('webdogs_support', get_option('optionsframework' ) );
+	      $optionsframework = get_option('webdogs_support' );
 	$optionsframework['id'] = $id;
 	
 	update_option( 'webdogs_support', $optionsframework );
