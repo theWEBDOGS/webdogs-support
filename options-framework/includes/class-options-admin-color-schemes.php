@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 defined( 'WPINC' ) or die;
 
-class Options_Framework_Admin_Color_Schemes {
+class Webdogs_Admin_Color_Schemes {
 	private static $instance;
 	private $base;
 	const OPTION = 'admin-color-schemes';
@@ -56,56 +56,56 @@ class Options_Framework_Admin_Color_Schemes {
 
 		// Set up color arrays - need translations
 		$this->colors['basic'] = array(
-			'base_color' => __( 'Base', 'options-framework' ),
-			'icon_color' => __( 'Icon', 'options-framework' ),
-			'highlight_color' => __( 'Highlight', 'options-framework' ),
-			'notification_color' => __( 'Notification', 'options-framework' ),
-			'link' => __( 'Link', 'options-framework' ),
+			'base_color' => __( 'Base', 'webdogs-support' ),
+			'icon_color' => __( 'Icon', 'webdogs-support' ),
+			'highlight_color' => __( 'Highlight', 'webdogs-support' ),
+			'notification_color' => __( 'Notification', 'webdogs-support' ),
+			'link' => __( 'Link', 'webdogs-support' ),
 		);
 
 		$this->colors['icon'] = array(
-			'menu_icon' => __( 'Base icon', 'options-framework' ),
-			'menu_highlight_icon' => __( 'Focus icon', 'options-framework' ),
-			'menu_current_icon' => __( 'Current icon', 'options-framework' )
+			'menu_icon' => __( 'Base icon', 'webdogs-support' ),
+			'menu_highlight_icon' => __( 'Focus icon', 'webdogs-support' ),
+			'menu_current_icon' => __( 'Current icon', 'webdogs-support' )
 		);
 
 		$this->colors['advanced'] = array(
-			'button_color' => __( 'Button', 'options-framework' ),
-			'text_color' => __( 'Text (over Base)', 'options-framework' ),
-			'body_background' => __( 'Body background', 'options-framework' ),
-			'link_focus' => __( 'Link interaction', 'options-framework' ),
-			'form_checked' => __( 'Checked form controls', 'options-framework' ),
-			'menu_background' => __( 'Menu background', 'options-framework' ),
-			'menu_text' => __( 'Menu text', 'options-framework' ),
-			// 'menu_icon' => __( 'Menu icon', 'options-framework' ),
-			'menu_highlight_background' => __( 'Menu highlight background', 'options-framework' ),
-			'menu_highlight_text' => __( 'Menu highlight text', 'options-framework' ),
-			// 'menu_highlight_icon' => __( 'Menu highlight icon', 'options-framework' ),
-			'menu_current_background' => __( 'Menu current background', 'options-framework' ),
-			'menu_current_text' => __( 'Menu current text', 'options-framework' ),
-			// 'menu_current_icon' => __( 'Menu current icon', 'options-framework' ),
-			'menu_submenu_background' => __( 'Submenu background', 'options-framework' ),
-			'menu_submenu_text' => __( 'Submenu text', 'options-framework' ),
-			'menu_submenu_background_alt' => __( 'Submenu alt background', 'options-framework' ),
-			'menu_submenu_focus_text' => __( 'Submenu text interaction', 'options-framework' ),
-			'menu_submenu_current_text' => __( 'Submenu current text', 'options-framework' ),
-			'menu_bubble_background' => __( 'Bubble background', 'options-framework' ),
-			'menu_bubble_text' => __( 'Bubble text', 'options-framework' ),
-			'menu_bubble_current_background' => __( 'Bubble current background', 'options-framework' ),
-			'menu_bubble_current_text' => __( 'Bubble current text', 'options-framework' ),
-			'menu_collapse_text' => __( 'Menu collapse text', 'options-framework' ),
-			'menu_collapse_icon' => __( 'Menu collapse icon', 'options-framework' ),
-			'menu_collapse_focus_text' => __( 'Menu collapse text interaction', 'options-framework' ),
-			'menu_collapse_focus_icon' => __( 'Menu collapse icon interaction', 'options-framework' ),
-			'adminbar_avatar_frame' => __( 'Toolbar avatar frame', 'options-framework' ),
-			'adminbar_input_background' => __( 'Toolbar input background', 'options-framework' ),
+			'button_color' => __( 'Button', 'webdogs-support' ),
+			'text_color' => __( 'Text (over Base)', 'webdogs-support' ),
+			'body_background' => __( 'Body background', 'webdogs-support' ),
+			'link_focus' => __( 'Link interaction', 'webdogs-support' ),
+			'form_checked' => __( 'Checked form controls', 'webdogs-support' ),
+			'menu_background' => __( 'Menu background', 'webdogs-support' ),
+			'menu_text' => __( 'Menu text', 'webdogs-support' ),
+			// 'menu_icon' => __( 'Menu icon', 'webdogs-support' ),
+			'menu_highlight_background' => __( 'Menu highlight background', 'webdogs-support' ),
+			'menu_highlight_text' => __( 'Menu highlight text', 'webdogs-support' ),
+			// 'menu_highlight_icon' => __( 'Menu highlight icon', 'webdogs-support' ),
+			'menu_current_background' => __( 'Menu current background', 'webdogs-support' ),
+			'menu_current_text' => __( 'Menu current text', 'webdogs-support' ),
+			// 'menu_current_icon' => __( 'Menu current icon', 'webdogs-support' ),
+			'menu_submenu_background' => __( 'Submenu background', 'webdogs-support' ),
+			'menu_submenu_text' => __( 'Submenu text', 'webdogs-support' ),
+			'menu_submenu_background_alt' => __( 'Submenu alt background', 'webdogs-support' ),
+			'menu_submenu_focus_text' => __( 'Submenu text interaction', 'webdogs-support' ),
+			'menu_submenu_current_text' => __( 'Submenu current text', 'webdogs-support' ),
+			'menu_bubble_background' => __( 'Bubble background', 'webdogs-support' ),
+			'menu_bubble_text' => __( 'Bubble text', 'webdogs-support' ),
+			'menu_bubble_current_background' => __( 'Bubble current background', 'webdogs-support' ),
+			'menu_bubble_current_text' => __( 'Bubble current text', 'webdogs-support' ),
+			'menu_collapse_text' => __( 'Menu collapse text', 'webdogs-support' ),
+			'menu_collapse_icon' => __( 'Menu collapse icon', 'webdogs-support' ),
+			'menu_collapse_focus_text' => __( 'Menu collapse text interaction', 'webdogs-support' ),
+			'menu_collapse_focus_icon' => __( 'Menu collapse icon interaction', 'webdogs-support' ),
+			'adminbar_avatar_frame' => __( 'Toolbar avatar frame', 'webdogs-support' ),
+			'adminbar_input_background' => __( 'Toolbar input background', 'webdogs-support' ),
 		);
 
 		// Hooks
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_post_admin-color-schemes-save', array( $this, 'save' ) );
 		add_action( 'wp_ajax_admin-color-schemes-save',    array( $this, 'save' ) );
-		add_action( 'optionsframework_after_validate',     array( $this, 'of_save' ) );
+		add_action( 'wds_after_validate',     array( $this, 'wds_save' ) );
 
 
 		add_filter( 'get_color_scheme_options',    array( __CLASS__, 'filter_color_scheme_options'), 10, 1 );
@@ -224,7 +224,7 @@ class Options_Framework_Admin_Color_Schemes {
 
 
 	public function admin_menu() {
-		// $hook = add_management_page( 'Admin Color Scheme', 'Admin Colors', 'manage_support_options', 'options-framework', array( $this, 'admin_page' ) );
+		// $hook = add_management_page( 'Admin Color Scheme', 'Admin Colors', 'manage_support_options', 'webdogs-support', array( $this, 'admin_page' ) );
 		// add_action( 'load-' . $hook, array( $this, 'load' ) );
 	}
 
@@ -476,8 +476,8 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 
 	public function admin_enqueue_scripts() {
 		// Compile and write!
-		// wp_enqueue_script( 'options-framework', plugins_url( '/js/admin-color-scheme.js', dirname( __FILE__ ) ), array( 'wp-color-picker' ), false, true );
-		// wp_enqueue_style( 'options-framework', plugins_url( '/css/admin-color-scheme.css', dirname( __FILE__ ) ), array( 'wp-color-picker' ) );
+		// wp_enqueue_script( 'webdogs-support', plugins_url( '/js/admin-color-scheme.js', dirname( __FILE__ ) ), array( 'wp-color-picker' ), false, true );
+		// wp_enqueue_style( 'webdogs-support', plugins_url( '/css/admin-color-scheme.css', dirname( __FILE__ ) ), array( 'wp-color-picker' ) );
 	}
 
 	public function admin_page() {
@@ -561,14 +561,14 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 			$scheme = $this->get_color_scheme();
 		}
 
-		$optionsframework_settings = get_option( 'optionsframework' );
+		$wds_settings = get_option( 'webdogs_support' );
 
 		// Gets the unique option id
-		if ( isset( $optionsframework_settings['id'] ) ) {
-			$option_name = $optionsframework_settings['id'];
+		if ( isset( $wds_settings['id'] ) ) {
+			$option_name = $wds_settings['id'];
 		}
 		else {
-			$option_name = 'optionsframework';
+			$option_name = 'webdogs-support';
 		};
 
 		$colors = $this->get_colors( 'keys' );
@@ -594,7 +594,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 			if ( $doing_ajax ) {
 				$response = array(
 					'errors' => true,
-					'message' => wds_base_strings( 'acs_selections_preview' )//__( 'Please make more selections to preview the color scheme.', 'options-framework' ),
+					'message' => wds_base_strings( 'acs_selections_preview' )//__( 'Please make more selections to preview the color scheme.', 'webdogs-support' ),
 				);
 
 				echo json_encode( $response );
@@ -704,7 +704,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 		exit;
 	}
 
-	public function of_save() {
+	public function wds_save() {
 
 		if( ! current_user_can( 'manage_support_options' )){ return; }
 
@@ -715,14 +715,14 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 
 		add_filter( 'scss_keys', 'format_scss_keys', 10 , 1 );
 
-		$optionsframework_settings = get_option( 'optionsframework' );
+		$wds_settings = get_option( 'webdogs_support' );
 
 		// Gets the unique option id
-		if ( isset( $optionsframework_settings['id'] ) ) {
-			$option_name = $optionsframework_settings['id'];
+		if ( isset( $wds_settings['id'] ) ) {
+			$option_name = $wds_settings['id'];
 		}
 		else {
-			$option_name = 'optionsframework';
+			$option_name = 'webdogs-support';
 		};
 
 		$colors = $this->get_colors( 'keys' );
@@ -747,7 +747,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 
 			// reset color scheme object
 			$scheme = $this->get_color_scheme();
-			// add_settings_error( 'options-framework', 'color_css', 'Using default color scheme.', 'update-nag dismissable' );
+			// add_settings_error( 'webdogs-support', 'color_css', 'Using default color scheme.', 'update-nag dismissable' );
 			return true;
 		}
 
@@ -756,7 +756,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 		// okay, let's see about getting credentials
 		// @todo: what to do about preview
 		if ( false === ( $creds = request_filesystem_credentials( $this->admin_url() ) ) ) {
-			add_settings_error( 'options-framework', 'color_css', wds_base_strings( 'acs_write_compiled_fail' ), 'error' );
+			add_settings_error( 'webdogs-support', 'color_css', wds_base_strings( 'acs_write_compiled_fail' ), 'error' );
 			return true;
 		}
 
@@ -789,7 +789,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 		if ( ! $wp_filesystem->put_contents( $scss_file, apply_filters( 'custom.scss', $scss ), FS_CHMOD_FILE ) ) {
 
 			// @todo: error that the scheme couldn't be written and redirect
-			add_settings_error( 'options-framework', 'color_css', wds_base_strings( 'acs_write_custom_fail' ), 'error' );
+			add_settings_error( 'webdogs-support', 'color_css', wds_base_strings( 'acs_write_custom_fail' ), 'error' );
 			return true;
 		}
 
@@ -800,7 +800,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 
 		if ( ! $wp_filesystem->put_contents( $css_file, $css, FS_CHMOD_FILE) ) {
 
-			add_settings_error( 'options-framework', 'color_css', wds_base_strings( 'acs_write_compiled_fail' ), 'update-nag dismissable' );
+			add_settings_error( 'webdogs-support', 'color_css', wds_base_strings( 'acs_write_compiled_fail' ), 'update-nag dismissable' );
 
 			return true;
 			// @todo: error that the compiled scheme couldn't be written and redirect
@@ -815,7 +815,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 		// switch to the scheme
 		// update_user_meta( get_current_user_id(), 'admin_color', $scheme->slug );
 
-		// add_settings_error( 'options-framework', 'color_css', 'the admin color scheme has been updated.', 'update-nag' );
+		// add_settings_error( 'webdogs-support', 'color_css', 'the admin color scheme has been updated.', 'update-nag' );
 	}
 
 	public function maybe_copy_core_files( $upload_dir ) {
@@ -879,12 +879,13 @@ class Admin_Bar_Color {
 		add_action( 'wp_enqueue_scripts',    array( $this, 'wp_enqueue_style' ) );
 		add_action( 'wp_enqueue_scripts',    array( $this, 'enqueue_admin_bar_color' ) );
 
-		add_action( 'optionsframework_after_validate',     array( $this, 'save_logo_icon_css_file' ), 100 );
+		add_action( 'wds_after_validate',     array( $this, 'save_logo_icon_css_file' ), 100 );
 	}
 
-	public function wp_enqueue_style(){
+	public function wp_enqueue_style(){ ?>
+		<style type="text/css" id="logo_icon_style"></style><?php
 
-		if( empty( of_get_option('logo_icon_css','') ) ) { return; }
+		if( empty( wds_get_option('logo_icon_css','') ) ) { return; }
 
 		$wp_upload_dir = wp_upload_dir();
 		$upload_dir = $wp_upload_dir['basedir'] . '/admin-color-scheme';
@@ -917,17 +918,17 @@ class Admin_Bar_Color {
 
 		if( ! current_user_can( 'manage_support_options' )){ return; }
 
-		check_admin_referer( Options_Framework_Admin_Color_Schemes::NONCE, '_acs_ofnonce' );
+		check_admin_referer( Webdogs_Admin_Color_Schemes::NONCE, '_acs_ofnonce' );
 		$_post = stripslashes_deep( $_POST );
 
-		$optionsframework_settings = get_option( 'optionsframework' );
+		$wds_settings = get_option( 'webdogs_support' );
 
 		// Gets the unique option id
-		if ( isset( $optionsframework_settings['id'] ) ) {
-			$option_name = $optionsframework_settings['id'];
+		if ( isset( $wds_settings['id'] ) ) {
+			$option_name = $wds_settings['id'];
 		}
 		else {
-			$option_name = 'optionsframework';
+			$option_name = 'webdogs-support';
 		};
 
 		$logo_icon_font_css = ( isset( $_post[ $option_name ][ 'logo_icon_css' ] ) ) ? $_post[ $option_name ][ 'logo_icon_css' ] : false ;
@@ -939,7 +940,7 @@ class Admin_Bar_Color {
 		// okay, let's see about getting credentials
 		// @todo: what to do about preview
 		if ( false === ( $creds = request_filesystem_credentials( $this->admin_url() ) ) ) {
-			add_settings_error( 'options-framework', 'logo_icon_css', wds_base_strings( 'acs_write_custom_fail' ), 'error' );
+			add_settings_error( 'webdogs-support', 'logo_icon_css', wds_base_strings( 'acs_write_custom_fail' ), 'error' );
 			return true;
 		}
 
@@ -975,7 +976,7 @@ class Admin_Bar_Color {
 		if ( ! $wp_filesystem->put_contents( $css_file, $logo_icon_font_css, FS_CHMOD_FILE ) ) {
 
 			// @todo: error that the scheme couldn't be written and redirect
-			add_settings_error( 'options-framework', 'color_css', wds_base_strings( 'acs_write_custom_fail' ), 'error' );
+			add_settings_error( 'webdogs-support', 'color_css', wds_base_strings( 'acs_write_custom_fail' ), 'error' );
 			return true;
 		}
 	}
@@ -1000,7 +1001,7 @@ class Admin_Bar_Color {
 		}
 		$user_color = get_user_option( 'admin_color' );
 		if ( isset( $user_color ) ) {
-			$admin_scheme = Options_Framework_Admin_Color_Schemes::get_instance();
+			$admin_scheme = Webdogs_Admin_Color_Schemes::get_instance();
 			$schemes = apply_filters( 'get_color_scheme_options', $admin_scheme->get_option( 'schemes', array() ) );
 			$schemes_slugs = wp_list_pluck( $schemes, 'slug' );
 			$schemes = array_combine( array_values( $schemes_slugs ), array_values( $schemes ) );
@@ -1034,7 +1035,7 @@ class Admin_Color_Scheme {
 
 	public function __construct( $attr = NULL ) {
 		// extend accessors
-		$admin_scheme = Options_Framework_Admin_Color_Schemes::get_instance();
+		$admin_scheme = Webdogs_Admin_Color_Schemes::get_instance();
 		$this->accessors = array_merge( $this->accessors, array_keys( $admin_scheme->get_colors() ) );
 
 		// set slug
@@ -1121,7 +1122,7 @@ class Admin_Color_Scheme {
 }
 
 
-class Options_Framework_Admin_Color_Schemes_Version_Check {
+class Webdogs_Admin_Color_Schemes_Version_Check {
 	private static $instance;
 
 	protected function __construct() {
@@ -1142,7 +1143,7 @@ class Options_Framework_Admin_Color_Schemes_Version_Check {
 
 	public function plugins_loaded() {
 		if ( ! $this->passes() ) {
-			remove_action( 'init', array( Options_Framework_Admin_Color_Schemes::get_instance(), 'init' ) );
+			remove_action( 'init', array( Webdogs_Admin_Color_Schemes::get_instance(), 'init' ) );
   		if ( current_user_can( 'activate_plugins' ) ) {
 				add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 			}
@@ -1150,7 +1151,7 @@ class Options_Framework_Admin_Color_Schemes_Version_Check {
 	}
 
 	public function admin_notices() {
-		echo '<div class="updated error"><p>' . __('<strong>Admin Color Scheme</strong> requires WordPress 3.8 or higher, and has thus been <strong>deactivated</strong>. Please update your install and then try again!', 'options-framework' ) . '</p></div>';
+		echo '<div class="updated error"><p>' . __('<strong>Admin Color Scheme</strong> requires WordPress 3.8 or higher, and has thus been <strong>deactivated</strong>. Please update your install and then try again!', 'webdogs-support' ) . '</p></div>';
 		if ( isset( $_GET['activate'] ) ) {
 			unset( $_GET['activate'] );
 		}

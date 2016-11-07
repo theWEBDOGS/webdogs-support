@@ -1,22 +1,25 @@
 <?php
+
+defined( 'WPINC' ) or die;
 /**
- * @package   Options_Framework
+ * @package   Webdogs
  * @author    Devin Price <devin@wptheming.com>
  * @license   GPL-2.0+
  * @link      http://wptheming.com
  * @copyright 2010-2016 WP Theming
  */
 
-class Options_Framework_Interface {
+
+class Webdogs_Interface {
 
 	
 	/**
 	 * Generates the tabs that are used in the options menu
 	 */
-	static function optionsframework_tabs() {
+	static function wds_tabs() {
 		$counter = 0;
-		$options = & Options_Framework::_optionsframework_options();
-		$options = apply_filters( 'of_options', $options );
+		$options = & Webdogs_Options::_wds_options();
+		$options = apply_filters( 'wds_options', $options );
 		$menu = array();
 
 		$indexes = array_values( array_map( 'absint', wp_list_pluck( array_values($options), 'order' ) ) );
@@ -60,28 +63,14 @@ class Options_Framework_Interface {
 	/**
 	 * Generates the tabs that are used in the options menu
 	 */
-	static function optionsframework_submit() { ?>
+	static function wds_submit() { ?>
 				</div>
-				<div id="optionsframework-submit">
-					<input type="submit" class="button-primary" name="update" value="<?php esc_attr_e( 'Save Options', 'options-framework' ); ?>" />
-					<?php $prev_proof = get_option( 'wd_maintenance_notification_proof' ); ?>
-					<?php $next_notice = wp_next_scheduled( 'wds_scheduled_notification' ); ?>
-					<?php if( $prev_proof ) : ?>
-						<p class="wd_notification_events">
-							<span class="wd_last_notification_sent" data-prev-notice="<?php echo $prev_proof; ?>">
-								<?php printf(__('Last notification: %s'), date(' F j, Y' , $prev_proof ) ); ?>	
-							</span>
-							<?php if( $next_notice ): ?>
-								<span class="wd_notification_scheduled" data-next-notice="<?php echo $next_notice; ?>"><?php print( __('Maintanace notifications are scheduled.') ); ?></span>
-							<?php else: ?>
-								<span class="wd_notification_scheduled" data-next-notice="">
-								</span>	
-							<?php endif; ?>
-						</p>
-					<?php elseif( $next_notice ): ?>
-						<p class="wd_notification_events"><span class="wd_notification_scheduled" data-next-notice="<?php echo $next_notice; ?>"><?php print( __('Maintanace notifications are scheduled.') ); ?></span></p>
-					<?php endif; ?>
-					<input type="submit" class="reset-button button-secondary hide" name="reset" value="<?php esc_attr_e( 'Restore Defaults', 'options-framework' ); ?>" onclick="return confirm( '<?php print esc_js( __( 'Click OK to reset. Any theme settings will be lost!', 'options-framework' ) ); ?>' );" />
+				<div id="wds-submit">
+					<input type="submit" class="button-primary" name="update" value="<?php esc_attr_e( 'Save Options', 'webdogs-support' ); ?>" />
+					
+					<?php Self::wds_maintenance_notification(); ?>
+
+					<input type="submit" class="reset-button button-secondary hide" name="reset" value="<?php esc_attr_e( 'Restore Defaults', 'webdogs-support' ); ?>" onclick="return confirm( '<?php print esc_js( __( 'Click OK to reset. Any theme settings will be lost!', 'webdogs-support' ) ); ?>' );" />
 					<div class="clear"></div>
 				</div>
 			</form>
@@ -89,25 +78,60 @@ class Options_Framework_Interface {
 		<?php
 	}
 	/**
+	 * Generates the tabs that are used in the options menu
+	 */
+	static function wds_maintenance_notification() { 
+
+	 	$prev_proof = get_option( 'wds_maintenance_notification_proof' ); 
+	 	$next_notice = wp_next_scheduled( 'wds_scheduled_notification' ); 
+
+	 	if( $prev_proof ) : ?>
+
+			<p class="wds_notification_events">
+				<span class="wds_last_notification_sent" data-prev-notice="<?php echo $prev_proof; ?>">
+					<?php printf(__('Last notification: %s'), date(' F j, Y' , $prev_proof ) ); ?>	
+				</span>
+
+					<?php if( $next_notice ): ?>
+
+					<span class="wds_notification_scheduled" data-next-notice="<?php echo $next_notice; ?>"><?php print( __('Maintanace notifications are scheduled.') ); ?></span>
+				
+				<?php else: ?>
+
+					<span class="wds_notification_scheduled" data-next-notice="">
+					</span>	
+
+				<?php endif; ?>
+
+			</p>
+
+		<?php elseif( $next_notice ): ?>
+
+			<p class="wds_notification_events"><span class="wds_notification_scheduled" data-next-notice="<?php echo $next_notice; ?>"><?php print( __('Maintanace notifications are scheduled.') ); ?></span></p>
+		
+		<?php endif; 
+	}
+
+	/**
 	 * Generates the options fields that are used in the form.
 	 */
-	static function optionsframework_fields() {
+	static function wds_fields() {
 
 		global $allowedtags;
-		$optionsframework_settings = get_option( 'optionsframework' );
+		$wds_settings = get_option( 'webdogs_support' );
 
 		// Gets the unique option id
-		if ( isset( $optionsframework_settings['id'] ) ) {
-			$option_name = $optionsframework_settings['id'];
+		if ( isset( $wds_settings['id'] ) ) {
+			$option_name = $wds_settings['id'];
 		}
 		else {
-			$option_name = 'optionsframework';
+			$option_name = 'webdogs-support';
 		};
 
 		$settings = get_option($option_name);
-		$options = & Options_Framework::_optionsframework_options();
+		$options = & Webdogs_Options::_wds_options();
 
-		$options = apply_filters( 'of_options', $options );
+		$options = apply_filters( 'wds_options', $options );
 
 		$counter = 0;
 		$wrapper = 0;
@@ -184,22 +208,28 @@ class Options_Framework_Interface {
 				$explain_value = $value['desc'];
 			}
 
-			if ( has_filter( 'optionsframework_' . $value['type'] ) ) {
-				$output .= apply_filters( 'optionsframework_' . $value['type'], $option_name, $value, $val );
+			if ( has_filter( 'wds_' . $value['type'] ) ) {
+				$output .= apply_filters( 'wds_' . $value['type'], $option_name, $value, $val );
 			}
 
 
 			switch ( $value['type'] ) {
+
+
 
 				// Basic text input
 				case 'text':
 					$output .= '<input id="' . esc_attr( $value['id'] ) . '" class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" type="text" value="' . esc_attr( $val ) . '" />';
 					break;
 
+
+
 				// Password input
 				case 'password':
 					$output .= '<input id="' . esc_attr( $value['id'] ) . '" class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" type="password" value="' . esc_attr( $val ) . '" />';
 					break;
+
+
 
 				// Textarea
 				case 'textarea':
@@ -213,8 +243,10 @@ class Options_Framework_Interface {
 					}
 
 					$val = stripslashes( $val );
-					$output .= '<textarea id="' . esc_attr( $value['id'] ) . '" class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" rows="' . $rows . '">' . apply_filters( 'of_'.$value['id'], esc_textarea( $val ) ) . '</textarea>';
+					$output .= '<textarea id="' . esc_attr( $value['id'] ) . '" class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" rows="' . $rows . '">' . apply_filters( 'wds_'.$value['id'], esc_textarea( $val ) ) . '</textarea>';
 					break;
+
+
 
 				// Select Box
 				case 'select':
@@ -227,6 +259,7 @@ class Options_Framework_Interface {
 					break;
 
 
+
 				// Radio Box
 				case "radio":
 					$name = $option_name .'['. $value['id'] .']';
@@ -235,6 +268,8 @@ class Options_Framework_Interface {
 						$output .= '<input class="of-input of-radio" type="radio" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" value="'. esc_attr( $key ) . '" '. checked( $val, $key, false) .' /><label for="' . esc_attr( $id ) . '">' . esc_html( $option ) . '</label>';
 					}
 					break;
+
+
 
 				// Image Selectors
 				case "images":
@@ -250,11 +285,15 @@ class Options_Framework_Interface {
 					}
 					break;
 
+
+
 				// Checkbox
 				case "checkbox":
 					$output .= '<input id="' . esc_attr( $value['id'] ) . '" class="checkbox of-input" type="checkbox" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" '. checked( $val, 1, false) .' />';
 					$output .= '<label class="explain" for="' . esc_attr( $value['id'] ) . '">' . wp_kses( $explain_value, $allowedtags) . '</label>';
 					break;
+
+
 
 				// Multicheck
 				case "multicheck":
@@ -274,6 +313,8 @@ class Options_Framework_Interface {
 					}
 					break;
 
+
+
 				// Color picker
 				case "color":
 					$default_color = '';
@@ -285,12 +326,16 @@ class Options_Framework_Interface {
 
 					break;
 
+
+
 				// Uploader
 				case "upload":
 					$val = ( !empty($val) ) ? $val : admin_url( 'images/wordpress-logo.svg' );
-					$output .= Options_Framework_Media_Uploader::optionsframework_uploader( $value['id'], $val, null );
+					$output .= Webdogs_Media_Uploader::wds_uploader( $value['id'], $val, null );
 
 					break;
+
+
 
 				// Typography
 				case 'typography':
@@ -307,9 +352,9 @@ class Options_Framework_Interface {
 					$typography_stored = wp_parse_args( $val, $typography_defaults );
 
 					$typography_options = array(
-						'sizes' => of_recognized_font_sizes(),
-						'faces' => of_recognized_font_faces(),
-						'styles' => of_recognized_font_styles(),
+						'sizes' => wds_recognized_font_sizes(),
+						'faces' => wds_recognized_font_faces(),
+						'styles' => wds_recognized_font_styles(),
 						'color' => true
 					);
 
@@ -360,10 +405,12 @@ class Options_Framework_Interface {
 
 					// Allow modification/injection of typography fields
 					$typography_fields = compact( 'font_size', 'font_face', 'font_style', 'font_color' );
-					$typography_fields = apply_filters( 'of_typography_fields', $typography_fields, $typography_stored, $option_name, $value );
+					$typography_fields = apply_filters( 'wds_typography_fields', $typography_fields, $typography_stored, $option_name, $value );
 					$output .= implode( '', $typography_fields );
 
 					break;
+
+
 
 				// Background
 				case 'background':
@@ -378,11 +425,16 @@ class Options_Framework_Interface {
 					}
 					$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][color]' ) . '" id="' . esc_attr( $value['id'] . '_color' ) . '" class="of-color of-background-color"  type="text" value="' . esc_attr( $background['color'] ) . '"' . $default_color .' />';
 
+					$default_image = admin_url( 'images/wordpress-logo.svg' );
+					if ( isset( $value['std']['image'] ) ) {
+						if ( $val !=  $value['std']['image'] )
+							$default_image = $value['std']['image'];
+					}
 					// Background Image
 					if ( !isset($background['image']) || empty( $background['image'] )) {
-						$background['image'] = admin_url( 'images/wordpress-logo.svg' );
+						$background['image'] = $default_image;
 					}
-					$output .= Options_Framework_Media_Uploader::optionsframework_uploader( $value['id'], $background['image'], null, esc_attr( $option_name . '[' . $value['id'] . '][image]' ) );
+					$output .= Webdogs_Media_Uploader::wds_uploader( $value['id'], $background['image'], null, esc_attr( $option_name . '[' . $value['id'] . '][image]' ) );
 					
 					$class = 'of-background-properties';
 					if ( '' == $background['image'] ) {
@@ -392,7 +444,7 @@ class Options_Framework_Interface {
 
 					// Background Repeat
 					$output .= '<select class="of-background of-background-repeat" name="' . esc_attr( $option_name . '[' . $value['id'] . '][repeat]'  ) . '" id="' . esc_attr( $value['id'] . '_repeat' ) . '">';
-					$repeats = of_recognized_background_repeat();
+					$repeats = wds_recognized_background_repeat();
 
 					foreach ($repeats as $key => $repeat) {
 						$output .= '<option value="' . esc_attr( $key ) . '" ' . selected( $background['repeat'], $key, false ) . '>'. esc_html( $repeat ) . '</option>';
@@ -401,7 +453,7 @@ class Options_Framework_Interface {
 
 					// Background Position
 					$output .= '<select class="of-background of-background-position" name="' . esc_attr( $option_name . '[' . $value['id'] . '][position]' ) . '" id="' . esc_attr( $value['id'] . '_position' ) . '">';
-					$positions = of_recognized_background_position();
+					$positions = wds_recognized_background_position();
 
 					foreach ($positions as $key=>$position) {
 						$output .= '<option value="' . esc_attr( $key ) . '" ' . selected( $background['position'], $key, false ) . '>'. esc_html( $position ) . '</option>';
@@ -410,7 +462,7 @@ class Options_Framework_Interface {
 
 					// Background Attachment
 					$output .= '<select class="of-background of-background-attachment" name="' . esc_attr( $option_name . '[' . $value['id'] . '][attachment]' ) . '" id="' . esc_attr( $value['id'] . '_attachment' ) . '">';
-					$attachments = of_recognized_background_attachment();
+					$attachments = wds_recognized_background_attachment();
 
 					foreach ($attachments as $key => $attachment) {
 						$output .= '<option value="' . esc_attr( $key ) . '" ' . selected( $background['attachment'], $key, false ) . '>' . esc_html( $attachment ) . '</option>';
@@ -419,6 +471,8 @@ class Options_Framework_Interface {
 					$output .= '</div>';
 
 					break;
+
+
 
 				// Admin color scheme
 				case 'scheme':
@@ -435,7 +489,7 @@ class Options_Framework_Interface {
 					// $output .= '<p class="explain">' . esc_html( $explain_value ) . '</p>';
 
 
-					$output .= wp_nonce_field( Options_Framework_Admin_Color_Schemes::NONCE, '_acs_ofnonce', null, false );
+					$output .= wp_nonce_field( Webdogs_Admin_Color_Schemes::NONCE, '_acs_ofnonce', null, false );
 
 					$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][name]' ) . '" id="' . esc_attr( $value['id'] . '_name' ) . '" class="of-hidden of-scheme"  type="hidden" value="' . esc_attr( get_bloginfo( 'name' ) ) . '" />';
 					
@@ -456,7 +510,7 @@ class Options_Framework_Interface {
 
 					$default = array();
 
-					$admin_schemes = Options_Framework_Admin_Color_Schemes::get_instance();
+					$admin_schemes = Webdogs_Admin_Color_Schemes::get_instance();
 
 					$scheme = $admin_schemes->get_color_scheme();
 
@@ -513,6 +567,8 @@ class Options_Framework_Interface {
 
 					break;
 
+
+
 				// Editor
 				case 'editor':
 					$output .= '<p class="explain">' . wp_kses( $explain_value, $allowedtags ) . '</p>'."\n";
@@ -531,6 +587,8 @@ class Options_Framework_Interface {
 					wp_editor( $val, $value['id'], $editor_settings );
 					$output = '';
 					break;
+
+
 
 				// Info
 				case "info":
@@ -578,8 +636,7 @@ class Options_Framework_Interface {
 							if ( isset( $value['desc'] ) ) {
 								$output .= '<p class="explain">' . $value['desc'] . '</p>' . "\n";
 							}
-						}
-						// $output .= '</div>' . "\n";
+						} 
 
 					} else {
 
@@ -608,6 +665,8 @@ class Options_Framework_Interface {
 						$output .= '</div>' . "\n";
 					}
 					break;
+
+
 
 				// Heading for Navigation
 				case "heading":
@@ -642,13 +701,15 @@ class Options_Framework_Interface {
 
 						$output .= '<div id="' . esc_attr( $id ) .'" class="' . esc_attr( $class ) . '">'."\n";
 
-						add_action( "of_function_{$id}", $value['function'] );
+						add_action( "wds_function_{$id}", $value['function'] );
 						ob_start();
-							do_action( "of_function_{$id}" );
+							do_action( "wds_function_{$id}" );
 						$output .= ob_get_clean();
 						$output .= '</div>';
 					}
 					break;
+
+
 
 				// form
 				case "form":
@@ -668,17 +729,7 @@ class Options_Framework_Interface {
 						$wrap['start'] = isset( $value['wrap']['start'] );
 						  $wrap['end'] = isset( $value['wrap']['end'] );
 
-						if ( $wrap['end'] ) {
-							/*if ( 0 < $wrapper ) {
-								$output .= str_repeat( '</div>'."\n", $wrapper );
-								$wrapper = 0;
-							}*/
-							/*$wrapper = 0;
-							if ( $counter >= 2 ) {
-								$output .= '</div>'."\n";
-							}*/
-
-						} elseif ( $wrap['start'] ) {
+						if ( $wrap['start'] ) {
 							$form = 1;
 						}
 					}
@@ -700,9 +751,9 @@ class Options_Framework_Interface {
 					break;
 
 			}
-			if ( isset( $value['rule'] ) && ! empty( $value['id'] ) ) {
-				$output .= Options_Framework_Interface::optionsframework_rule( $value['rule'], $value['id'] );
-			}
+
+			// END SWITCH OUTPUT
+
 			if ( ( $value['type'] != "heading" ) && ( $value['type'] != "form" ) && ( $value['type'] != "info" ) ) {
 				$output .= '</div>';
 				if ( ( $value['type'] != "checkbox" ) && ( $value['type'] != "editor" ) && ( $value['type'] != "scheme" ) ) {
@@ -714,119 +765,330 @@ class Options_Framework_Interface {
 			echo $output;
 
 			if ( $value['type'] === "form" && isset( $value['wrap']['start'] ) && null== $value['wrap']['end'] ) {
-				settings_fields( 'optionsframework' );
+				settings_fields( 'webdogs-support' );
 			}elseif ( $value['type'] === "form" && isset( $value['wrap']['end'] ) && null == $value['wrap']['start'] ) {
 				/* <submit></form> */
 				
 				if ( $form ) { 
 					$form=0;
-					Options_Framework_Interface::optionsframework_submit(); 
+					Webdogs_Interface::wds_submit(); 
 				}
 			}
 		}
 
+		// Outputs closing divs
 		if ( 0 < $wrapper ) {
 			echo str_repeat( '</div>'."\n", $wrapper );
 			$wrapper = 0;
 		}
 
 		// Outputs closing div if there tabs
-		if ( Options_Framework_Interface::optionsframework_tabs() != '' ) {
+		if ( Webdogs_Interface::wds_tabs() != '' ) {
 			// echo '</div>';
 		}
+
+		// OUTPUT DYNAMIC JS 
+		// FOR CONDITIONAL FIEILD UX 
+		Self::wds_rules();
+
+		// var_export(Webdogs_Login_Logo::$instance);
 
 	}
 
 	/**
 	 * Generates the tabs that are used in the options menu
 	 */
-	static function optionsframework_rule($rule=null, $id=null) {
+	static function wds_rules() {
+		$counter = 0;
+		$options = &Webdogs_Options::_wds_options();
+		$options = apply_filters( 'wds_options', $options );
 
-		if(is_null($rule)||is_null($id)){ return; }
+		/////////////////
+		// JQUERY SCRIPT 
+		// 	SELECTORS 
+		//  METHODS
+		// 	WRAPPERS 
+		/////////////////
+		/////////////////
+		$format = array( 
 
-		$set = isset($rule['set'])?$rule['set']:"";
-		$exe = isset($rule['exe'])?$rule['exe']:"";
+			'this' => "jQuery('#section-%1\$s :input')",
 
-		if((empty($set)||!is_array($set))&&(empty($exe)||!is_array($exe))){ return; }
+			'on' => "%1\$s.on('%2\$s', %3\$s).trigger('%2\$s');\n\n\t",
 
+			'val' => "jQuery('#section-%1\$s :input')%2\$s%3\$s.val()",
 
-		// exe
+			'field' => "jQuery('#section-%1\$s')%2\$s",
 
-		elseif(!empty($exe)&&is_array($exe)){
-
-			$format = array(
-			'script' => "
-<script type='text/javascript'>
-	jQuery('#section-%1\$s :input').on('%2\$s',function(){ 
-		var val    = jQuery('#section-%1\$s :input')%3\$s%4\$s.val(), 
-		    target = jQuery('#%5\$s'); 
-		%6\$s;
-	}).trigger('%2\$s');
-</script>",
-
-			'exec' => "
-				target.%s(%s);
-				",
+			'target' => "jQuery('#%1\$s')%2\$s",
 
 			'filter' => ".filter('%s')",
 
-			'not' => ".not('%s')"
-			);
+			'not' => ".not('%s')",
 
-			// global $optionsframework_rules; // $optionsframework_rules = ( isset( $optionsframework_rules ) ) ? $optionsframework_rules : "" ;
+			'find' => ".find('%s')",
+
+			'case' => "%s()",
+
+			'exec' => "%s(%s)",
+
+			'func' => "function(){ \n\t\t\t\t%s\n\t\t\t}",
+
+			'return' => "function(){ \n\t\t\t\treturn %s;\n\t\t\t}",
+
+			'pass' => "function( val ){ \n\t\t\t\t%s;\n\t\t\t}",
+
+			'cases' => "\n\t\t\t\tcase '%1\$s':\n\t\t\t\t\twds_options['callback']['switch'][%2\$d]();\n\t\t\t\t\t\tbreak;\n\t\t\t\t\t",
+
+			'passes' => "\n\t\t\t\tvar val = wds_options['return'][%1\$d]();\n\t\t\t\twds_options['callback']['pass'][%2\$d]( val );\n\t\t\t", 
+
+			'switches' => "\n\t\t\t\tvar val = wds_options['return'][%1\$d]();\n\t\t\t\tswitch( val ) { \n\t\t\t\t\t%2\$s\n\t\t\t\t}\n\t\t\t", 
+
+		);
+
+
+		$allrule = array();
+		$allfunc = array();
+		$allswch = array();
+		$allvalu = array();
+
+		$rule_index = wp_list_pluck( array_values( $options ), 'rule', 'id' );
+
+		foreach ( $rule_index as $id => $rule ) {
+
 			$filter = isset($rule['filter'])? sprintf( $format['filter'], $rule['filter'] ):"";
 			$not    = isset($rule['not'])   ? sprintf( $format['not'],    $rule['not']    ):"";
+			$find   = isset($rule['find'])  ? sprintf( $format['find'],   $rule['find']   ):"";
+			$on     = $rule['on'];
 
-			$action ="";
-			foreach ( $exe as $method => $value ) {
-				$action .= sprintf( $format['exec'], $method, $value );
+			if ( isset( $rule['set'] ) ) {
+
+				$el     = sprintf( $format['this'],  $rule['id']);
+				// $on     = sprintf( $format['on'],    $rule['on']);
+				$val    = sprintf( $format['val'],   $rule['id'], $filter, $not);
+				$field  = sprintf( $format['field'], $id, $find);
+
+				///////////////////////////
+				// SUPER MAGIC ARRAY SET //  PLEASE... 
+				///////////////////////////  DO NOT TOUCH THIS !
+			  	$set = array_combine(
+					(call_user_func_array( 'array_merge', 
+						(array_map( 
+							(function($v){ 
+								return array_map('strval', ( is_array($v)?$v:array($v)));
+							}),
+							array_values( $rule['set'] )
+						))
+					)), 
+					(array_map(
+						(function( $va, $i ) use ( $rule, $format ) { 
+							$va['value']=strval( $i ); 
+							foreach( $rule['set'] as $method=>$value ) { 
+								if( is_array( $value ) && in_array( $i, $value ) ) { 
+									array_push( $va['method'], sprintf( $format['case'], $method ) ); 
+								} elseif( $i == $value ) {
+									array_push( $va['method'], sprintf( $format['case'], $method ) ); 
+								} 
+							} 
+							return $va; 
+						}), 
+						(array_fill_keys( 
+							(call_user_func_array( 'array_merge',
+								(array_map(
+									(function($v){
+										return array_map('strval', ( is_array($v)?$v:array($v)));
+									}), 
+									array_values($rule['set']) 
+								))
+							)), 
+							array('value'=> null,'method'=>array() )
+						)), 
+						(call_user_func_array( 'array_merge',
+							(array_map(
+								(function($v){ 
+									return array_map('strval', ( is_array($v)?$v:array($v)));
+								}), 
+								array_values($rule['set'])
+							))
+						))
+					))
+  				);
+				
+				array_map( 
+					(function( $v ) use ( $rule, $el, $on, $val, &$allrule, &$allfunc, &$allvalu, &$allswch, $set, $field ) {  
+						
+						if( is_array( $set[ strval($v) ]['method'] ) )
+							$set[ strval($v) ]['method'] = implode('.', $set[ strval($v) ]['method'] );
+
+						$callback =	implode('.', array( $field, $set[ strval($v) ]['method'] ) );
+
+						////////////////////////////
+						// SET MASTER METHOD INDEXES
+						////////////////////////////
+						array_push( $allfunc, $callback );
+						$allfunc = array_unique( $allfunc );
+						//INDEX FOR TRIGGERED METHODS
+						$funcindex = strval(array_search( $callback, $allfunc ));
+
+						array_push( $allvalu, $val );
+						$allvalu = array_unique( $allvalu );
+						//INDEX FOR VALUE RETURNING METHODS
+						$valuindex = strval( array_search( $val, $allvalu ) );
+
+						//////////////////////
+						// SET COMPILER ARRAYS
+						//////////////////////
+						if( ! isset( $allrule[ $el ][ $on ]['switch']['val'][ strval($valuindex) ]['case'][ strval($v) ]['callback'] ) )
+							$allrule[ $el ][ $on ]['switch']['val'][ strval($valuindex) ]['case'][ strval($v) ]['callback'] = array();
+						
+						if( ! isset( $allswch['val'][ strval($valuindex) ]['case'][ strval($v) ]['callback'] ) )
+							$allswch['val'][ strval($valuindex) ]['case'][ strval($v) ]['callback'] = array();
+
+						array_push( $allswch['val'][ strval($valuindex) ]['case'][ strval($v) ]['callback'], strval($funcindex) );
+						array_push( $allrule[ $el ][ $on ]['switch']['val'][ strval($valuindex) ]['case'][ strval($v) ]['callback'], strval($funcindex) );
+
+						return $v; 
+					}), 
+					array_keys( $set )
+				);
 			}
-			
-			$jrule = sprintf( $format['script'], $id, $rule['on'], $filter, $not, $rule['id'], $action );
-
-		}
 
 
-		//set
 
-		elseif(!empty($set)&&is_array($set)){
+			if( isset( $rule['exe'] ) ) {
 
-			$format = array(
-			'script' => "
-<script type='text/javascript'>
-	jQuery('#section-%1\$s :input').on('%2\$s',function(){ 
-		var val   = jQuery('#section-%1\$s :input')%3\$s%4\$s.val(), 
-		    field = jQuery('#%5\$s').closest('.section'); 
-		switch (val) {
-			%6\$s
-		}
-	}).trigger('%2\$s');
-</script>",
+				$el     = sprintf( $format['this'],   $id);
+				// $on     = sprintf( $format['on'],     $rule['on']);
+				$val    = sprintf( $format['val'],    $id, $filter, $not );
+				$target = sprintf( $format['target'], $rule['id'], $find );
 
-			'case' => "
-			case '%s':
-				field.%s();
-				break;
-				",
+				///////////////////////////
+				// SUPER MAGIC ARRAY SET //  PLEASE... 
+				///////////////////////////  DO NOT TOUCH THIS !
+				$set = call_user_func_array( 'array_merge',
+					(array_map(
+						(function( $va ) use ( $rule, $format ) { 
+							foreach( $rule['exe'] as $method => $value ) { 
+								if( is_array( $value ) && ! empty( $value ) ) { 
+					  				array_push( $va['method'], sprintf( $format['exec'], $method, implode(', ', $value ) ) );
+					  			} else { 
+					  				array_push( $va['method'], sprintf( $format['exec'], $method, $value ) ); 
+					  			} 
+							} 
+							return $va; 
+						}),
+						(array_fill( 0, sizeof($rule['exe']), array( 'method'=>array() )))
+					))
+  				);
 
-			'filter' => ".filter('%s')",
+				if( is_array($set['method']) )
+					$set['method'] = implode('.', $set['method'] );
 
-			'not' => ".not('%s')"
-			);
+				$callback =	implode('.', array( $target, $set['method'] ) );
 
-			// global $optionsframework_rules; // $optionsframework_rules = ( isset( $optionsframework_rules ) ) ? $optionsframework_rules : "" ;
-			$filter = isset($rule['filter'])? sprintf( $format['filter'], $rule['filter'] ):"";
-			$not    = isset($rule['not'])   ? sprintf( $format['not'],    $rule['not']    ):"";
+				////////////////////////////
+				// SET MASTER METHOD INDEXES
+				////////////////////////////
+				array_push( $allfunc, $callback );
+				$allfunc = array_unique( $allfunc );
+				//INDEX FOR TRIGGERED METHODS
+				$funcindex = array_search( $callback, $allfunc );
 
-			$cases ="";
-			foreach ( $set as $value => $method ) {
-				$cases .= sprintf( $format['case'], $method, $value );
+				array_push( $allvalu, $val );
+				$allvalu = array_unique( $allvalu );
+				//INDEX FOR VALUE RETURNING METHODS
+				$valuindex = strval( array_search( $val, $allvalu ) );
+
+				//////////////////////
+				// SET COMPILER ARRAYS
+				//////////////////////
+				$func = array();
+				$func['val'] = strval($valuindex);
+				$func['callback'] = strval($funcindex);
+
+				if( ! isset( $allrule[ $el ][ $on ]['function'] ) )
+					$allrule[ $el ][ $on ]['function'] = array();
+
+				array_push( $allrule[ $el ][ $on ]['function'], $func );
 			}
-			
-			$jrule = sprintf( $format['script'], $rule['id'], $rule['on'], $filter, $not, $id, $cases );
-
 		}
-		return $jrule;
+		//////////////////////////////////
+		// COMPOUND COMPILER DATA ARRAY // 
+		//////////////////////////////////
+
+		$wds_options = array( 'condition' => $allrule, 'callback' => $allfunc, 'return' => $allvalu, 'switch' => $allswch );
+		
+		$i = 0;
+		$switch_callbacks = array();
+
+		$conditions = "";
+		foreach ($wds_options['condition'] as $elem => $triggers ) {
+
+			foreach( $triggers as $trigger => $actions ) {
+				$trigger_actions = "";
+				if( isset( $actions['switch'] ) && !empty( $actions['switch'] ) ) {
+					$switches = "";
+					foreach ( $actions['switch']['val'] as $val => &$case ) {
+						$cases = "";
+						if( isset( $case['case'] ) && !empty( $case['case'] ) ){
+							foreach ($case['case'] as $value => &$callback ) {
+								if( isset( $callback['callback'] ) && !empty( $callback['callback'] ) ) {
+									$switch_callbacks[ $i ] = sprintf( $format['func'], implode( ";\n\t\t\t\t", array_map( (function( $v ) use ( $wds_options ){ return $wds_options['callback'][ $v ]; }), $callback['callback'] ) ) );
+									$callback['callback'] = $i;
+									$cases .= sprintf($format['cases'], strval($value), $i );
+									$i++;
+								}
+							}
+						}
+						$switches .= sprintf($format['switches'], strval($val), $cases );
+					}
+					$trigger_actions .= $switches;
+				}
+				if( isset( $actions['function'] ) && !empty( $actions['function'] ) ){
+					$passes = "";
+					foreach ( $actions['function'] as &$action ) {
+						$passes .= sprintf($format['passes'], $action['val'], $action['callback'] );
+					}
+					$trigger_actions .= $passes;
+				}
+				$conditions .= sprintf($format['on'], $elem, $trigger, sprintf($format['func'], $trigger_actions ));
+			}
+		}
+
+// OUTPUT THE WDS OPTIONS OBJECT
+// JS LIB FOR CONDITIONAL FIELDS 
+?>
+
+<script type="text/javascript">
+
+var wds_options = {
+
+	return: [ 
+
+			<?php echo implode( ",\n\t\t\t", array_map( function($v) use ( $format ){ return sprintf( $format['return'], $v ); }, $wds_options['return'] ) ); ?>
+
+		],
+
+	callback: {
+
+		switch: [ 
+
+			<?php echo implode( ",\n\t\t\t", $switch_callbacks ); ?>
+			
+		],
+
+		pass: [ 
+
+			<?php echo implode( ",\n\t\t\t", array_map( function($v) use ( $format ){ return sprintf( $format['pass'], $v ); }, $wds_options['callback'] ) ); ?>
+
+		]
 	}
+};
+	<?php echo $conditions; ?>
 
+</script>
+<?
+
+		return $allrulez;
+	}
 }

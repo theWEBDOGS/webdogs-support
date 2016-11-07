@@ -1,13 +1,13 @@
 <?php
 /**
- * @package   Options_Framework
+ * @package   Webdogs
  * @author    Devin Price <devin@wptheming.com>
  * @license   GPL-2.0+
  * @link      http://wptheming.com
  * @copyright 2010-2016 WP Theming
  */
 
-class Options_Framework_Media_Uploader {
+class Webdogs_Media_Uploader {
 
 	/**
 	 * Initialize the media uploader class
@@ -15,9 +15,9 @@ class Options_Framework_Media_Uploader {
 	 * @since 1.7.0
 	 */
 	public function init() {
-		add_action( 'admin_enqueue_scripts', array( $this, 'optionsframework_media_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'wds_media_scripts' ) );
 
-		add_filter( 'upload_mimes',  array( $this, 'optionsframework_svgs_upload_mimes' ) );
+		add_filter( 'upload_mimes',  array( $this, 'wds_svgs_upload_mimes' ) );
 	}
 
 	/**
@@ -31,12 +31,12 @@ class Options_Framework_Media_Uploader {
 	 *
 	 */
 
-	static function optionsframework_uploader( $_id, $_value, $_desc = '', $_name = '' ) {
+	static function wds_uploader( $_id, $_value, $_desc = '', $_name = '' ) {
 
-		$optionsframework_settings = get_option( 'optionsframework' );
+		$wds_settings = get_option( 'webdogs_support' );
 
 		// Gets the unique option id
-		$option_name = $optionsframework_settings['id'];
+		$option_name = $wds_settings['id'];
 
 		$output = '';
 		$id = '';
@@ -62,15 +62,15 @@ class Options_Framework_Media_Uploader {
 		if ( $value ) {
 			$class = ' has-file';
 		}
-		$output .= '<input id="' . $id . '" class="upload' . $class . '" type="text" name="'.$name.'" value="' . $value . '" placeholder="' . __('No file chosen', 'options-framework') .'" />' . "\n";
+		$output .= '<input id="' . $id . '" class="upload' . $class . '" type="text" name="'.$name.'" value="' . $value . '" placeholder="' . __('No file chosen', 'webdogs-support') .'" />' . "\n";
 		if ( function_exists( 'wp_enqueue_media' ) ) {
 			if ( ( $value == '' ) ) {
-				$output .= '<input id="upload-' . $id . '" class="upload-button button" type="button" value="' . __( 'Upload', 'options-framework' ) . '" />' . "\n";
+				$output .= '<input id="upload-' . $id . '" class="upload-button button" type="button" value="' . __( 'Upload', 'webdogs-support' ) . '" />' . "\n";
 			} else {
-				$output .= '<input id="remove-' . $id . '" class="remove-file button" type="button" value="' . __( 'Remove', 'options-framework' ) . '" />' . "\n";
+				$output .= '<input id="remove-' . $id . '" class="remove-file button" type="button" value="' . __( 'Remove', 'webdogs-support' ) . '" />' . "\n";
 			}
 		} else {
-			$output .= '<p><i>' . __( 'Upgrade your version of WordPress for full media support.', 'options-framework' ) . '</i></p>';
+			$output .= '<p><i>' . __( 'Upgrade your version of WordPress for full media support.', 'webdogs-support' ) . '</i></p>';
 		}
 
 		if ( $_desc != '' ) {
@@ -100,7 +100,7 @@ class Options_Framework_Media_Uploader {
 				$output .= '';
 
 				// Standard generic output if it's not an image.
-				$title = __( 'View File', 'options-framework' );
+				$title = __( 'View File', 'webdogs-support' );
 				$output .= '<div class="no-image"><span class="file_link"><a href="' . $value . '" target="_blank" rel="external">'.$title.'</a></span></div>';
 			}
 		}
@@ -111,9 +111,9 @@ class Options_Framework_Media_Uploader {
 	/**
 	 * Enqueue scripts for file uploader
 	 */
-	function optionsframework_media_scripts( $hook ) {
+	function wds_media_scripts( $hook ) {
 
-		$menu = Options_Framework_Admin::menu_settings();
+		$menu = Webdogs_Admin::menu_settings();
 
         if ( substr( $hook, -strlen( $menu['menu_slug'] ) ) !== $menu['menu_slug'] )
 	        return;
@@ -121,18 +121,18 @@ class Options_Framework_Media_Uploader {
 		if ( function_exists( 'wp_enqueue_media' ) )
 			wp_enqueue_media();
 
-		wp_register_script( 'of-media-uploader', plugin_dir_url( dirname(__FILE__) ) .'js/media-uploader.js', array( 'jquery' ), Options_Framework::VERSION );
+		wp_register_script( 'of-media-uploader', plugin_dir_url( dirname(__FILE__) ) .'js/media-uploader.js', array( 'jquery' ), Webdogs_Options::VERSION );
 		wp_enqueue_script( 'of-media-uploader' );
-		wp_localize_script( 'of-media-uploader', 'optionsframework_l10n', array(
-			'upload' => __( 'Upload', 'options-framework' ),
-			'remove' => __( 'Remove', 'options-framework' )
+		wp_localize_script( 'of-media-uploader', 'wds_l10n', array(
+			'upload' => __( 'Upload', 'webdogs-support' ),
+			'remove' => __( 'Remove', 'webdogs-support' )
 		) );
 	}
 
 	/**
 	 * Add SVG support
 	 */
-	function optionsframework_svgs_upload_mimes($mimes = array()) {
+	function wds_svgs_upload_mimes($mimes = array()) {
 		// support for bodhi plugin.
 		global $bodhi_svgs_options;
 

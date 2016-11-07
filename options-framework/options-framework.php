@@ -13,7 +13,7 @@
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
-function optionsframework_init() {
+function wds_init() {
 
 	// Instantiate the login logo plugin class.
 	// Loads the required Options Framework classes.
@@ -23,17 +23,17 @@ function optionsframework_init() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-options-admin-color-schemes.php';
 
 	// Pull in the plugin classes and initialize
-	$options_framework_endpoint = Options_Framework_Endpoint::register();
+	$options_framework_endpoint = Webdogs_Endpoint::register();
 
 	// Pull in the plugin classes and initialize
-	$options_framework_login_logo = new Options_Framework_Login_Logo;
+	$options_framework_login_logo = new Webdogs_Login_Logo;
 	$options_framework_login_logo->init();
 
 	// Pull in the plugin classes and initialize
-	$options_framework_admin_color_schemes = Options_Framework_Admin_Color_Schemes::get_instance();
+	$options_framework_admin_color_schemes = Webdogs_Admin_Color_Schemes::get_instance();
 
 	// Pull in the version checker and initialize
-	$options_framework_admin_color_schemes_version_check = Options_Framework_Admin_Color_Schemes_Version_Check::get_instance();
+	$options_framework_admin_color_schemes_version_check = Webdogs_Admin_Color_Schemes_Version_Check::get_instance();
 
 	//  If user can't edit theme options, exit
 	if ( ! current_user_can( 'manage_options' ) ) return;
@@ -47,31 +47,31 @@ function optionsframework_init() {
 
 	// Instantiate the plugin activation class.
 	// Ensure only one instance of the class is ever invoked.
-	$options_framework_plugin_activation = Options_Framework_Plugin_Activation::get_instance();
+	$options_framework_plugin_activation = Webdogs_Plugin_Activation::get_instance();
 
 
 	// Instantiate the main plugin class.
-	$options_framework = new Options_Framework;
+	$options_framework = new Webdogs_Options;
 	$options_framework->init();
 
 	// Instantiate the options page.
-	$options_framework_admin = new Options_Framework_Admin;
+	$options_framework_admin = new Webdogs_Admin;
 	$options_framework_admin->init();
 
 	// Instantiate the media uploader class
-	$options_framework_media_uploader = new Options_Framework_Media_Uploader;
+	$options_framework_media_uploader = new Webdogs_Media_Uploader;
 	$options_framework_media_uploader->init();
 
 	add_action( 'init', function(){
 		// Load translation files
-		load_plugin_textdomain( 'options-framework', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+		load_plugin_textdomain( 'webdogs-support', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 
 	} );
 
 }
 
 if ( did_action( 'plugins_loaded' ) ) {
-	optionsframework_init();
+	wds_init();
 } else {
-	add_action( 'plugins_loaded', 'optionsframework_init' );
+	add_action( 'plugins_loaded', 'wds_init' );
 }

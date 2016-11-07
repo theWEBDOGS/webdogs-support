@@ -92,7 +92,7 @@ You can also watch the video screencast I have at [http://wptheming.com/options-
 * Update translation .pot
 * Updated Portuguese translations by @pedro-mendonca
 * Indonesian translations props @aryaprakasa)
-* Use filtered values for optionsframework_admin_bar
+* Use filtered values for wds_admin_bar
 
 = 1.8.0 =
 
@@ -144,7 +144,7 @@ You can also watch the video screencast I have at [http://wptheming.com/options-
 * Updated width of text input
 * New media uploader
 * Dropped custom post types for file attachments
-* Update routine to remove unused 'optionsframework' post types
+* Update routine to remove unused 'webdogs-support' post types
 * Updated IDs for .tabs and .groups
 * Italian translations (andreabersi.com)
 * Russian translations (verha.net)
@@ -157,13 +157,13 @@ You can also watch the video screencast I have at [http://wptheming.com/options-
 * Farsi translations (@vahidd.com)
 * Added password option type (props @neojp)
 * Allow ids to passed to tabs (props @themeblvd)
-* Added optionsframework_after_validate hook (h/t @vanpop and @pryley)
+* Added wds_after_validate hook (h/t @vanpop and @pryley)
 
 = 1.3.0 =
 
 * Allow options to save when set by theme customizer
 * Save checkbox options to boolean false rather than "0"
-* Added optionsframework_after hook
+* Added wds_after hook
 * Hungarian translations by kardiweb.org
 
 = 1.2.0 =
@@ -203,12 +203,12 @@ You can also watch the video screencast I have at [http://wptheming.com/options-
 
 * Saves tab states using local storage
 * Style updates WordPress 3.2 release
-* Added sanitization filter for info (of_sanitize_allowedtags)
+* Added sanitization filter for info (wds_sanitize_allowedtags)
 
 = 0.7.0 =
 
 * Added filtering for recognized arrays (like Font Face)
-* Using isset rather than !empty to return of_get_option
+* Using isset rather than !empty to return wds_get_option
 * Significant updates for setting and restoring defaults
 * Background option outputs no-repeat rather than none
 
@@ -224,14 +224,14 @@ You can also watch the video screencast I have at [http://wptheming.com/options-
 = 0.5.0 =
 
 * Fixed errors when more than one multicheck options is used
-* Updated optionsframework_setdefaults so defaults actually save on first run
+* Updated wds_setdefaults so defaults actually save on first run
 * Require that all options have lowercase alphanumeric ids
 * Added link to options from the WordPress admin bar
 
 = 0.4.0 =
 
 * Updated multicheck option to save keys rather than values
-* Unset default array options after each output in optionsframework_setdefaults
+* Unset default array options after each output in wds_setdefaults
 
 = 0.3.0 =
 

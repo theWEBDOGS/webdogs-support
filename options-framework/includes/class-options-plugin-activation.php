@@ -43,7 +43,7 @@
 	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
+if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 
 	/**
 	 * Automatic plugin installation and activation library.
@@ -58,7 +58,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 	 * @author  Thomas Griffin
 	 * @author  Gary Jones
 	 */
-	class Options_Framework_Plugin_Activation {
+	class Webdogs_Plugin_Activation {
 		/**
 		 * Options Framework version number.
 		 *
@@ -91,7 +91,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @var Options_Framework_Plugin_Activation
+		 * @var Webdogs_Plugin_Activation
 		 */
 		public static $instance;
 
@@ -169,7 +169,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 *
 		 * @var string
 		 */
-		public $id = 'optionsframework';
+		public $id = 'webdogs-support';
 
 		/**
 		 * Name of the query-string argument for the admin page.
@@ -178,7 +178,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 *
 		 * @var string
 		 */
-		protected $menu = 'optionsframework';
+		protected $menu = 'webdogs-support';
 
 		/**
 		 * Parent menu file slug.
@@ -283,7 +283,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 
 		/**
 		 * Adds a reference of this object to $instance, populates default strings,
-		 * does the optionsframework_init action hook, and hooks in the interactions to init.
+		 * does the wds_init action hook, and hooks in the interactions to init.
 		 *
 		 * @internal This method should be `protected`, but as too many Options Framework implementations
 		 * haven't upgraded beyond v2.3.6 yet, this gives backward compatibility issues.
@@ -291,14 +291,14 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @see Options_Framework_Plugin_Activation::init()
+		 * @see Webdogs_Plugin_Activation::init()
 		 */
 		public function __construct() {
 			// Set the current WordPress version.
 			$this->wp_version = $GLOBALS['wp_version'];
 
 			// Announce that the class is ready, and pass the object (for advanced use).
-			do_action_ref_array( 'optionsframeworkpluginactivation_init', array( &$this ) );
+			do_action_ref_array( 'wds_plugin_activation_init', array( &$this ) );
 
 			// When the rest of WP has loaded, kick-start the rest of the class.
 			add_action( 'init', array( &$this, 'init' ) );
@@ -339,9 +339,9 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 *
 		 * @since 2.0.0
 		 *
-		 * @see Options_Framework_Plugin_Activation::admin_menu()
-		 * @see Options_Framework_Plugin_Activation::notices()
-		 * @see Options_Framework_Plugin_Activation::styles()
+		 * @see Webdogs_Plugin_Activation::admin_menu()
+		 * @see Webdogs_Plugin_Activation::notices()
+		 * @see Webdogs_Plugin_Activation::styles()
 		 */
 		public function init() {
 			/**
@@ -353,99 +353,99 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			 * @param bool $load Whether or not Options Framework should load.
 			 *                   Defaults to the return of `is_admin() && ! defined( 'DOING_AJAX' )`.
 			 */
-			if ( true !== apply_filters( 'optionsframework_load', ( is_admin() && ! defined( 'DOING_AJAX' ) ) ) ) {
+			if ( true !== apply_filters( 'wds_load', ( is_admin() && ! defined( 'DOING_AJAX' ) ) ) ) {
 				return;
 			}
 
 			// Load class strings.
 			$this->strings = array(
-				'page_title'                      => __( 'Install Required Plugins', 'optionsframework' ),
-				'menu_title'                      => __( 'Install Plugins', 'optionsframework' ),
-				'installing'                      => __( 'Installing Plugin: %s', 'optionsframework' ),
-				'oops'                            => __( 'Something went wrong with the plugin API.', 'optionsframework' ),
+				'page_title'                      => __( 'Install Required Plugins', 'webdogs-support' ),
+				'menu_title'                      => __( 'Install Plugins', 'webdogs-support' ),
+				'installing'                      => __( 'Installing Plugin: %s', 'webdogs-support' ),
+				'oops'                            => __( 'Something went wrong with the plugin API.', 'webdogs-support' ),
 				'notice_can_install_required'     => _n_noop(
 					'This theme requires the following plugin: %1$s.',
 					'This theme requires the following plugins: %1$s.',
-					'optionsframework'
+					'webdogs-support'
 				),
 				'notice_can_install_recommended'  => _n_noop(
 					'This theme recommends the following plugin: %1$s.',
 					'This theme recommends the following plugins: %1$s.',
-					'optionsframework'
+					'webdogs-support'
 				),
 				'notice_cannot_install'           => _n_noop(
 					'Sorry, but you do not have the correct permissions to install the %1$s plugin.',
 					'Sorry, but you do not have the correct permissions to install the %1$s plugins.',
-					'optionsframework'
+					'webdogs-support'
 				),
 				'notice_ask_to_update'            => _n_noop(
 					'The following plugin needs to be updated to its latest version to ensure maximum compatibility with this theme: %1$s.',
 					'The following plugins need to be updated to their latest version to ensure maximum compatibility with this theme: %1$s.',
-					'optionsframework'
+					'webdogs-support'
 				),
 				'notice_ask_to_update_maybe'      => _n_noop(
 					'There is an update available for: %1$s.',
 					'There are updates available for the following plugins: %1$s.',
-					'optionsframework'
+					'webdogs-support'
 				),
 				'notice_cannot_update'            => _n_noop(
 					'Sorry, but you do not have the correct permissions to update the %1$s plugin.',
 					'Sorry, but you do not have the correct permissions to update the %1$s plugins.',
-					'optionsframework'
+					'webdogs-support'
 				),
 				'notice_can_activate_required'    => _n_noop(
 					'The following required plugin is currently inactive: %1$s.',
 					'The following required plugins are currently inactive: %1$s.',
-					'optionsframework'
+					'webdogs-support'
 				),
 				'notice_can_activate_recommended' => _n_noop(
 					'The following recommended plugin is currently inactive: %1$s.',
 					'The following recommended plugins are currently inactive: %1$s.',
-					'optionsframework'
+					'webdogs-support'
 				),
 				'notice_cannot_activate'          => _n_noop(
 					'Sorry, but you do not have the correct permissions to activate the %1$s plugin.',
 					'Sorry, but you do not have the correct permissions to activate the %1$s plugins.',
-					'optionsframework'
+					'webdogs-support'
 				),
 				'install_link'                    => _n_noop(
 					'Begin installing plugin',
 					'Begin installing plugins',
-					'optionsframework'
+					'webdogs-support'
 				),
 				'update_link'                     => _n_noop(
 					'Begin updating plugin',
 					'Begin updating plugins',
-					'optionsframework'
+					'webdogs-support'
 				),
 				'activate_link'                   => _n_noop(
 					'Begin activating plugin',
 					'Begin activating plugins',
-					'optionsframework'
+					'webdogs-support'
 				),
 				'plugin_deletion'            => _n_noop( 
 					'The following plugin has been removed: %s ', 
 					'The following plugins have been removed: %s ', 
-					'optionsframework' 
+					'webdogs-support' 
 				),
 				'theme_deleted_successfully'      => _n_noop( 
 					'The following theme has been removed: %s ', 
 					'The following themes have been removed: %s ', 
-					'optionsframework' 
+					'webdogs-support' 
 				),
-				'return'                          => __( 'Return to Required Plugins Installer', 'optionsframework' ),
-				'dashboard'                       => __( 'Return to the dashboard', 'optionsframework' ),
-				'plugin_activated'                => __( 'Plugin activated successfully.', 'optionsframework' ),
-				'activated_successfully'          => __( 'The following plugin was activated successfully:', 'optionsframework' ),
-				'plugin_already_active'           => __( 'No action taken. Plugin %1$s was already active.', 'optionsframework' ),
-				'plugin_needs_higher_version'     => __( 'Plugin not activated. A higher version of %s is needed for this theme. Please update the plugin.', 'optionsframework' ),
-				'complete'                        => __( 'All plugins installed and activated successfully. %1$s', 'optionsframework' ),
-				'dismiss'                         => __( 'Dismiss this notice', 'optionsframework' ),
-				'contact_admin'                   => __( 'Please contact the administrator of this site for help.', 'optionsframework' ),
+				'return'                          => __( 'Return to Required Plugins Installer', 'webdogs-support' ),
+				'dashboard'                       => __( 'Return to the dashboard', 'webdogs-support' ),
+				'plugin_activated'                => __( 'Plugin activated successfully.', 'webdogs-support' ),
+				'activated_successfully'          => __( 'The following plugin was activated successfully:', 'webdogs-support' ),
+				'plugin_already_active'           => __( 'No action taken. Plugin %1$s was already active.', 'webdogs-support' ),
+				'plugin_needs_higher_version'     => __( 'Plugin not activated. A higher version of %s is needed for this theme. Please update the plugin.', 'webdogs-support' ),
+				'complete'                        => __( 'All plugins installed and activated successfully. %1$s', 'webdogs-support' ),
+				'dismiss'                         => __( 'Dismiss this notice', 'webdogs-support' ),
+				'contact_admin'                   => __( 'Please contact the administrator of this site for help.', 'webdogs-support' ),
 			);
 
 			
-			do_action( 'optionsframework_register' );//do_action( 'optionsframework_register' );
+			do_action( 'wds_register' );//do_action( 'wds_register' );
 
 			/* After this point, the plugins should be registered and the configuration set. */
 
@@ -456,7 +456,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			}
 
 			// Set up the menu and notices if we still have outstanding actions.
-			if ( true !== $this->is_optionsframework_complete() ) {
+			if ( true !== $this->is_wds_complete() ) {
 				// Sort the plugins.
 				array_multisort( $this->sort_order, SORT_ASC, $this->plugins );
 
@@ -464,10 +464,10 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 				add_action( 'admin_head', array( $this, 'dismiss' ) );
 
 				// Filter value through optionsframework option override
-				add_filter('optionsframework-has_theme_deletion', array($this,'filter_optionframwork_override'), 10, 1 );
-				add_filter('optionsframework-has_forced_activation', array($this,'filter_optionframwork_override'), 10, 1 );
-				add_filter('optionsframework-has_forced_deactivation', array($this,'filter_optionframwork_override'), 10, 1 );
-				add_filter('optionsframework-has_forced_deletion', array($this,'filter_optionframwork_override'), 10, 1 );
+				add_filter('wds-has_theme_deletion', array($this,'filter_optionframwork_override'), 10, 1 );
+				add_filter('wds-has_forced_activation', array($this,'filter_optionframwork_override'), 10, 1 );
+				add_filter('wds-has_forced_deactivation', array($this,'filter_optionframwork_override'), 10, 1 );
+				add_filter('wds-has_forced_deletion', array($this,'filter_optionframwork_override'), 10, 1 );
 				
 				// Prevent the normal links from showing underneath a single install/update page.
 				add_filter( 'install_plugin_complete_actions', array( $this, 'actions' ) );
@@ -493,22 +493,22 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			}
 
 			// Setup the force deletion hook.
-			if ( true === apply_filters('optionsframework-has_theme_deletion', $this->has_theme_deletion ) ) {
+			if ( true === apply_filters('wds-has_theme_deletion', $this->has_theme_deletion ) ) {
 				add_action( 'admin_init', array( $this, 'theme_deletion' ) );
 			}
 
 			// Setup the force activation hook.
-			if ( true === apply_filters('optionsframework-has_forced_activation', $this->has_forced_activation ) ) {
+			if ( true === apply_filters('wds-has_forced_activation', $this->has_forced_activation ) ) {
 				add_action( 'admin_init', array( $this, 'force_activation' ) );
 			}
 
 			// Setup the force deactivation hook.
-			if ( true === apply_filters('optionsframework-has_forced_deactivation', $this->has_forced_deactivation ) ) {
+			if ( true === apply_filters('wds-has_forced_deactivation', $this->has_forced_deactivation ) ) {
 				add_action( 'admin_head', array( $this, 'force_deactivation' ) );
 			}
 
 			// Setup the force deletion hook.
-			if ( true === apply_filters('optionsframework-has_forced_deletion', $this->has_forced_deletion ) ) {
+			if ( true === apply_filters('wds-has_forced_deletion', $this->has_forced_deletion ) ) {
 				add_action( 'admin_init', array( $this, 'force_deletion' ) );
 			}
 
@@ -591,9 +591,9 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		public function filter_plugin_action_links_update( $actions ) {
 			$actions['update'] = sprintf(
 				'<a href="%1$s" title="%2$s" class="edit">%3$s</a>',
-				esc_url( $this->get_optionsframework_status_url( 'update' ) ),
-				esc_attr__( 'This plugin needs to be updated to be compatible with your theme.', 'optionsframework' ),
-				esc_html__( 'Update Required', 'optionsframework' )
+				esc_url( $this->get_wds_status_url( 'update' ) ),
+				esc_attr__( 'This plugin needs to be updated to be compatible with your theme.', 'webdogs-support' ),
+				esc_html__( 'Update Required', 'webdogs-support' )
 			);
 
 			return $actions;
@@ -623,7 +623,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 * @return null Returns early if not the Options Framework page.
 		 */
 		public function admin_init() {
-			if ( ! $this->is_optionsframework_page() ) {
+			if ( ! $this->is_wds_page() ) {
 				return;
 			}
 
@@ -657,7 +657,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 * @since 2.1.0
 		 */
 		public function thickbox() {
-			if ( ! get_user_meta( get_current_user_id(), 'optionsframework_dismissed_notice_' . $this->id, true ) ) {
+			if ( ! get_user_meta( get_current_user_id(), 'wds_dismissed_notice_' . $this->id, true ) ) {
 				add_thickbox();
 			}
 		}
@@ -672,8 +672,8 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @see Options_Framework_Plugin_Activation::init()
-		 * @see Options_Framework_Plugin_Activation::install_plugins_page()
+		 * @see Webdogs_Plugin_Activation::init()
+		 * @see Webdogs_Plugin_Activation::install_plugins_page()
 		 *
 		 * @return null Return early if user lacks capability to install a plugin.
 		 */
@@ -684,7 +684,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			}
 
 			$args = apply_filters(
-				'optionsframework_admin_menu_args',
+				'wds_admin_menu_args',
 				array(
 					'parent_slug' => $this->parent_slug,                     // Parent Menu slug.
 					'page_title'  => $this->strings['page_title'],           // Page title.
@@ -706,8 +706,8 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 * @param array $args Menu item configuration.
 		 */
 		protected function add_admin_menu( array $args ) {
-			if ( has_filter( 'optionsframework_admin_menu_use_add_theme_page' ) ) {
-				_deprecated_function( 'The "optionsframework_admin_menu_use_add_theme_page" filter', '2.5.0', esc_html__( 'Set the parent_slug config variable instead.', 'optionsframework' ) );
+			if ( has_filter( 'wds_admin_menu_use_add_theme_page' ) ) {
+				_deprecated_function( 'The "wds_admin_menu_use_add_theme_page" filter', '2.5.0', esc_html__( 'Set the parent_slug config variable instead.', 'webdogs-support' ) );
 			}
 
 			if ( 'themes.php' === $this->parent_slug ) {
@@ -730,17 +730,17 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 */
 		public function install_plugins_page() {
 			// Store new instance of plugin table in object.
-			$plugin_table = new Options_Framework_List_Table;
+			$plugin_table = new Webdogs_List_Table;
 
 			// Return early if processing a plugin installation action.
-			if ( ( ( 'optionsframework-bulk-install' === $plugin_table->current_action() || 'optionsframework-bulk-update' === $plugin_table->current_action() ) && $plugin_table->process_bulk_actions() ) || $this->do_plugin_install() ) {
+			if ( ( ( 'wds-bulk-install' === $plugin_table->current_action() || 'wds-bulk-update' === $plugin_table->current_action() ) && $plugin_table->process_bulk_actions() ) || $this->do_plugin_install() ) {
 				return;
 			}
 
 			// Force refresh of available plugin information so we'll know about manual updates/deletes.
 			wp_clean_plugins_cache( false );
 
-			$included = ( stripos( current_action(), 'of_function' ) !== false );
+			$included = ( stripos( current_action(), 'wds_function' ) !== false );
 
 			if( ! $included ) : ?>
 			<div class="optionsframework wrap">
@@ -756,9 +756,9 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 				<?php $plugin_table->views(); ?>
 
 				<?php //if( ! $included ) : ?>
-				<form id="optionsframework-plugins" action="<?php echo ( ! $included ) ? $this->get_optionsframework_url() : str_replace( 'plugins.php?page=options-framework', 'plugins.php?page=optionsframework', $this->get_optionsframework_url() ); ?>" method="post">
+				<form id="wds-plugins" action="<?php echo ( ! $included ) ? $this->get_wds_url() : str_replace( 'plugins.php?page=options-framework', 'plugins.php?page=optionsframework', $this->get_wds_url() ); ?>" method="post">
 				<?php// endif; ?>
-					<input type="hidden" name="optionsframework-page" value="<?php echo esc_attr( $this->menu ); ?>" />
+					<input type="hidden" name="wds-page" value="<?php echo esc_attr( $this->menu ); ?>" />
 					<input type="hidden" name="plugin_status" value="<?php echo esc_attr( $plugin_table->view_context ); ?>" />
 					<?php $plugin_table->display(); ?>
 				<?php// if( ! $included ) : ?>
@@ -816,26 +816,26 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			}
 
 			// Was an install or upgrade action link clicked?
-			if ( ( isset( $_GET['optionsframework-install'] ) && 'install-plugin' === $_GET['optionsframework-install'] ) || ( isset( $_GET['optionsframework-update'] ) && 'update-plugin' === $_GET['optionsframework-update'] ) ) {
+			if ( ( isset( $_GET['wds-install'] ) && 'install-plugin' === $_GET['wds-install'] ) || ( isset( $_GET['wds-update'] ) && 'update-plugin' === $_GET['wds-update'] ) ) {
 
 				$install_type = 'install';
-				if ( isset( $_GET['optionsframework-update'] ) && 'update-plugin' === $_GET['optionsframework-update'] ) {
+				if ( isset( $_GET['wds-update'] ) && 'update-plugin' === $_GET['wds-update'] ) {
 					$install_type = 'update';
 				}
 
-				check_admin_referer( 'optionsframework-' . $install_type, 'optionsframework-nonce' );
+				check_admin_referer( 'wds-' . $install_type, 'wds-nonce' );
 
 				// Pass necessary information via URL if WP_Filesystem is needed.
 				$url = wp_nonce_url(
 					add_query_arg(
 						array(
 							'plugin'                 => urlencode( $slug ),
-							'optionsframework-' . $install_type => $install_type . '-plugin',
+							'wds-' . $install_type => $install_type . '-plugin',
 						),
-						$this->get_optionsframework_url()
+						$this->get_wds_url()
 					),
-					'optionsframework-' . $install_type,
-					'optionsframework-nonce'
+					'wds-' . $install_type,
+					'wds-nonce'
 				);
 
 				$method = ''; // Leave blank so WP_Filesystem can populate it as necessary.
@@ -918,20 +918,20 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 					}
 				}
 
-				$this->show_optionsframework_version();
+				$this->show_wds_version();
 
 				// Display message based on if all plugins are now active or not.
-				if ( $this->is_optionsframework_complete() ) {
-					echo '<p>', sprintf( esc_html( $this->strings['complete'] ), '<a href="' . esc_url( self_admin_url() ) . '">' . esc_html__( 'Return to the Dashboard', 'optionsframework' ) . '</a>' ), '</p>';
+				if ( $this->is_wds_complete() ) {
+					echo '<p>', sprintf( esc_html( $this->strings['complete'] ), '<a href="' . esc_url( self_admin_url() ) . '">' . esc_html__( 'Return to the Dashboard', 'webdogs-support' ) . '</a>' ), '</p>';
 					echo '<style type="text/css">#adminmenu .wp-submenu li.current { display: none !important; }</style>';
 				} else {
-					echo '<p><a href="', esc_url( $this->get_optionsframework_url() ), '" target="_parent">', esc_html( $this->strings['return'] ), '</a></p>';
+					echo '<p><a href="', esc_url( $this->get_wds_url() ), '" target="_parent">', esc_html( $this->strings['return'] ), '</a></p>';
 				}
 
 				return true;
-			} elseif ( isset( $this->plugins[ $slug ]['file_path'], $_GET['optionsframework-activate'] ) && 'activate-plugin' === $_GET['optionsframework-activate'] ) {
+			} elseif ( isset( $this->plugins[ $slug ]['file_path'], $_GET['wds-activate'] ) && 'activate-plugin' === $_GET['wds-activate'] ) {
 				// Activate action link was clicked.
-				check_admin_referer( 'optionsframework-activate', 'optionsframework-nonce' );
+				check_admin_referer( 'wds-activate', 'wds-nonce' );
 
 				if ( false === $this->activate_single_plugin( $this->plugins[ $slug ]['file_path'], $slug ) ) {
 					return true; // Finish execution of the function early as we encountered an error.
@@ -992,7 +992,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 * @return string $source
 		 */
 		public function maybe_adjust_source_dir( $source, $remote_source, $upgrader ) {
-			if ( ! $this->is_optionsframework_page() || ! is_object( $GLOBALS['wp_filesystem'] ) ) {
+			if ( ! $this->is_wds_page() || ! is_object( $GLOBALS['wp_filesystem'] ) ) {
 				return $source;
 			}
 
@@ -1019,7 +1019,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 				if ( true === $GLOBALS['wp_filesystem']->move( $from, $to ) ) {
 					return trailingslashit( $to );
 				} else {
-					return new WP_Error( 'rename_failed', esc_html__( 'The remote plugin package does not contain a folder with the desired slug and renaming did not work.', 'optionsframework' ) . ' ' . esc_html__( 'Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines.', 'optionsframework' ), array( 'found' => $subdir_name, 'expected' => $desired_slug ) );
+					return new WP_Error( 'rename_failed', esc_html__( 'The remote plugin package does not contain a folder with the desired slug and renaming did not work.', 'webdogs-support' ) . ' ' . esc_html__( 'Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines.', 'webdogs-support' ), array( 'found' => $subdir_name, 'expected' => $desired_slug ) );
 				}
 			}
 			unset( $slug );
@@ -1048,10 +1048,10 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 					if ( true === $GLOBALS['wp_filesystem']->move( $from, $to ) ) {
 						return trailingslashit( $to );
 					} else {
-						return new WP_Error( 'rename_failed', esc_html__( 'The remote plugin package does not contain a folder with the desired slug and renaming did not work.', 'optionsframework' ) . ' ' . esc_html__( 'Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines.', 'optionsframework' ), array( 'found' => $subdir_name, 'expected' => $desired_slug ) );
+						return new WP_Error( 'rename_failed', esc_html__( 'The remote plugin package does not contain a folder with the desired slug and renaming did not work.', 'webdogs-support' ) . ' ' . esc_html__( 'Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines.', 'webdogs-support' ), array( 'found' => $subdir_name, 'expected' => $desired_slug ) );
 					}
 				} elseif ( empty( $subdir_name ) ) {
-					return new WP_Error( 'packaged_wrong', esc_html__( 'The remote plugin package consists of more than one file, but the files are not packaged in a folder.', 'optionsframework' ) . ' ' . esc_html__( 'Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines.', 'optionsframework' ), array( 'found' => $subdir_name, 'expected' => $desired_slug ) );
+					return new WP_Error( 'packaged_wrong', esc_html__( 'The remote plugin package consists of more than one file, but the files are not packaged in a folder.', 'webdogs-support' ) . ' ' . esc_html__( 'Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines.', 'webdogs-support' ), array( 'found' => $subdir_name, 'expected' => $desired_slug ) );
 				}
 			}
 
@@ -1075,7 +1075,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 
 				if ( is_wp_error( $activate ) ) {
 					echo '<div id="message" class="error"><p>', wp_kses_post( $activate->get_error_message() ), '</p></div>',
-						'<p><a href="', esc_url( $this->get_optionsframework_url() ), '" target="_parent">', esc_html( $this->strings['return'] ), '</a></p>';
+						'<p><a href="', esc_url( $this->get_wds_url() ), '" target="_parent">', esc_html( $this->strings['return'] ), '</a></p>';
 
 					return false; // End it here if there is an error with activation.
 				} else {
@@ -1137,7 +1137,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 */
 		public function notices() {
 			// Remove nag on the install page / Return early if the nag message has been dismissed.
-			if ( $this->is_optionsframework_page() || get_user_meta( get_current_user_id(), 'optionsframework_dismissed_notice_' . $this->id, true ) ) {
+			if ( $this->is_wds_page() || get_user_meta( get_current_user_id(), 'wds_dismissed_notice_' . $this->id, true ) ) {
 				return;
 			}
 
@@ -1230,14 +1230,14 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 					unset( $plugin_slug );
 
 					$count          = count( $plugin_group );
-					$linked_plugins = /*array_map( array( 'Options_Framework_Utils', 'wrap_in_em' ),*/ $linked_plugins /*)*/;
+					$linked_plugins = /*array_map( array( 'Webdogs_Utils', 'wrap_in_em' ),*/ $linked_plugins /*)*/;
 					// $last_plugin    = array_pop( $linked_plugins ); // Pop off last name to prep for readability.
-					$imploded       = /*empty( $linked_plugins ) ? $last_plugin :(*/  implode( ', ', $linked_plugins );/* . ' ' . esc_html_x( 'and', 'plugin A *and* plugin B', 'optionsframework' ) . ' ' . $last_plugin );*/
+					$imploded       = /*empty( $linked_plugins ) ? $last_plugin :(*/  implode( ', ', $linked_plugins );/* . ' ' . esc_html_x( 'and', 'plugin A *and* plugin B', 'webdogs-support' ) . ' ' . $last_plugin );*/
 
 					$rendered[] = sprintf(
 						$line_template,
 						sprintf(
-							translate_nooped_plural( $this->strings[ $type ], $count, 'optionsframework' ),
+							translate_nooped_plural( $this->strings[ $type ], $count, 'webdogs-support' ),
 							$imploded,
 							$count
 						)
@@ -1256,7 +1256,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 					'install'  => '',
 					'update'   => '',
 					'activate' => '',
-					'dismiss'  => $this->dismissable ? '<a href="' . esc_url( add_query_arg( 'optionsframework-dismiss', 'dismiss_admin_notices' ) ) . '" class="dismiss-notice" target="_parent">' . esc_html( $this->strings['dismiss'] ) . '</a>' : '',
+					'dismiss'  => $this->dismissable ? '<a href="' . esc_url( add_query_arg( 'wds-dismiss', 'dismiss_admin_notices' ) ) . '" class="dismiss-notice" target="_parent">' . esc_html( $this->strings['dismiss'] ) . '</a>' : '',
 				);
 
 				$link_template = '<a href="%2$s">%1$s</a>';
@@ -1265,15 +1265,15 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 					if ( $install_link_count > 0 ) {
 						$action_links['install'] = sprintf(
 							$link_template,
-							translate_nooped_plural( $this->strings['install_link'], $install_link_count, 'optionsframework' ),
-							esc_url( $this->get_optionsframework_status_url( 'install' ) )
+							translate_nooped_plural( $this->strings['install_link'], $install_link_count, 'webdogs-support' ),
+							esc_url( $this->get_wds_status_url( 'install' ) )
 						);
 					}
 					if ( $update_link_count > 0 ) {
 						$action_links['update'] = sprintf(
 							$link_template,
-							translate_nooped_plural( $this->strings['update_link'], $update_link_count, 'optionsframework' ),
-							esc_url( $this->get_optionsframework_status_url( 'update' ) )
+							translate_nooped_plural( $this->strings['update_link'], $update_link_count, 'webdogs-support' ),
+							esc_url( $this->get_wds_status_url( 'update' ) )
 						);
 					}
 				}
@@ -1281,27 +1281,27 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 				if ( current_user_can( 'activate_plugins' ) && $activate_link_count > 0 ) {
 					$action_links['activate'] = sprintf(
 						$link_template,
-						translate_nooped_plural( $this->strings['activate_link'], $activate_link_count, 'optionsframework' ),
-						esc_url( $this->get_optionsframework_status_url( 'activate' ) )
+						translate_nooped_plural( $this->strings['activate_link'], $activate_link_count, 'webdogs-support' ),
+						esc_url( $this->get_wds_status_url( 'activate' ) )
 					);
 				}
 
-				$action_links = apply_filters( 'optionsframework_notice_action_links', $action_links );
+				$action_links = apply_filters( 'wds_notice_action_links', $action_links );
 
 				$action_links = array_filter( (array) $action_links ); // Remove any empty array items.
 
 				if ( ! empty( $action_links ) && is_array( $action_links ) ) {
 					$action_links = sprintf( $line_template, implode( ' | ', $action_links ) );
 					$rendered    .= "<br/><br/>";
-					$rendered    .= apply_filters( 'optionsframework_notice_rendered_action_links', $action_links );
+					$rendered    .= apply_filters( 'wds_notice_rendered_action_links', $action_links );
 				}
 
 				// Register the nag messages and prepare them to be processed.
 				if ( ! empty( $this->strings['nag_type'] ) ) {
-					add_settings_error( 'optionsframework', 'optionsframework', $rendered, sanitize_html_class( strtolower( $this->strings['nag_type'] ) ) );
+					add_settings_error( 'webdogs-support', 'webdogs-support', $rendered, sanitize_html_class( strtolower( $this->strings['nag_type'] ) ) );
 				} else {
 					$nag_class = version_compare( $this->wp_version, '3.8', '<' ) ? 'updated' : 'update-nag';
-					add_settings_error( 'optionsframework', 'optionsframework', $rendered, $nag_class );
+					add_settings_error( 'webdogs-support', 'webdogs-support', $rendered, $nag_class );
 				}
 			}
 
@@ -1319,10 +1319,10 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		protected function display_settings_errors() {
 			global $wp_settings_errors;
 
-			settings_errors( 'optionsframework' );
+			settings_errors( 'webdogs-support' );
 
 			foreach ( (array) $wp_settings_errors as $key => $details ) {
-				if ( 'optionsframework' === $details['setting'] ) {
+				if ( 'webdogs-support' === $details['setting'] ) {
 					unset( $wp_settings_errors[ $key ] );
 					break;
 				}
@@ -1337,8 +1337,8 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 * @since 2.1.0
 		 */
 		public function dismiss() {
-			if ( isset( $_GET['optionsframework-dismiss'] ) ) {
-				update_user_meta( get_current_user_id(), 'optionsframework_dismissed_notice_' . $this->id, 1 );
+			if ( isset( $_GET['wds-dismiss'] ) ) {
+				update_user_meta( get_current_user_id(), 'wds_dismissed_notice_' . $this->id, 1 );
 			}
 		}
 
@@ -1376,7 +1376,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			$theme['slug'] = $this->sanitize_key( $theme['slug'] );
 
 			// Forgive users for using string versions of booleans or floats for version number.
-			$theme['force_deletion']     = Options_Framework_Utils::validate_bool( $theme['force_deletion'] );
+			$theme['force_deletion']     = Webdogs_Utils::validate_bool( $theme['force_deletion'] );
 
 			// Set the class properties.
 			$this->themes[ $theme['slug'] ]     = $theme;
@@ -1432,11 +1432,11 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			// Forgive users for using string versions of booleans or floats for version number.
 			$plugin['version']            = (string) $plugin['version'];
 			$plugin['source']             = empty( $plugin['source'] ) ? 'repo' : $plugin['source'];
-			$plugin['must_use']           = Options_Framework_Utils::validate_bool( $plugin['must_use'] );
-			$plugin['required']           = Options_Framework_Utils::validate_bool( $plugin['required'] );
-			$plugin['force_activation']   = Options_Framework_Utils::validate_bool( $plugin['force_activation'] );
-			$plugin['force_deactivation'] = Options_Framework_Utils::validate_bool( $plugin['force_deactivation'] );
-			$plugin['force_deletion']     = Options_Framework_Utils::validate_bool( $plugin['force_deletion'] );
+			$plugin['must_use']           = Webdogs_Utils::validate_bool( $plugin['must_use'] );
+			$plugin['required']           = Webdogs_Utils::validate_bool( $plugin['required'] );
+			$plugin['force_activation']   = Webdogs_Utils::validate_bool( $plugin['force_activation'] );
+			$plugin['force_deactivation'] = Webdogs_Utils::validate_bool( $plugin['force_deactivation'] );
+			$plugin['force_deletion']     = Webdogs_Utils::validate_bool( $plugin['force_deletion'] );
 
 			// Enrich the received data.
 			if ( empty( $plugin['file_path'] ) ) {
@@ -1475,9 +1475,9 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 */
 		public function filter_optionframwork_override( $value ) {
 
-			$option_name = str_replace('optionsframework-', '', current_filter() );
+			$option_name = str_replace('wds-', '', current_filter() );
 
-		    return Options_Framework_Utils::validate_bool( of_get_option( $option_name, false ) );
+		    return Webdogs_Utils::validate_bool( wds_get_option( $option_name, false ) );
 		}
 		/**
 		 * Determine what type of source the plugin comes from.
@@ -1524,7 +1524,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			* @param string $key     Sanitized key.
 			* @param string $raw_key The key prior to sanitization.
 			*/
-			return apply_filters( 'optionsframework_sanitize_key', $key, $raw_key );
+			return apply_filters( 'wds_sanitize_key', $key, $raw_key );
 		}
 
 		/**
@@ -1570,7 +1570,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 */
 		public function actions( $install_actions ) {
 			// Remove action links on the Options Framework install page.
-			if ( $this->is_optionsframework_page() ) {
+			if ( $this->is_wds_page() ) {
 				return false;
 			}
 
@@ -1772,7 +1772,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 *
 		 * @return boolean True when on the Options Framework page, false otherwise.
 		 */
-		protected function is_optionsframework_page() {
+		protected function is_wds_page() {
 			return isset( $_GET['page'] ) && $this->menu === $_GET['page'];
 		}
 
@@ -1780,13 +1780,13 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 * Retrieve the URL to the Options Framework Install page.
 		 *
 		 * I.e. depending on the config settings passed something along the lines of:
-		 * http://example.com/wp-admin/themes.php?page=optionsframework-install-plugins
+		 * http://example.com/wp-admin/themes.php?page=wds-install-plugins
 		 *
 		 * @since 2.5.0
 		 *
 		 * @return string Properly encoded URL (not escaped).
 		 */
-		public function get_optionsframework_url() {
+		public function get_wds_url() {
 			static $url;
 
 				$menu = $this->menu;
@@ -1816,19 +1816,19 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 * Retrieve the URL to the Options Framework Install page for a specific plugin status (view).
 		 *
 		 * I.e. depending on the config settings passed something along the lines of:
-		 * http://example.com/wp-admin/themes.php?page=optionsframework-install-plugins&plugin_status=install
+		 * http://example.com/wp-admin/themes.php?page=wds-install-plugins&plugin_status=install
 		 *
 		 * @since 2.5.0
 		 *
 		 * @param string $status Plugin status - either 'install', 'update' or 'activate'.
 		 * @return string Properly encoded URL (not escaped).
 		 */
-		public function get_optionsframework_status_url( $status ) {
+		public function get_wds_status_url( $status ) {
 			return add_query_arg(
 				array(
 					'plugin_status' => urlencode( $status ),
 				),
-				$this->get_optionsframework_url()
+				$this->get_wds_url()
 			);
 		}
 
@@ -1839,7 +1839,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 *
 		 * @return bool True if complete, i.e. no outstanding actions. False otherwise.
 		 */
-		public function is_optionsframework_complete() {
+		public function is_wds_complete() {
 			$complete = true;
 			foreach ( $this->plugins as $slug => $plugin ) {
 				if ( ! $this->is_plugin_active( $slug ) || false !== $this->does_plugin_have_update( $slug ) ) {
@@ -2049,7 +2049,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 				require_once ABSPATH . 'wp-admin/includes/plugin.php';
 			}
 
-			return apply_filters( 'optionsframework_filter_plugins', get_plugins( $plugin_folder ) );
+			return apply_filters( 'wds_filter_plugins', get_plugins( $plugin_folder ) );
 		}
 
 		/**
@@ -2061,7 +2061,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 * @since 2.1.1
 		 */
 		public function update_dismiss() {
-			delete_metadata( 'user', null, 'optionsframework_dismissed_notice_' . $this->id, null, true );
+			delete_metadata( 'user', null, 'wds_dismissed_notice_' . $this->id, null, true );
 		}
 
 		/**
@@ -2144,15 +2144,15 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 			if ( empty( $delete ) ) return true;
 			$delete_result = delete_plugins( $delete ); //var_export($delete_result);
 			if( is_wp_error( $delete_result ) ) {
-			    add_settings_error( 'options-framework', 'plugin_deletion', $return->get_error_message(), 'error update-nag' );
+			    add_settings_error( 'webdogs-support', 'plugin_deletion', $return->get_error_message(), 'error update-nag' );
 			} else {
 				$imploded = implode(', ', $deleted_names);
 				$rendered = sprintf(
-							translate_nooped_plural( $this->strings[ 'plugin_deletion' ], count($delete), 'optionsframework' ),
+							translate_nooped_plural( $this->strings[ 'plugin_deletion' ], count($delete), 'webdogs-support' ),
 							$imploded,
 							count($delete)
 						);
-				add_settings_error( 'options-framework', 'plugin_deletion', $rendered, 'update-nag' );
+				add_settings_error( 'webdogs-support', 'plugin_deletion', $rendered, 'update-nag' );
 			}
 		}
 
@@ -2169,7 +2169,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 * @since 2.2.0
 		 */
 		public function theme_deletion() {
-			// if ('no' === of_get_option('has_theme_deletion') ) {
+			// if ('no' === wds_get_option('has_theme_deletion') ) {
 			// 	return true;
 			// }
 			$error = $deleted_names = array();
@@ -2192,17 +2192,17 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 				    	$line_template = /*'<span style="display: block; margin: 0.5em 0.5em 0 0; clear: both;">*/'%s'/*</span>'*/ . "\n";
 			    		$error_message .= $messsage;
 			    	}
-			    	add_settings_error( 'options-framework', 'theme_deletion', $error_message, 'update-nag' );
+			    	add_settings_error( 'webdogs-support', 'theme_deletion', $error_message, 'update-nag' );
 			    }		
 			    if(!empty($deleted_names)){
 				    $imploded = implode(', ', $deleted_names);
 					$rendered = 
 							sprintf(
-								translate_nooped_plural( $this->strings[ 'theme_deletion' ], count($delete), 'optionsframework' ),
+								translate_nooped_plural( $this->strings[ 'theme_deletion' ], count($delete), 'webdogs-support' ),
 								$imploded,
 								count($delete)
 							);
-					add_settings_error( 'options-framework', 'theme_deletion', $rendered, 'update-nag' );
+					add_settings_error( 'webdogs-support', 'theme_deletion', $rendered, 'update-nag' );
 				}
 			}
 		}
@@ -2210,9 +2210,9 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		/**
 		 * Echo the current Options Framework version number to the page.<strong></strong>
 		 */
-		public function show_optionsframework_version() {
+		public function show_wds_version() {
 			// echo '<p style="float: right; padding: 0em 1.5em 0.5em 0;"><small>',
-				// esc_html( sprintf( _x( 'Options Framework v%s', '%s = version number', 'optionsframework' ), self::OPTIONS_FRAMEWORK_VERSION ) ),
+				// esc_html( sprintf( _x( 'Options Framework v%s', '%s = version number', 'webdogs-support' ), self::OPTIONS_FRAMEWORK_VERSION ) ),
 				// '</small></p>';
 		}
 
@@ -2221,7 +2221,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 		 *
 		 * @since 2.4.0
 		 *
-		 * @return object The Options_Framework_Plugin_Activation object.
+		 * @return object The Webdogs_Plugin_Activation object.
 		 */
 		public static function get_instance() {
 			if ( ! isset( self::$instance ) && ! ( self::$instance instanceof self ) ) {
@@ -2233,7 +2233,7 @@ if ( ! class_exists( 'Options_Framework_Plugin_Activation' ) ) {
 	}
 }
 
-if ( ! function_exists( 'Options_Framework_Install_Plugins_Page' ) ) {
+if ( ! function_exists( 'Webdogs_Install_Plugins_Page' ) ) {
 	/**
 	 * Helper function to register a collection of required plugins.
 	 *
@@ -2243,12 +2243,12 @@ if ( ! function_exists( 'Options_Framework_Install_Plugins_Page' ) ) {
 	 * @param array $plugins An array of plugin arrays.
 	 * @param array $config  Optional. An array of configuration values.
 	 */
-	function Options_Framework_Install_Plugins_Page() {
-		$instance = $GLOBALS['optionsframeworkpluginactivation'];
+	function Webdogs_Install_Plugins_Page() {
+		$instance = $GLOBALS['wds_plugin_activation'];
 		$instance->install_plugins_page();
 	}
 }
-if ( ! function_exists( 'Is_Options_Framework_Plugins_Page' ) ) {
+if ( ! function_exists( 'Is_Webdogs_Plugins_Page' ) ) {
 	/**
 	 * Helper function to register a collection of required plugins.
 	 *
@@ -2258,12 +2258,12 @@ if ( ! function_exists( 'Is_Options_Framework_Plugins_Page' ) ) {
 	 * @param array $plugins An array of plugin arrays.
 	 * @param array $config  Optional. An array of configuration values.
 	 */
-	function Is_Options_Framework_Plugins_Page( $boolval ) {
+	function Is_Webdogs_Plugins_Page( $boolval ) {
 		return ( ! empty( $_GET['plugin_status'] ) );
 	}
 }
 
-if ( ! function_exists( 'Options_Framework_Register_Plugins' ) ) {
+if ( ! function_exists( 'Webdogs_Register_Plugins' ) ) {
 	/**
 	 * Helper function to register a collection of required plugins.
 	 *
@@ -2273,8 +2273,8 @@ if ( ! function_exists( 'Options_Framework_Register_Plugins' ) ) {
 	 * @param array $plugins An array of plugin arrays.
 	 * @param array $config  Optional. An array of configuration values.
 	 */
-	function Options_Framework_Register_Plugins( $plugins, $themes, $config = array() ) {
-		$instance = $GLOBALS['optionsframeworkpluginactivation'];
+	function Webdogs_Register_Plugins( $plugins, $themes, $config = array() ) {
+		$instance = $GLOBALS['wds_plugin_activation'];
 
 		foreach ( $plugins as $plugin ) {
 			call_user_func( array( $instance, 'register' ), $plugin );
@@ -2315,7 +2315,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
-if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
+if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 
 	/**
 	 * List table class for handling plugins.
@@ -2334,7 +2334,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 	 * @author  Thomas Griffin
 	 * @author  Gary Jones
 	 */
-	class Options_Framework_List_Table extends WP_List_Table {
+	class Webdogs_List_Table extends WP_List_Table {
 		/**
 		 * Options Framework instance.
 		 *
@@ -2342,7 +2342,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		 *
 		 * @var object
 		 */
-		protected $optionsframework;
+		protected $wds_plugin_activation;
 
 		/**
 		 * The currently chosen view.
@@ -2373,7 +2373,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		 * @since 2.2.0
 		 */
 		public function __construct() {
-			$this->optionsframework = $GLOBALS['optionsframeworkpluginactivation'];
+			$this->wds_plugin_activation = $GLOBALS['wds_plugin_activation'];
 
 			parent::__construct(
 				array(
@@ -2387,7 +2387,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 				$this->view_context = sanitize_key( $_REQUEST['plugin_status'] );
 			}
 
-			add_filter( 'optionsframework_table_data_items', array( $this, 'sort_table_items' ) );
+			add_filter( 'wds_table_data_items', array( $this, 'sort_table_items' ) );
 		}
 
 		/**
@@ -2412,8 +2412,8 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		 */
 		protected function _gather_plugin_data() {
 			// Load thickbox for plugin links.
-			$this->optionsframework->admin_init();
-			$this->optionsframework->thickbox();
+			$this->wds_plugin_activation->admin_init();
+			$this->wds_plugin_activation->thickbox();
 
 			// Categorize the plugins which have open actions.
 			$plugins = $this->categorize_plugins_to_views();
@@ -2436,23 +2436,23 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 
 				$table_data[ $i ]['sanitized_plugin']  = $plugin['name'];
 				$table_data[ $i ]['slug']              = $slug;
-				$table_data[ $i ]['plugin']            = /*'<strong>' . */$this->optionsframework->get_info_link( $slug )/* . '</strong>'*/;
+				$table_data[ $i ]['plugin']            = /*'<strong>' . */$this->wds_plugin_activation->get_info_link( $slug )/* . '</strong>'*/;
 				$table_data[ $i ]['source']            = $this->get_plugin_source_type_text( $plugin['source_type'] );
 				$table_data[ $i ]['type']              = $this->get_plugin_advise_type_text( $plugin['required'] );
 				$table_data[ $i ]['status']            = $this->get_plugin_status_text( $slug );
-				$table_data[ $i ]['installed_version'] = $this->optionsframework->get_installed_version( $slug );
+				$table_data[ $i ]['installed_version'] = $this->wds_plugin_activation->get_installed_version( $slug );
 				$table_data[ $i ]['minimum_version']   = $plugin['version'];
-				$table_data[ $i ]['available_version'] = $this->optionsframework->does_plugin_have_update( $slug );
+				$table_data[ $i ]['available_version'] = $this->wds_plugin_activation->does_plugin_have_update( $slug );
 
 				// Prep the upgrade notice info.
-				$upgrade_notice = $this->optionsframework->get_upgrade_notice( $slug );
+				$upgrade_notice = $this->wds_plugin_activation->get_upgrade_notice( $slug );
 				if ( ! empty( $upgrade_notice ) ) {
 					$table_data[ $i ]['upgrade_notice'] = $upgrade_notice;
 
-					add_action( "optionsframework_after_plugin_row_$slug", array( $this, 'wp_plugin_update_row' ), 10, 3 );
+					add_action( "wds_after_plugin_row_$slug", array( $this, 'wp_plugin_update_row' ), 10, 3 );
 				}
 
-				$table_data[ $i ] = apply_filters( 'optionsframework_table_data_item', $table_data[ $i ], $plugin );
+				$table_data[ $i ] = apply_filters( 'wds_table_data_item', $table_data[ $i ], $plugin );
 
 				$i++;
 			}
@@ -2473,21 +2473,21 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 				'activate' => array(),
 			);
 
-			foreach ( $this->optionsframework->plugins as $slug => $plugin ) {
-				if ( ( $this->optionsframework->is_plugin_active( $slug ) && false === $this->optionsframework->does_plugin_have_update( $slug ) ) || true === $plugin['force_deactivation'] || true === $plugin['force_deletion'] ) {
+			foreach ( $this->wds_plugin_activation->plugins as $slug => $plugin ) {
+				if ( ( $this->wds_plugin_activation->is_plugin_active( $slug ) && false === $this->wds_plugin_activation->does_plugin_have_update( $slug ) ) || true === $plugin['force_deactivation'] || true === $plugin['force_deletion'] ) {
 					// No need to display plugins if they are installed, up-to-date and active.
 					continue;
 				} else {
 					$plugins['all'][ $slug ] = $plugin;
 
-					if ( ! $this->optionsframework->is_plugin_installed( $slug ) ) {
+					if ( ! $this->wds_plugin_activation->is_plugin_installed( $slug ) ) {
 						$plugins['install'][ $slug ] = $plugin;
 					} else {
-						if ( false !== $this->optionsframework->does_plugin_have_update( $slug ) ) {
+						if ( false !== $this->wds_plugin_activation->does_plugin_have_update( $slug ) ) {
 							$plugins['update'][ $slug ] = $plugin;
 						}
 
-						if ( $this->optionsframework->can_plugin_activate( $slug ) ) {
+						if ( $this->wds_plugin_activation->can_plugin_activate( $slug ) ) {
 							$plugins['activate'][ $slug ] = $plugin;
 						}
 					}
@@ -2520,10 +2520,10 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		 */
 		protected function get_plugin_advise_type_text( $required ) {
 			if ( true === $required ) {
-				return __( 'Required', 'optionsframework' );
+				return __( 'Required', 'webdogs-support' );
 			}
 
-			return __( 'Recommended', 'optionsframework' );
+			return __( 'Recommended', 'webdogs-support' );
 		}
 
 		/**
@@ -2539,13 +2539,13 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 
 			switch ( $type ) {
 				case 'repo':
-					$string = __( 'WordPress Repository', 'optionsframework' );
+					$string = __( 'WordPress Repository', 'webdogs-support' );
 					break;
 				case 'external':
-					$string = __( 'External Source', 'optionsframework' );
+					$string = __( 'External Source', 'webdogs-support' );
 					break;
 				case 'bundled':
-					$string = __( 'Pre-Packaged', 'optionsframework' );
+					$string = __( 'Pre-Packaged', 'webdogs-support' );
 					break;
 			}
 
@@ -2561,26 +2561,26 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		 * @return string
 		 */
 		protected function get_plugin_status_text( $slug ) {
-			if ( ! $this->optionsframework->is_plugin_installed( $slug ) ) {
-				return __( 'Not Installed', 'optionsframework' );
+			if ( ! $this->wds_plugin_activation->is_plugin_installed( $slug ) ) {
+				return __( 'Not Installed', 'webdogs-support' );
 			}
 
-			if ( ! $this->optionsframework->is_plugin_active( $slug ) ) {
-				$install_status = __( 'Installed But Not Activated', 'optionsframework' );
+			if ( ! $this->wds_plugin_activation->is_plugin_active( $slug ) ) {
+				$install_status = __( 'Installed But Not Activated', 'webdogs-support' );
 			} else {
-				$install_status = __( 'Active', 'optionsframework' );
+				$install_status = __( 'Active', 'webdogs-support' );
 			}
 
 			$update_status = '';
 
-			if ( $this->optionsframework->does_plugin_require_update( $slug ) && false === $this->optionsframework->does_plugin_have_update( $slug ) ) {
-				$update_status = __( 'Required Update not Available', 'optionsframework' );
+			if ( $this->wds_plugin_activation->does_plugin_require_update( $slug ) && false === $this->wds_plugin_activation->does_plugin_have_update( $slug ) ) {
+				$update_status = __( 'Required Update not Available', 'webdogs-support' );
 
-			} elseif ( $this->optionsframework->does_plugin_require_update( $slug ) ) {
-				$update_status = __( 'Requires Update', 'optionsframework' );
+			} elseif ( $this->wds_plugin_activation->does_plugin_require_update( $slug ) ) {
+				$update_status = __( 'Requires Update', 'webdogs-support' );
 
-			} elseif ( false !== $this->optionsframework->does_plugin_have_update( $slug ) ) {
-				$update_status = __( 'Update recommended', 'optionsframework' );
+			} elseif ( false !== $this->wds_plugin_activation->does_plugin_have_update( $slug ) ) {
+				$update_status = __( 'Update recommended', 'webdogs-support' );
 			}
 
 			if ( '' === $update_status ) {
@@ -2588,7 +2588,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 			}
 
 			return sprintf(
-				_x( '%1$s, %2$s', '%1$s = install status, %2$s = update status', 'optionsframework' ),
+				_x( '%1$s, %2$s', '%1$s = install status, %2$s = update status', 'webdogs-support' ),
 				$install_status,
 				$update_status
 			);
@@ -2633,16 +2633,16 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 
 				switch ( $type ) {
 					case 'all':
-						$text = _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $count, 'plugins', 'optionsframework' );
+						$text = _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $count, 'plugins', 'webdogs-support' );
 						break;
 					case 'install':
-						$text = _n( 'To Install <span class="count">(%s)</span>', 'To Install <span class="count">(%s)</span>', $count, 'optionsframework' );
+						$text = _n( 'To Install <span class="count">(%s)</span>', 'To Install <span class="count">(%s)</span>', $count, 'webdogs-support' );
 						break;
 					case 'update':
-						$text = _n( 'Update Available <span class="count">(%s)</span>', 'Update Available <span class="count">(%s)</span>', $count, 'optionsframework' );
+						$text = _n( 'Update Available <span class="count">(%s)</span>', 'Update Available <span class="count">(%s)</span>', $count, 'webdogs-support' );
 						break;
 					case 'activate':
-						$text = _n( 'To Activate <span class="count">(%s)</span>', 'To Activate <span class="count">(%s)</span>', $count, 'optionsframework' );
+						$text = _n( 'To Activate <span class="count">(%s)</span>', 'To Activate <span class="count">(%s)</span>', $count, 'webdogs-support' );
 						break;
 					default:
 						$text = '';
@@ -2653,7 +2653,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 
 					$status_links[ $type ] = sprintf(
 						'<a href="%s"%s>%s</a>',
-						esc_url( str_replace( 'page=optionsframework-install-plugins', 'page='.$_GET['page'], $this->optionsframework->get_optionsframework_status_url( $type ) ) ),
+						esc_url( str_replace( 'page=wds-install-plugins', 'page='.$_GET['page'], $this->wds_plugin_activation->get_wds_status_url( $type ) ) ),
 						( $type === $this->view_context ) ? ' class="current"' : '',
 						sprintf( $text, number_format_i18n( $count ) )
 					);
@@ -2723,16 +2723,16 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		public function column_version( $item ) {
 			$output = array();
 
-			if ( $this->optionsframework->is_plugin_installed( $item['slug'] ) ) {
-				$installed = ! empty( $item['installed_version'] ) ? $item['installed_version'] : _x( 'unknown', 'as in: "version nr unknown"', 'optionsframework' );
+			if ( $this->wds_plugin_activation->is_plugin_installed( $item['slug'] ) ) {
+				$installed = ! empty( $item['installed_version'] ) ? $item['installed_version'] : _x( 'unknown', 'as in: "version nr unknown"', 'webdogs-support' );
 
 				$color = '';
-				if ( ! empty( $item['minimum_version'] ) && $this->optionsframework->does_plugin_require_update( $item['slug'] ) ) {
+				if ( ! empty( $item['minimum_version'] ) && $this->wds_plugin_activation->does_plugin_require_update( $item['slug'] ) ) {
 					$color = ' color: #ff0000; font-weight: bold;';
 				}
 
 				$output[] = sprintf(
-					'<p><span style="min-width: 32px; text-align: right; float: right;%1$s">%2$s</span>' . __( 'Installed version:', 'optionsframework' ) . '</p>',
+					'<p><span style="min-width: 32px; text-align: right; float: right;%1$s">%2$s</span>' . __( 'Installed version:', 'webdogs-support' ) . '</p>',
 					$color,
 					$installed
 				);
@@ -2740,7 +2740,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 
 			if ( ! empty( $item['minimum_version'] ) ) {
 				$output[] = sprintf(
-					'<p><span style="min-width: 32px; text-align: right; float: right;">%1$s</span>' . __( 'Minimum required version:', 'optionsframework' ) . '</p>',
+					'<p><span style="min-width: 32px; text-align: right; float: right;">%1$s</span>' . __( 'Minimum required version:', 'webdogs-support' ) . '</p>',
 					$item['minimum_version']
 				);
 			}
@@ -2752,7 +2752,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 				}
 
 				$output[] = sprintf(
-					'<p><span style="min-width: 32px; text-align: right; float: right;%1$s">%2$s</span>' . __( 'Available version:', 'optionsframework' ) . '</p>',
+					'<p><span style="min-width: 32px; text-align: right; float: right;%1$s">%2$s</span>' . __( 'Available version:', 'webdogs-support' ) . '</p>',
 					$color,
 					$item['available_version']
 				);
@@ -2775,7 +2775,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		 * @since 2.2.0
 		 */
 		public function no_items() {
-			printf( wp_kses_post( __( 'No plugins to install, update or activate. <a href="%1$s">Return to the Dashboard</a>', 'optionsframework' ) ), esc_url( self_admin_url() ) );
+			printf( wp_kses_post( __( 'No plugins to install, update or activate. <a href="%1$s">Return to the Dashboard</a>', 'webdogs-support' ) ), esc_url( self_admin_url() ) );
 			echo '<style type="text/css">#adminmenu .wp-submenu li.current { display: none !important; }</style>';
 		}
 
@@ -2789,17 +2789,17 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		public function get_columns() {
 			$columns = array(
 				'cb'     => '<input type="checkbox" />',
-				'plugin' => __( 'Plugin', 'optionsframework' ),
-				'source' => __( 'Source', 'optionsframework' ),
-				'type'   => __( 'Type', 'optionsframework' ),
+				'plugin' => __( 'Plugin', 'webdogs-support' ),
+				'source' => __( 'Source', 'webdogs-support' ),
+				'type'   => __( 'Type', 'webdogs-support' ),
 			);
 
 			if ( 'all' === $this->view_context || 'update' === $this->view_context ) {
-				$columns['version'] = __( 'Version', 'optionsframework' );
-				$columns['status']  = __( 'Status', 'optionsframework' );
+				$columns['version'] = __( 'Version', 'webdogs-support' );
+				$columns['status']  = __( 'Status', 'webdogs-support' );
 			}
 
-			return apply_filters( 'optionsframework_table_columns', $columns );
+			return apply_filters( 'wds_table_columns', $columns );
 		}
 
 		/**
@@ -2843,17 +2843,17 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 			$action_links = array();
 
 			// Display the 'Install' action link if the plugin is not yet available.
-			if ( ! $this->optionsframework->is_plugin_installed( $item['slug'] ) ) {
-				$actions['install'] = _x( 'Install %2$s', '%2$s = plugin name in screen reader markup', 'optionsframework' );
+			if ( ! $this->wds_plugin_activation->is_plugin_installed( $item['slug'] ) ) {
+				$actions['install'] = _x( 'Install %2$s', '%2$s = plugin name in screen reader markup', 'webdogs-support' );
 			} else {
 				// Display the 'Update' action link if an update is available and WP complies with plugin minimum.
-				if ( false !== $this->optionsframework->does_plugin_have_update( $item['slug'] ) && $this->optionsframework->can_plugin_update( $item['slug'] ) ) {
-					$actions['update'] = _x( 'Update %2$s', '%2$s = plugin name in screen reader markup', 'optionsframework' );
+				if ( false !== $this->wds_plugin_activation->does_plugin_have_update( $item['slug'] ) && $this->wds_plugin_activation->can_plugin_update( $item['slug'] ) ) {
+					$actions['update'] = _x( 'Update %2$s', '%2$s = plugin name in screen reader markup', 'webdogs-support' );
 				}
 
 				// Display the 'Activate' action link, but only if the plugin meets the minimum version.
-				if ( $this->optionsframework->can_plugin_activate( $item['slug'] ) ) {
-					$actions['activate'] = _x( 'Activate %2$s', '%2$s = plugin name in screen reader markup', 'optionsframework' );
+				if ( $this->wds_plugin_activation->can_plugin_activate( $item['slug'] ) ) {
+					$actions['activate'] = _x( 'Activate %2$s', '%2$s = plugin name in screen reader markup', 'webdogs-support' );
 				}
 			}
 
@@ -2863,12 +2863,12 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 					add_query_arg(
 						array(
 							'plugin'           => urlencode( $item['slug'] ),
-							'optionsframework-' . $action => $action . '-plugin',
+							'wds-' . $action => $action . '-plugin',
 						),
-						$this->optionsframework->get_optionsframework_url()
+						$this->wds_plugin_activation->get_wds_url()
 					),
-					'optionsframework-' . $action,
-					'optionsframework-nonce'
+					'wds-' . $action,
+					'wds-nonce'
 				);
 
 				$action_links[ $action ] = sprintf(
@@ -2879,7 +2879,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 			}
 
 			$prefix = ( defined( 'WP_NETWORK_ADMIN' ) && WP_NETWORK_ADMIN ) ? 'network_admin_' : '';
-			return apply_filters( "optionsframework_{$prefix}plugin_action_links", array_filter( $action_links ), $item['slug'], $item, $this->view_context );
+			return apply_filters( "wds_{$prefix}plugin_action_links", array_filter( $action_links ), $item['slug'], $item, $this->view_context );
 		}
 
 		
@@ -2894,7 +2894,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 			global $status;
 
 			$plugin_data = $item;
-			$plugin = $this->optionsframework->plugins[ $plugin_data['slug'] ];
+			$plugin = $this->wds_plugin_activation->plugins[ $plugin_data['slug'] ];
 			$plugin_file = $plugin['file_path'];
 
 			$is_active = ( stripos( $plugin_data['status'], 'Active') !== FALSE && stripos($plugin_data['status'], 'Not Activated') === FALSE );
@@ -2935,7 +2935,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 			 * @since 2.5.0
 			 */
 			$slug = $item['slug'];
-			do_action( "optionsframework_after_plugin_row_{$slug}", $item['slug'], $item, $this->view_context );
+			do_action( "wds_after_plugin_row_{$slug}", $item['slug'], $item, $this->view_context );
 		}
 
 		/**
@@ -2958,7 +2958,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 				<tr class="plugin-update-tr">
 					<td colspan="', absint( $this->get_column_count() ), '" class="plugin-update colspanchange">
 						<div class="update-message">',
-							esc_html__( 'Upgrade message from the plugin author:', 'optionsframework' ),
+							esc_html__( 'Upgrade message from the plugin author:', 'webdogs-support' ),
 							'', wp_kses_data( $item['upgrade_notice'] ), '
 						</div>
 					</td>
@@ -2974,7 +2974,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		 */
 		public function extra_tablenav( $which ) {
 			if ( 'bottom' === $which ) {
-				$this->optionsframework->show_optionsframework_version();
+				$this->wds_plugin_activation->show_wds_version();
 			}
 		}
 
@@ -2991,16 +2991,16 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 
 			if ( 'update' !== $this->view_context && 'activate' !== $this->view_context ) {
 				if ( current_user_can( 'install_plugins' ) ) {
-					$actions['optionsframework-bulk-install'] = __( 'Install', 'optionsframework' );
+					$actions['wds-bulk-install'] = __( 'Install', 'webdogs-support' );
 				}
 			}
 
 			if ( 'install' !== $this->view_context ) {
 				if ( current_user_can( 'update_plugins' ) ) {
-					$actions['optionsframework-bulk-update'] = __( 'Update', 'optionsframework' );
+					$actions['wds-bulk-update'] = __( 'Update', 'webdogs-support' );
 				}
 				if ( current_user_can( 'activate_plugins' ) ) {
-					$actions['optionsframework-bulk-activate'] = __( 'Activate', 'optionsframework' );
+					$actions['wds-bulk-activate'] = __( 'Activate', 'webdogs-support' );
 				}
 			}
 
@@ -3017,12 +3017,12 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		 */
 		public function process_bulk_actions() {
 			// Bulk installation process.
-			if ( 'optionsframework-bulk-install' === $this->current_action() || 'optionsframework-bulk-update' === $this->current_action() ) {
+			if ( 'wds-bulk-install' === $this->current_action() || 'wds-bulk-update' === $this->current_action() ) {
 
 				check_admin_referer( 'bulk-' . $this->_args['plural'] );
 
 				$install_type = 'install';
-				if ( 'optionsframework-bulk-update' === $this->current_action() ) {
+				if ( 'wds-bulk-update' === $this->current_action() ) {
 					$install_type = 'update';
 				}
 
@@ -3031,9 +3031,9 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 				// Did user actually select any plugins to install/update ?
 				if ( empty( $_POST['plugin'] ) ) {
 					if ( 'install' === $install_type ) {
-						$message = __( 'No plugins were selected to be installed. No action taken.', 'optionsframework' );
+						$message = __( 'No plugins were selected to be installed. No action taken.', 'webdogs-support' );
 					} else {
-						$message = __( 'No plugins were selected to be updated. No action taken.', 'optionsframework' );
+						$message = __( 'No plugins were selected to be updated. No action taken.', 'webdogs-support' );
 					}
 
 					echo '<div id="message" class="error"><p>', esc_html( $message ), '</p></div>';
@@ -3055,13 +3055,13 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 				// Validate the received input.
 				foreach ( $plugins_to_install as $key => $slug ) {
 					// Check if the plugin was registered with Options Framework and remove if not.
-					if ( ! isset( $this->optionsframework->plugins[ $slug ] ) ) {
+					if ( ! isset( $this->wds_plugin_activation->plugins[ $slug ] ) ) {
 						unset( $plugins_to_install[ $key ] );
 						continue;
 					}
 
 					// For updates: make sure this is a plugin we *can* update (update available and WP version ok).
-					if ( 'update' === $install_type && ( $this->optionsframework->is_plugin_installed( $slug ) && ( false === $this->optionsframework->does_plugin_have_update( $slug ) || ! $this->optionsframework->can_plugin_update( $slug ) ) ) ) {
+					if ( 'update' === $install_type && ( $this->wds_plugin_activation->is_plugin_installed( $slug ) && ( false === $this->wds_plugin_activation->does_plugin_have_update( $slug ) || ! $this->wds_plugin_activation->can_plugin_update( $slug ) ) ) ) {
 						unset( $plugins_to_install[ $key ] );
 					}
 				}
@@ -3069,9 +3069,9 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 				// No need to proceed further if we have no plugins to handle.
 				if ( empty( $plugins_to_install ) ) {
 					if ( 'install' === $install_type ) {
-						$message = __( 'No plugins are available to be installed at this time.', 'optionsframework' );
+						$message = __( 'No plugins are available to be installed at this time.', 'webdogs-support' );
 					} else {
-						$message = __( 'No plugins are available to be updated at this time.', 'optionsframework' );
+						$message = __( 'No plugins are available to be updated at this time.', 'webdogs-support' );
 					}
 
 					echo '<div id="message" class="error"><p>', esc_html( $message ), '</p></div>';
@@ -3081,7 +3081,7 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 
 				// Pass all necessary information if WP_Filesystem is needed.
 				$url = wp_nonce_url(
-					$this->optionsframework->get_optionsframework_url(),
+					$this->wds_plugin_activation->get_wds_url(),
 					'bulk-' . $this->_args['plural']
 				);
 
@@ -3113,8 +3113,8 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 
 				// Prepare the data for validated plugins for the install/upgrade.
 				foreach ( $plugins_to_install as $slug ) {
-					$name   = $this->optionsframework->plugins[ $slug ]['name'];
-					$source = $this->optionsframework->get_download_url( $slug );
+					$name   = $this->wds_plugin_activation->plugins[ $slug ]['name'];
+					$source = $this->wds_plugin_activation->get_download_url( $slug );
 
 					if ( ! empty( $name ) && ! empty( $source ) ) {
 						$names[] = $name;
@@ -3126,8 +3126,8 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 								break;
 
 							case 'update':
-								$file_paths[]                 = $this->optionsframework->plugins[ $slug ]['file_path'];
-								$to_inject[ $slug ]           = $this->optionsframework->plugins[ $slug ];
+								$file_paths[]                 = $this->wds_plugin_activation->plugins[ $slug ]['file_path'];
+								$to_inject[ $slug ]           = $this->wds_plugin_activation->plugins[ $slug ];
 								$to_inject[ $slug ]['source'] = $source;
 								break;
 						}
@@ -3135,11 +3135,11 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 				}
 				unset( $slug, $name, $source );
 
-				// Create a new instance of Options_Framework_Bulk_Installer.
-				$installer = new Options_Framework_Bulk_Installer(
-					new Options_Framework_Bulk_Installer_Skin(
+				// Create a new instance of Webdogs_Bulk_Installer.
+				$installer = new Webdogs_Bulk_Installer(
+					new Webdogs_Bulk_Installer_Skin(
 						array(
-							'url'          => esc_url_raw( $this->optionsframework->get_optionsframework_url() ),
+							'url'          => esc_url_raw( $this->wds_plugin_activation->get_wds_url() ),
 							'nonce'        => 'bulk-' . $this->_args['plural'],
 							'names'        => $names,
 							'install_type' => $install_type,
@@ -3154,9 +3154,9 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 				// Process the bulk installation submissions.
 				add_filter( 'upgrader_source_selection', array( $this->optionsframework, 'maybe_adjust_source_dir' ), 1, 3 );
 
-				if ( 'optionsframework-bulk-update' === $this->current_action() ) {
+				if ( 'wds-bulk-update' === $this->current_action() ) {
 					// Inject our info into the update transient.
-					$this->optionsframework->inject_update_info( $to_inject );
+					$this->wds_plugin_activation->inject_update_info( $to_inject );
 
 					$installer->bulk_upgrade( $file_paths );
 				} else {
@@ -3171,12 +3171,12 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 			}
 
 			// Bulk activation process.
-			if ( 'optionsframework-bulk-activate' === $this->current_action() ) {
+			if ( 'wds-bulk-activate' === $this->current_action() ) {
 				check_admin_referer( 'bulk-' . $this->_args['plural'] );
 
 				// Did user actually select any plugins to activate ?
 				if ( empty( $_POST['plugin'] ) ) {
-					echo '<div id="message" class="error"><p>', esc_html__( 'No plugins were selected to be activated. No action taken.', 'optionsframework' ), '</p></div>';
+					echo '<div id="message" class="error"><p>', esc_html__( 'No plugins were selected to be activated. No action taken.', 'webdogs-support' ), '</p></div>';
 
 					return false;
 				}
@@ -3193,16 +3193,16 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 
 				// Grab the file paths for the selected & inactive plugins from the registration array.
 				foreach ( $plugins as $slug ) {
-					if ( $this->optionsframework->can_plugin_activate( $slug ) ) {
-						$plugins_to_activate[] = $this->optionsframework->plugins[ $slug ]['file_path'];
-						$plugin_names[]        = $this->optionsframework->plugins[ $slug ]['name'];
+					if ( $this->wds_plugin_activation->can_plugin_activate( $slug ) ) {
+						$plugins_to_activate[] = $this->wds_plugin_activation->plugins[ $slug ]['file_path'];
+						$plugin_names[]        = $this->wds_plugin_activation->plugins[ $slug ]['name'];
 					}
 				}
 				unset( $slug );
 
 				// Return early if there are no plugins to activate.
 				if ( empty( $plugins_to_activate ) ) {
-					echo '<div id="message" class="error"><p>', esc_html__( 'No plugins are available to be activated at this time.', 'optionsframework' ), '</p></div>';
+					echo '<div id="message" class="error"><p>', esc_html__( 'No plugins are available to be activated at this time.', 'webdogs-support' ), '</p></div>';
 
 					return false;
 				}
@@ -3214,13 +3214,13 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 					echo '<div id="message" class="error"><p>', wp_kses_post( $activate->get_error_message() ), '</p></div>';
 				} else {
 					$count        = count( $plugin_names ); // Count so we can use _n function.
-					$plugin_names =  $plugin_names; //array_map( array( 'Options_Framework_Utils', 'wrap_in_strong' ), $plugin_names );
+					$plugin_names =  $plugin_names; //array_map( array( 'Webdogs_Utils', 'wrap_in_strong' ), $plugin_names );
 					$last_plugin  = array_pop( $plugin_names ); // Pop off last name to prep for readability.
-					$imploded     = empty( $plugin_names ) ? $last_plugin : ( implode( ', ', $plugin_names ) . ' ' . esc_html_x( 'and', 'plugin A *and* plugin B', 'optionsframework' ) . ' ' . $last_plugin );
+					$imploded     = empty( $plugin_names ) ? $last_plugin : ( implode( ', ', $plugin_names ) . ' ' . esc_html_x( 'and', 'plugin A *and* plugin B', 'webdogs-support' ) . ' ' . $last_plugin );
 
 					printf( // WPCS: xss ok.
 						'<div id="message" class="updated"><p>%1$s %2$s.</p></div>',
-						esc_html( _n( 'The following plugin was activated successfully:', 'The following plugins were activated successfully:', $count, 'optionsframework' ) ),
+						esc_html( _n( 'The following plugin was activated successfully:', 'The following plugins were activated successfully:', $count, 'webdogs-support' ) ),
 						$imploded
 					);
 
@@ -3255,12 +3255,12 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 			$this->_column_headers = array( $columns, $hidden, $sortable, $primary ); // Get all necessary column headers.
 
 			// Process our bulk activations here.
-			if ( 'optionsframework-bulk-activate' === $this->current_action() ) {
+			if ( 'wds-bulk-activate' === $this->current_action() ) {
 				$this->process_bulk_actions();
 			}
 
 			// Store all of our plugin data into $items array so WP_List_Table can use it.
-			$this->items = apply_filters( 'optionsframework_table_data_items', $this->_gather_plugin_data() );
+			$this->items = apply_filters( 'wds_table_data_items', $this->_gather_plugin_data() );
 		}
 
 		/* *********** DEPRECATED METHODS *********** */
@@ -3269,36 +3269,36 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
 		 * Retrieve plugin data, given the plugin name.
 		 *
 		 * @since      2.2.0
-		 * @deprecated 2.5.0 use {@see Options_Framework_Plugin_Activation::_get_plugin_data_from_name()} instead.
-		 * @see        Options_Framework_Plugin_Activation::_get_plugin_data_from_name()
+		 * @deprecated 2.5.0 use {@see Webdogs_Plugin_Activation::_get_plugin_data_from_name()} instead.
+		 * @see        Webdogs_Plugin_Activation::_get_plugin_data_from_name()
 		 *
 		 * @param string $name Name of the plugin, as it was registered.
 		 * @param string $data Optional. Array key of plugin data to return. Default is slug.
 		 * @return string|boolean Plugin slug if found, false otherwise.
 		 */
 		protected function _get_plugin_data_from_name( $name, $data = 'slug' ) {
-			_deprecated_function( __FUNCTION__, 'Options Framework 2.5.0', 'Options_Framework_Plugin_Activation::_get_plugin_data_from_name()' );
+			_deprecated_function( __FUNCTION__, 'Options Framework 2.5.0', 'Webdogs_Plugin_Activation::_get_plugin_data_from_name()' );
 
-			return $this->optionsframework->_get_plugin_data_from_name( $name, $data );
+			return $this->wds_plugin_activation->_get_plugin_data_from_name( $name, $data );
 		}
 	}
 }
 
 
-// if ( ! class_exists( 'Options_Framework_Bulk_Installer' ) ) {
+// if ( ! class_exists( 'Webdogs_Bulk_Installer' ) ) {
 
 // 	/**
 // 	 * Hack: Prevent Options Framework v2.4.1- bulk installer class from being loaded if 2.4.1- is loaded after 2.5+.
 // 	 */
-// 	class Options_Framework_Bulk_Installer {
+// 	class Webdogs_Bulk_Installer {
 // 	}
 // }
-// if ( ! class_exists( 'Options_Framework_Bulk_Installer_Skin' ) ) {
+// if ( ! class_exists( 'Webdogs_Bulk_Installer_Skin' ) ) {
 
 // 	/**
 // 	 * Hack: Prevent Options Framework v2.4.1- bulk installer skin class from being loaded if 2.4.1- is loaded after 2.5+.
 // 	 */
-// 	class Options_Framework_Bulk_Installer_Skin {
+// 	class Webdogs_Bulk_Installer_Skin {
 // 	}
 // }
 
@@ -3312,27 +3312,27 @@ if ( ! class_exists( 'Options_Framework_List_Table' ) ) {
  *
  * @since 2.2.0
  */
-add_action( 'admin_init', 'optionsframework_load_bulk_installer' );
+add_action( 'admin_init', 'wds_load_bulk_installer' );
 
-if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
+if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 	/**
 	 * Load bulk installer
 	 */
-	function optionsframework_load_bulk_installer() {
+	function wds_load_bulk_installer() {
 		// Silently fail if 2.5+ is loaded *after* an older version.
-		if ( ! isset( $GLOBALS['optionsframeworkpluginactivation'] ) ) {
+		if ( ! isset( $GLOBALS['wds_plugin_activation'] ) ) {
 			return;
 		}
 
 		// Get Options Framework class instance.
-		$optionsframework_instance = $GLOBALS['optionsframeworkpluginactivation'];
+		$wds_instance = $GLOBALS['wds_plugin_activation'];
 
-		if ( isset( $_GET['page'] ) && $optionsframework_instance->menu === $_GET['page'] ) {
+		if ( isset( $_GET['page'] ) && $wds_instance->menu === $_GET['page'] ) {
 			if ( ! class_exists( 'Plugin_Upgrader', false ) ) {
 				require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 			}
 
-			if ( ! class_exists( 'Options_Framework_Bulk_Installer' ) ) {
+			if ( ! class_exists( 'Webdogs_Bulk_Installer' ) ) {
 
 				/**
 				 * Installer class to handle bulk plugin installations.
@@ -3343,14 +3343,14 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 				 * @since 2.2.0
 				 *
 				 * @internal Since 2.5.0 the class is an extension of Plugin_Upgrader rather than WP_Upgrader
-				 * @internal Since 2.5.2 the class has been renamed from Options_Framework_Bulk_Installer to Options_Framework_Bulk_Installer.
+				 * @internal Since 2.5.2 the class has been renamed from Webdogs_Bulk_Installer to Webdogs_Bulk_Installer.
 				 *           This was done to prevent backward compatibility issues with v2.3.6.
 				 *
 				 * @package Options-Framework-Plugin-Activation
 				 * @author  Thomas Griffin
 				 * @author  Gary Jones
 				 */
-				class Options_Framework_Bulk_Installer extends Plugin_Upgrader {
+				class Webdogs_Bulk_Installer extends Plugin_Upgrader {
 					/**
 					 * Holds result of bulk plugin installation.
 					 *
@@ -3396,7 +3396,7 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 					 */
 					public function __construct( $skin = null ) {
 						// Get Options Framework class instance.
-						$this->optionsframework = $GLOBALS['optionsframeworkpluginactivation'];
+						$this->wds_plugin_activation = $GLOBALS['wds_plugin_activation'];
 
 						parent::__construct( $skin );
 
@@ -3404,7 +3404,7 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 							$this->clear_destination = true;
 						}
 
-						if ( $this->optionsframework->is_automatic ) {
+						if ( $this->wds_plugin_activation->is_automatic ) {
 							$this->activate_strings();
 						}
 
@@ -3417,8 +3417,8 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 					 * @since 2.2.0
 					 */
 					public function activate_strings() {
-						$this->strings['activation_failed']  = __( 'Plugin activation failed.', 'optionsframework' );
-						$this->strings['activation_success'] = __( 'Plugin activated successfully.', 'optionsframework' );
+						$this->strings['activation_failed']  = __( 'Plugin activation failed.', 'webdogs-support' );
+						$this->strings['activation_success'] = __( 'Plugin activated successfully.', 'webdogs-support' );
 					}
 
 					/**
@@ -3435,7 +3435,7 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 						$result = parent::run( $options );
 
 						// Reset the strings in case we changed one during automatic activation.
-						if ( $this->optionsframework->is_automatic ) {
+						if ( $this->wds_plugin_activation->is_automatic ) {
 							if ( 'update' === $this->skin->options['install_type'] ) {
 								$this->upgrade_strings();
 							} else {
@@ -3628,7 +3628,7 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 					 */
 					public function auto_activate( $bool ) {
 						// Only process the activation of installed plugins if the automatic flag is set to true.
-						if ( $this->optionsframework->is_automatic ) {
+						if ( $this->wds_plugin_activation->is_automatic ) {
 							// Flush plugins cache so the headers of the newly installed plugins will be read correctly.
 							wp_clean_plugins_cache();
 
@@ -3656,7 +3656,7 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 				}
 			}
 
-			if ( ! class_exists( 'Options_Framework_Bulk_Installer_Skin' ) ) {
+			if ( ! class_exists( 'Webdogs_Bulk_Installer_Skin' ) ) {
 
 				/**
 				 * Installer skin to set strings for the bulk plugin installations..
@@ -3666,8 +3666,8 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 				 *
 				 * @since 2.2.0
 				 *
-				 * @internal Since 2.5.2 the class has been renamed from Options_Framework_Bulk_Installer_Skin to
-				 *           Options_Framework_Bulk_Installer_Skin.
+				 * @internal Since 2.5.2 the class has been renamed from Webdogs_Bulk_Installer_Skin to
+				 *           Webdogs_Bulk_Installer_Skin.
 				 *           This was done to prevent backward compatibility issues with v2.3.6.
 				 *
 				 * @see https://core.trac.wordpress.org/browser/trunk/src/wp-admin/includes/class-wp-upgrader-skins.php
@@ -3676,7 +3676,7 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 				 * @author  Thomas Griffin
 				 * @author  Gary Jones
 				 */
-				class Options_Framework_Bulk_Installer_Skin extends Bulk_Upgrader_Skin {
+				class Webdogs_Bulk_Installer_Skin extends Bulk_Upgrader_Skin {
 					/**
 					 * Holds plugin info for each individual plugin installation.
 					 *
@@ -3711,7 +3711,7 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 					 *
 					 * @var object
 					 */
-					protected $optionsframework;
+					protected $wds_plugin_activation;
 
 					/**
 					 * Constructor. Parses default args with new ones and extracts them for use.
@@ -3722,7 +3722,7 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 					 */
 					public function __construct( $args = array() ) {
 						// Get Options Framework class instance.
-						$this->optionsframework = $GLOBALS['optionsframeworkpluginactivation'];
+						$this->wds_plugin_activation = $GLOBALS['wds_plugin_activation'];
 
 						// Parse default and new args.
 						$defaults = array(
@@ -3751,23 +3751,23 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 					public function add_strings() {
 						if ( 'update' === $this->options['install_type'] ) {
 							parent::add_strings();
-							$this->upgrader->strings['skin_before_update_header'] = __( 'Updating Plugin %1$s (%2$d/%3$d)', 'optionsframework' );
+							$this->upgrader->strings['skin_before_update_header'] = __( 'Updating Plugin %1$s (%2$d/%3$d)', 'webdogs-support' );
 						} else {
-							$this->upgrader->strings['skin_update_failed_error'] = __( 'An error occurred while installing %1$s: <strong>%2$s</strong>.', 'optionsframework' );
-							$this->upgrader->strings['skin_update_failed']       = __( 'The installation of %1$s failed.', 'optionsframework' );
+							$this->upgrader->strings['skin_update_failed_error'] = __( 'An error occurred while installing %1$s: <strong>%2$s</strong>.', 'webdogs-support' );
+							$this->upgrader->strings['skin_update_failed']       = __( 'The installation of %1$s failed.', 'webdogs-support' );
 
-							if ( $this->optionsframework->is_automatic ) {
+							if ( $this->wds_plugin_activation->is_automatic ) {
 								// Automatic activation strings.
-								$this->upgrader->strings['skin_upgrade_start']        = __( 'The installation and activation process is starting. This process may take a while on some hosts, so please be patient.', 'optionsframework' );
-								$this->upgrader->strings['skin_update_successful']    = __( '%1$s installed and activated successfully.', 'optionsframework' ) . ' <a href="#" class="hide-if-no-js" onclick="%2$s"><span>' . esc_html__( 'Show Details', 'optionsframework' ) . '</span><span class="hidden">' . esc_html__( 'Hide Details', 'optionsframework' ) . '</span>.</a>';
-								$this->upgrader->strings['skin_upgrade_end']          = __( 'All installations and activations have been completed.', 'optionsframework' );
-								$this->upgrader->strings['skin_before_update_header'] = __( 'Installing and Activating Plugin %1$s (%2$d/%3$d)', 'optionsframework' );
+								$this->upgrader->strings['skin_upgrade_start']        = __( 'The installation and activation process is starting. This process may take a while on some hosts, so please be patient.', 'webdogs-support' );
+								$this->upgrader->strings['skin_update_successful']    = __( '%1$s installed and activated successfully.', 'webdogs-support' ) . ' <a href="#" class="hide-if-no-js" onclick="%2$s"><span>' . esc_html__( 'Show Details', 'webdogs-support' ) . '</span><span class="hidden">' . esc_html__( 'Hide Details', 'webdogs-support' ) . '</span>.</a>';
+								$this->upgrader->strings['skin_upgrade_end']          = __( 'All installations and activations have been completed.', 'webdogs-support' );
+								$this->upgrader->strings['skin_before_update_header'] = __( 'Installing and Activating Plugin %1$s (%2$d/%3$d)', 'webdogs-support' );
 							} else {
 								// Default installation strings.
-								$this->upgrader->strings['skin_upgrade_start']        = __( 'The installation process is starting. This process may take a while on some hosts, so please be patient.', 'optionsframework' );
-								$this->upgrader->strings['skin_update_successful']    = esc_html__( '%1$s installed successfully.', 'optionsframework' ) . ' <a href="#" class="hide-if-no-js" onclick="%2$s"><span>' . esc_html__( 'Show Details', 'optionsframework' ) . '</span><span class="hidden">' . esc_html__( 'Hide Details', 'optionsframework' ) . '</span>.</a>';
-								$this->upgrader->strings['skin_upgrade_end']          = __( 'All installations have been completed.', 'optionsframework' );
-								$this->upgrader->strings['skin_before_update_header'] = __( 'Installing Plugin %1$s (%2$d/%3$d)', 'optionsframework' );
+								$this->upgrader->strings['skin_upgrade_start']        = __( 'The installation process is starting. This process may take a while on some hosts, so please be patient.', 'webdogs-support' );
+								$this->upgrader->strings['skin_update_successful']    = esc_html__( '%1$s installed successfully.', 'webdogs-support' ) . ' <a href="#" class="hide-if-no-js" onclick="%2$s"><span>' . esc_html__( 'Show Details', 'webdogs-support' ) . '</span><span class="hidden">' . esc_html__( 'Hide Details', 'webdogs-support' ) . '</span>.</a>';
+								$this->upgrader->strings['skin_upgrade_end']          = __( 'All installations have been completed.', 'webdogs-support' );
+								$this->upgrader->strings['skin_before_update_header'] = __( 'Installing Plugin %1$s (%2$d/%3$d)', 'webdogs-support' );
 							}
 						}
 					}
@@ -3817,20 +3817,20 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 						// Flush plugins cache so we can make sure that the installed plugins list is always up to date.
 						wp_clean_plugins_cache();
 
-						$this->optionsframework->show_optionsframework_version();
+						$this->wds_plugin_activation->show_wds_version();
 
 						// Display message based on if all plugins are now active or not.
 						$update_actions = array();
 
-						if ( $this->optionsframework->is_optionsframework_complete() ) {
+						if ( $this->wds_plugin_activation->is_wds_complete() ) {
 							// All plugins are active, so we display the complete string and hide the menu to protect users.
 							echo '<style type="text/css">#adminmenu .wp-submenu li.current { display: none !important; }</style>';
 							$update_actions['dashboard'] = sprintf(
-								esc_html( $this->optionsframework->strings['complete'] ),
-								'<a href="' . esc_url( self_admin_url() ) . '">' . esc_html__( 'Return to the Dashboard', 'optionsframework' ) . '</a>'
+								esc_html( $this->wds_plugin_activation->strings['complete'] ),
+								'<a href="' . esc_url( self_admin_url() ) . '">' . esc_html__( 'Return to the Dashboard', 'webdogs-support' ) . '</a>'
 							);
 						} else {
-							$update_actions['optionsframework_page'] = '<a href="' . esc_url( $this->optionsframework->get_optionsframework_url() ) . '" target="_parent">' . esc_html( $this->optionsframework->strings['return'] ) . '</a>';
+							$update_actions['wds_page'] = '<a href="' . esc_url( $this->wds_plugin_activation->get_wds_url() ) . '" target="_parent">' . esc_html( $this->wds_plugin_activation->strings['return'] ) . '</a>';
 						}
 
 						/**
@@ -3841,7 +3841,7 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 						 * @param array $update_actions Array of plugin action links.
 						 * @param array $plugin_info    Array of information for the last-handled plugin.
 						 */
-						$update_actions = apply_filters( 'optionsframework_update_bulk_plugins_complete_actions', $update_actions, $this->plugin_info );
+						$update_actions = apply_filters( 'wds_update_bulk_plugins_complete_actions', $update_actions, $this->plugin_info );
 
 						if ( ! empty( $update_actions ) ) {
 							$this->feedback( implode( ' | ', (array) $update_actions ) );
@@ -3881,21 +3881,21 @@ if ( ! function_exists( 'optionsframework_load_bulk_installer' ) ) {
 	}
 }
 
-if ( ! class_exists( 'Options_Framework_Utils' ) ) {
+if ( ! class_exists( 'Webdogs_Utils' ) ) {
 
 	/**
 	 * Generic utilities for Options Framework.
 	 *
 	 * All methods are static, poor-dev name-spacing class wrapper.
 	 *
-	 * Class was called Options_Framework_Utils in 2.5.0 but renamed Options_Framework_Utils in 2.5.1 as this was conflicting with Soliloquy.
+	 * Class was called Webdogs_Utils in 2.5.0 but renamed Webdogs_Utils in 2.5.1 as this was conflicting with Soliloquy.
 	 *
 	 * @since 2.5.0
 	 *
 	 * @package Options-Framework-Plugin-Activation
 	 * @author  Juliette Reinders Folmer
 	 */
-	class Options_Framework_Utils {
+	class Webdogs_Utils {
 		/**
 		 * Whether the PHP filter extension is enabled.
 		 *
@@ -4006,5 +4006,5 @@ if ( ! class_exists( 'Options_Framework_Utils' ) ) {
 
 			return false;
 		}
-	} // End of class Options_Framework_Utils
+	} // End of class Webdogs_Utils
 } // End of class_exists wrapper
