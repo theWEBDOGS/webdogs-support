@@ -44,13 +44,12 @@ class Webdogs_Admin {
 
 			// Adds options menu to the admin bar
 			add_action( 'wp_before_admin_bar_render', array( $this, 'wds_admin_bar' ) );
-
 			add_action( 'wp_before_admin_bar_render', array( $this, 'add_adminbar_sitename_logo' ) );
 
 		} else {
 			// Display a notice if options aren't present in the theme
 			add_action( 'admin_notices', array( $this, 'options_notice' ) );
-			add_action( 'admin_init', array( $this, 'options_notice_ignore' ) );
+			add_action( 'admin_init',    array( $this, 'options_notice_ignore' ) );
 		}
 
     }
@@ -505,7 +504,7 @@ class Webdogs_Admin {
 
 		<h1><?php echo esc_html( $menu['page_title'] ); ?> <span class="subtitle alignright">v<?php print WEBDOGS_VERSION; ?></span></h1>
 
-	    <?php //settings_errors( 'webdogs-support' ); ?>
+	    <?php settings_errors( 'webdogs-support' ); ?>
 
 	    <h2 class="nav-tab-wrapper">
 	        <?php echo Webdogs_Interface::wds_tabs(); ?>

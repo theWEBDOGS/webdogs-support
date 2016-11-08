@@ -66,7 +66,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 *
 		 * @const string Version number.
 		 */
-		const OPTIONS_FRAMEWORK_VERSION = '2.5.2';
+		const VERSION = '2.5.2';
 
 		/**
 		 * Regular expression to test if a URL is a WP plugin repo URL.
@@ -629,7 +629,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 
 			if ( isset( $_REQUEST['tab'] ) && 'plugin-information' === $_REQUEST['tab'] ) {
 				// Needed for install_plugin_information().
-				require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+				require_once ABSPATH .'wp-admin/includes/plugin-install.php';
 
 				wp_enqueue_style( 'plugin-install' );
 
@@ -1137,9 +1137,9 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 */
 		public function notices() {
 			// Remove nag on the install page / Return early if the nag message has been dismissed.
-			// if ( $this->is_wds_page() || get_user_meta( get_current_user_id(), 'wds_dismissed_notice_' . $this->id, true ) ) {
-			// 	return;
-			// }
+			if ( $this->is_wds_page() || get_user_meta( get_current_user_id(), 'wds_dismissed_notice_' . $this->id, true ) ) {
+				return;
+			}
 
 			// Store for the plugin slugs by message type.
 			$message = array();
@@ -1306,9 +1306,9 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 			}
 
 			// Admin options pages already output settings_errors, so this is to avoid duplication.
-			if ( 'options-general' !== $GLOBALS['current_screen']->parent_base ) {
-				$this->display_settings_errors();
-			}
+			// if ( 'options-general' !== $GLOBALS['current_screen']->parent_base ) {
+			// 	$this->display_settings_errors();
+			// }
 		}
 
 		/**
@@ -2212,7 +2212,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 */
 		public function show_wds_version() {
 			// echo '<p style="float: right; padding: 0em 1.5em 0.5em 0;"><small>',
-				// esc_html( sprintf( _x( 'Options Framework v%s', '%s = version number', 'webdogs-support' ), self::OPTIONS_FRAMEWORK_VERSION ) ),
+				// esc_html( sprintf( _x( 'Options Framework v%s', '%s = version number', 'webdogs-support' ), self::VERSION ) ),
 				// '</small></p>';
 		}
 
