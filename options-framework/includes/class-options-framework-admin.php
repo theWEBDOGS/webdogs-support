@@ -139,7 +139,7 @@ class Webdogs_Admin {
             // Submenu default settings
             'page_title' => __('Support', 'webdogs-support'),
 			'menu_title' => __('Support', 'webdogs-support'),
-			'capability' => 'manage_options',
+			'capability' => 'manage_support',
 			'menu_slug' => 'webdogs-support',
             'parent_slug' => 'admin.php',
 
