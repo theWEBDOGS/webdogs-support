@@ -1137,9 +1137,9 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 */
 		public function notices() {
 			// Remove nag on the install page / Return early if the nag message has been dismissed.
-			if ( $this->is_wds_page() || get_user_meta( get_current_user_id(), 'wds_dismissed_notice_' . $this->id, true ) ) {
-				return;
-			}
+			// if ( $this->is_wds_page() || get_user_meta( get_current_user_id(), 'wds_dismissed_notice_' . $this->id, true ) ) {
+			// 	return;
+			// }
 
 			// Store for the plugin slugs by message type.
 			$message = array();
