@@ -447,6 +447,7 @@
 }
 #section-login_logo_css #wpadminbar.adminbar-preview.default #wp-admin-bar-site-name>.ab-item:before {
     content: "\f324";
+    content: "\f120";
     position: relative;
     float: left;
     font: 400 20px/1 dashicons;
