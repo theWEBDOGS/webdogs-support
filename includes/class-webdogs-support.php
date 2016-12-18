@@ -111,7 +111,7 @@ class Webdogs_Support {
 		/**
 		 * The class responsible for scheduling and sending maintainance notifications.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-notifications.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-maintainance-notifications.php';
 
 		/**
 		 * The class responsible for providing a JSON data endpoint.
@@ -248,10 +248,10 @@ class Webdogs_Support {
 		$this->loader->add_action( 'wds_after_validate', $plugin_admin_color_schemes, 'wds_save', 10, 1 );
 
 		// filter cplor scheme options
-		$this->loader->add_filter( 'get_color_scheme_options', get_class( $plugin_admin_color_schemes ), 'filter_color_scheme_options'), 10, 1 );
+		$this->loader->add_filter( 'get_color_scheme_options', get_class( $plugin_admin_color_schemes ), 'filter_color_scheme_options', 10, 1 );
 
 		// Override the user's admin color scheme.
-		$this->loader->add_filter( 'get_user_option_admin_color', get_class( $plugin_admin_color_schemes ), 'must_use_admin_color',10, 1 );
+		$this->loader->add_filter( 'get_user_option_admin_color', get_class( $plugin_admin_color_schemes ), 'must_use_admin_color', 10, 1 );
 
 		// Hide the Admin Color Scheme field from users who can't set a forced color scheme.
 		$this->loader->add_action( 'admin_color_scheme_picker', $plugin_admin_color_schemes, 'hide_admin_color_input', 8 );

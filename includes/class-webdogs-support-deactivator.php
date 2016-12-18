@@ -22,15 +22,16 @@
  */
 class Webdogs_Support_Deactivator {
 
-	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
-	 *
-	 * @since    1.0.0
-	 */
-	public static function deactivate() {
-
-	}
+    /**
+     * Short Description. (use period)
+     *
+     * Long Description.
+     *
+     * @since    1.0.0
+     */
+    public static function deactivate() {
+        wp_clear_scheduled_hook( 'wdw_create_daily_notification' );
+        wp_clear_scheduled_hook( 'wds_scheduled_notification'  );
+    }
 
 }

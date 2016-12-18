@@ -30,6 +30,32 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+define( 'WEBDOGS_SUPPORT_DIR', trailingslashit( __DIR__ ) );
+define( 'WEBDOGS_SUPPORT_DIR_PATH', plugin_dir_path( __FILE__ ) );
+
+if(!function_exists('WEBDOGS_VERSION')) {
+
+    function WEBDOGS_VERSION(){ 
+        if( defined( 'WEBDOGS_VERSION' ) ){ return WEBDOGS_VERSION; }
+
+        $webdogs_plugin_data = get_file_data( __FILE__, array( 'Version' => 'Version' ) );
+        $webdogs_version = $webdogs_plugin_data['Version']; 
+        
+        return $webdogs_version; }
+}
+
+if(class_exists('Webdogs_Support')) { return; }
+
+define( 'WEBDOGS_TITLE', "WEBDOGS Support" );
+define( 'WEBDOGS_SUPPORT', "support@webdogs.com" );
+define( 'WEBDOGS_DOMAIN', "webdogs.com" );
+
+define( 'WEBDOGS_VERSION', WEBDOGS_VERSION() );
+define( 'WEBDOGS_LATEST_VERSION', function_exists( 
+        'WEBDOGS_LATEST_VERSION' ) ? 
+         WEBDOGS_LATEST_VERSION() : 
+         WEBDOGS_VERSION() );
+
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-webdogs-support-activator.php
