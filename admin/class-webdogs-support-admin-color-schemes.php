@@ -38,7 +38,7 @@ class Webdogs_Support_Admin_Color_Schemes {
 
 	private $colors;
 
-	protected function __construct() {
+	public function __construct() {
 		self::$instance = $this;
 		$this->base = WEBDOGS_SUPPORT_DIR_PATH . 'options-framework';
 	}
@@ -850,7 +850,7 @@ class Webdogs_Support_Admin_Bar {
 
 	private $base;
 
-	function __construct() {
+	public function __construct() {
 		$this->base = WEBDOGS_SUPPORT_DIR_PATH . 'options-framework';
 		add_action( 'wp_before_admin_bar_render', array( $this, 'save_wp_admin_color_schemes_list' ) );
 

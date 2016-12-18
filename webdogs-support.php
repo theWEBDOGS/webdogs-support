@@ -84,6 +84,50 @@ register_deactivation_hook( __FILE__, 'deactivate_webdogs_support' );
 require plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support.php';
 
 /**
+ * Helper function to return the theme option value.
+ * If no value has been saved, it returns $default.
+ * Needed because options are saved as serialized strings.
+ *
+ * Not in a class to support backwards compatibility in themes.
+ */
+
+if ( ! function_exists( 'wds_get_option' ) ) {
+
+    function wds_get_option( $name, $default = false ) {
+        $config = get_option( 'webdogs_support' );
+
+        if ( ! isset( $config['id'] ) ) {
+            return $default;
+        }
+
+        $options = get_option( $config['id'] );
+
+        if ( isset( $options[$name] ) ) {
+            return $options[$name];
+        }
+
+        return $default;
+    }
+}
+
+if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php');
+
+
+
+if(!function_exists('is_plugin_active')) include_once( ABSPATH . 'wp-admin/includes/plugin.php');
+
+if(!function_exists('wp_prepare_themes_for_js')) include_once( ABSPATH . 'wp-admin/includes/theme.php');
+
+if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');
+
+
+/**
+ * The core plugin class that is used to define internationalization,
+ * admin-specific hooks, and public-facing site hooks.
+ */
+require plugin_dir_path( __FILE__ ) . 'includes/webdogs-support-common-functions.php';
+
+/**
  * Begins execution of the plugin.
  *
  * Since everything within the plugin is registered via hooks,
@@ -93,6 +137,12 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support.php';
  * @since    1.0.0
  */
 function run_webdogs_support() {
+    /**
+     * The core plugin class that is used to define internationalization,
+     * admin-specific hooks, and public-facing site hooks.
+     */
+    require plugin_dir_path( __FILE__ ) . 'options.php';
+
 
 	$plugin = new Webdogs_Support();
 	$plugin->run();

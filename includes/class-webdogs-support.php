@@ -73,6 +73,10 @@ class Webdogs_Support {
 
 		$this->load_dependencies();
 		$this->set_locale();
+
+		$this->define_maintainance_notification_hooks();
+		$this->define_endpoint_hooks();
+
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 
@@ -275,6 +279,9 @@ class Webdogs_Support {
 	 * @access   private
 	 */
 	private function define_admin_hooks() {
+		if ( ! is_admin() ) return;
+
+		$this->define_admin_color_scheme_hooks();
 
 		$plugin_admin = new Webdogs_Support_Admin( $this->get_plugin_name(), $this->get_version() );
 
@@ -291,6 +298,7 @@ class Webdogs_Support {
 	 * @access   private
 	 */
 	private function define_public_hooks() {
+		if ( is_admin() ) return;
 
 		$plugin_public = new Webdogs_Support_Public( $this->get_plugin_name(), $this->get_version() );
 

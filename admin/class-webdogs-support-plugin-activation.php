@@ -7,23 +7,12 @@
  * for the support of your plugin or theme. Please contact the plugin
  * or theme author for support.
  *
- * @package   Options-Framework-Plugin-Activation
- * @version   2.5.2
+ * @package   TGM-Plugin-Activation
+ * @version   2.6.1
  * @link      http://tgmpluginactivation.com/
  * @author    Thomas Griffin, Gary Jones, Juliette Reinders Folmer
  * @copyright Copyright (c) 2011, Thomas Griffin
  * @license   GPL-2.0+
- *
- * @wordpress-plugin
- * Plugin Name: TGM Plugin Activation
- * Plugin URI:
- * Description: Plugin installation and activation for WordPress themes.
- * Version:     2.5.2
- * Author:      Thomas Griffin, Gary Jones, Juliette Reinders Folmer
- * Author URI:  http://tgmpluginactivation.com/
- * Text Domain: optionsframework
- * Domain Path: /languages/
- * Copyright:   2011, Thomas Griffin
  */
 
 /*
@@ -54,19 +43,19 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @package Options-Framework-Plugin-Activation
+	 * @package TGM-Plugin-Activation
 	 * @author  Thomas Griffin
 	 * @author  Gary Jones
 	 */
 	class Webdogs_Plugin_Activation {
 		/**
-		 * Options Framework version number.
+		 * TGMPA version number.
 		 *
 		 * @since 2.5.0
 		 *
 		 * @const string Version number.
 		 */
-		const OPTIONS_FRAMEWORK_VERSION = '2.5.2';
+		const VERSION = '2.6.1';
 
 		/**
 		 * Regular expression to test if a URL is a WP plugin repo URL.
@@ -178,7 +167,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 *
 		 * @var string
 		 */
-		protected $menu = 'webdogs-support';
+		protected $menu = 'wds-plugins';
 
 		/**
 		 * Parent menu file slug.
@@ -283,15 +272,15 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 
 		/**
 		 * Adds a reference of this object to $instance, populates default strings,
-		 * does the wds_init action hook, and hooks in the interactions to init.
+		 * does the tgmpa_init action hook, and hooks in the interactions to init.
 		 *
-		 * @internal This method should be `protected`, but as too many Options Framework implementations
+		 * {@internal This method should be `protected`, but as too many TGMPA implementations
 		 * haven't upgraded beyond v2.3.6 yet, this gives backward compatibility issues.
-		 * Reverted back to public for the time being.
+		 * Reverted back to public for the time being.}}
 		 *
 		 * @since 1.0.0
 		 *
-		 * @see Webdogs_Plugin_Activation::init()
+		 * @see TGM_Plugin_Activation::init()
 		 */
 		public function __construct() {
 			// Set the current WordPress version.
@@ -300,18 +289,29 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 			// Announce that the class is ready, and pass the object (for advanced use).
 			do_action_ref_array( 'wds_plugin_activation_init', array( &$this ) );
 
+			/*
+			 * Load our text domain and allow for overloading the fall-back file.
+			 *
+			 * {@internal IMPORTANT! If this code changes, review the regex in the custom TGMPA
+			 * generator on the website.}}
+			 */
+			add_action( 'init', array( $this, 'load_textdomain' ), 5 );
+			add_filter( 'load_textdomain_mofile', array( $this, 'overload_textdomain_mofile' ), 10, 2 );
+
 			// When the rest of WP has loaded, kick-start the rest of the class.
-			add_action( 'init', array( &$this, 'init' ) );
+			add_action( 'init', array( $this, 'init' ) );
 		}
 
 		/**
 		 * Magic method to (not) set protected properties from outside of this class.
 		 *
-		 * @internal hackedihack... There is a serious bug in v2.3.2 - 2.3.6  where the `menu` property
+		 * {@internal hackedihack... There is a serious bug in v2.3.2 - 2.3.6  where the `menu` property
 		 * is being assigned rather than tested in a conditional, effectively rendering it useless.
-		 * This 'hack' prevents this from happening.
+		 * This 'hack' prevents this from happening.}}
 		 *
-		 * @see https://github.com/TGMPA/Options-Framework-Plugin-Activation/blob/2.3.6/tgm-plugin-activation/class-tgm-plugin-activation.php#L1593
+		 * @see https://github.com/TGMPA/TGM-Plugin-Activation/blob/2.3.6/tgm-plugin-activation/class-tgm-plugin-activation.php#L1593
+		 *
+		 * @since 2.5.2
 		 *
 		 * @param string $name  Name of an inaccessible property.
 		 * @param mixed  $value Value to assign to the property.
@@ -324,6 +324,8 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 
 		/**
 		 * Magic method to get the value of a protected property outside of this class context.
+		 *
+		 * @since 2.5.2
 		 *
 		 * @param string $name Name of an inaccessible property.
 		 * @return mixed The property value.
@@ -339,18 +341,18 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 *
 		 * @since 2.0.0
 		 *
-		 * @see Webdogs_Plugin_Activation::admin_menu()
-		 * @see Webdogs_Plugin_Activation::notices()
-		 * @see Webdogs_Plugin_Activation::styles()
+		 * @see TGM_Plugin_Activation::admin_menu()
+		 * @see TGM_Plugin_Activation::notices()
+		 * @see TGM_Plugin_Activation::styles()
 		 */
 		public function init() {
 			/**
-			 * By default Options Framework only loads on the WP back-end and not in an Ajax call. Using this filter
+			 * By default TGMPA only loads on the WP back-end and not in an Ajax call. Using this filter
 			 * you can overrule that behaviour.
 			 *
 			 * @since 2.5.0
 			 *
-			 * @param bool $load Whether or not Options Framework should load.
+			 * @param bool $load Whether or not TGMPA should load.
 			 *                   Defaults to the return of `is_admin() && ! defined( 'DOING_AJAX' )`.
 			 */
 			if ( true !== apply_filters( 'wds_load', ( is_admin() && ! defined( 'DOING_AJAX' ) ) ) ) {
@@ -440,12 +442,13 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 				'plugin_already_active'           => __( 'No action taken. Plugin %1$s was already active.', 'webdogs-support' ),
 				'plugin_needs_higher_version'     => __( 'Plugin not activated. A higher version of %s is needed for this theme. Please update the plugin.', 'webdogs-support' ),
 				'complete'                        => __( 'All plugins installed and activated successfully. %1$s', 'webdogs-support' ),
+				'notice_cannot_install_activate'  => __( 'There are one or more required or recommended plugins to install, update or activate.', 'webdogs-support' ),	
 				'dismiss'                         => __( 'Dismiss this notice', 'webdogs-support' ),
 				'contact_admin'                   => __( 'Please contact the administrator of this site for help.', 'webdogs-support' ),
 			);
 
 			
-			do_action( 'wds_register' );//do_action( 'wds_register' );
+			do_action( 'wds_register' );
 
 			/* After this point, the plugins should be registered and the configuration set. */
 
@@ -481,9 +484,10 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 					add_action( 'admin_init', array( $this, 'admin_init' ), 1 );
 					add_action( 'admin_enqueue_scripts', array( $this, 'thickbox' ) );
 				}
-
-				add_action( 'load-plugins.php', array( $this, 'add_plugin_action_link_filters' ), 1 );
 			}
+
+			// If needed, filter plugin action links.
+			add_action( 'load-plugins.php', array( $this, 'add_plugin_action_link_filters' ), 1 );
 
 			// Make sure things get reset on switch theme.
 			add_action( 'switch_theme', array( $this, 'flush_plugins_cache' ) );
@@ -514,6 +518,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 
 		}
 
+
 		public function hide_plugins() {
 			global $wp_list_table;
 			$plugins = $wp_list_table->items;
@@ -529,8 +534,95 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		} 
 
 		/**
-		 * Prevent activation of plugins which don't meet the minimum version requirement from the
-		 * WP native plugins page.
+		 * Load translations.
+		 *
+		 * @since 2.6.0
+		 *
+		 * (@internal Uses `load_theme_textdomain()` rather than `load_plugin_textdomain()` to
+		 * get round the different ways of handling the path and deprecated notices being thrown
+		 * and such. For plugins, the actual file name will be corrected by a filter.}}
+		 *
+		 * {@internal IMPORTANT! If this function changes, review the regex in the custom TGMPA
+		 * generator on the website.}}
+		 */
+		public function load_textdomain() {
+			if ( is_textdomain_loaded( 'webdogs-support' ) ) {
+				return;
+			}
+
+			if ( false !== strpos( __FILE__, WP_PLUGIN_DIR ) || false !== strpos( __FILE__, WPMU_PLUGIN_DIR ) ) {
+				// Plugin, we'll need to adjust the file name.
+				add_action( 'load_textdomain_mofile', array( $this, 'correct_plugin_mofile' ), 10, 2 );
+				load_theme_textdomain( 'webdogs-support', dirname( __FILE__ ) . '/languages' );
+				remove_action( 'load_textdomain_mofile', array( $this, 'correct_plugin_mofile' ), 10 );
+			} else {
+				load_theme_textdomain( 'webdogs-support', dirname( __FILE__ ) . '/languages' );
+			}
+		}
+
+		/**
+		 * Correct the .mo file name for (must-use) plugins.
+		 *
+		 * Themese use `/path/{locale}.mo` while plugins use `/path/{text-domain}-{locale}.mo`.
+		 *
+		 * {@internal IMPORTANT! If this function changes, review the regex in the custom TGMPA
+		 * generator on the website.}}
+		 *
+		 * @since 2.6.0
+		 *
+		 * @param string $mofile Full path to the target mofile.
+		 * @param string $domain The domain for which a language file is being loaded.
+		 * @return string $mofile
+		 */
+		public function correct_plugin_mofile( $mofile, $domain ) {
+			// Exit early if not our domain (just in case).
+			if ( 'webdogs-support' !== $domain ) {
+				return $mofile;
+			}
+			return preg_replace( '`/([a-z]{2}_[A-Z]{2}.mo)$`', '/webdogs-support-$1', $mofile );
+		}
+
+		/**
+		 * Potentially overload the fall-back translation file for the current language.
+		 *
+		 * WP, by default since WP 3.7, will load a local translation first and if none
+		 * can be found, will try and find a translation in the /wp-content/languages/ directory.
+		 * As this library is theme/plugin agnostic, translation files for TGMPA can exist both
+		 * in the WP_LANG_DIR /plugins/ subdirectory as well as in the /themes/ subdirectory.
+		 *
+		 * This method makes sure both directories are checked.
+		 *
+		 * {@internal IMPORTANT! If this function changes, review the regex in the custom TGMPA
+		 * generator on the website.}}
+		 *
+		 * @since 2.6.0
+		 *
+		 * @param string $mofile Full path to the target mofile.
+		 * @param string $domain The domain for which a language file is being loaded.
+		 * @return string $mofile
+		 */
+		public function overload_textdomain_mofile( $mofile, $domain ) {
+			// Exit early if not our domain, not a WP_LANG_DIR load or if the file exists and is readable.
+			if ( 'webdogs-support' !== $domain || false === strpos( $mofile, WP_LANG_DIR ) || @is_readable( $mofile ) ) {
+				return $mofile;
+			}
+
+			// Current fallback file is not valid, let's try the alternative option.
+			if ( false !== strpos( $mofile, '/themes/' ) ) {
+				return str_replace( '/themes/', '/plugins/', $mofile );
+			} elseif ( false !== strpos( $mofile, '/plugins/' ) ) {
+				return str_replace( '/plugins/', '/themes/', $mofile );
+			} else {
+				return $mofile;
+			}
+		}
+
+		/**
+		 * Hook in plugin action link filters for the WP native plugins page.
+		 *
+		 * - Prevent activation of plugins which don't meet the minimum version requirements.
+		 * - Prevent deactivation of force-activated plugins.
+		 * - Add update notice if update available.
 		 *
 		 * @since 2.5.0
 		 */
@@ -602,7 +694,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		/**
 		 * Handles calls to show plugin information via links in the notices.
 		 *
-		 * We get the links in the admin notices to point to the Options Framework page, rather
+		 * We get the links in the admin notices to point to the TGMPA page, rather
 		 * than the typical plugin-install.php file, so we can prepare everything
 		 * beforehand.
 		 *
@@ -613,14 +705,14 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 *
 		 * Down right easy once you know how...
 		 *
-		 * Returns early if not the Options Framework page.
+		 * Returns early if not the TGMPA page.
 		 *
 		 * @since 2.1.0
 		 *
 		 * @global string $tab Used as iframe div class names, helps with styling
 		 * @global string $body_id Used as the iframe body ID, helps with styling
 		 *
-		 * @return null Returns early if not the Options Framework page.
+		 * @return null Returns early if not the TGMPA page.
 		 */
 		public function admin_init() {
 			if ( ! $this->is_wds_page() ) {
@@ -672,8 +764,8 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @see Webdogs_Plugin_Activation::init()
-		 * @see Webdogs_Plugin_Activation::install_plugins_page()
+		 * @see TGM_Plugin_Activation::init()
+		 * @see TGM_Plugin_Activation::install_plugins_page()
 		 *
 		 * @return null Return early if user lacks capability to install a plugin.
 		 */
@@ -700,6 +792,9 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 
 		/**
 		 * Add the menu item.
+		 *
+		 * {@internal IMPORTANT! If this function changes, review the regex in the custom TGMPA
+		 * generator on the website.}}
 		 *
 		 * @since 2.5.0
 		 *
@@ -754,16 +849,11 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 				<?php } ?>
 
 				<?php $plugin_table->views(); ?>
-
-				<?php //if( ! $included ) : ?>
-				<form id="wds-plugins" action="<?php echo ( ! $included ) ? $this->get_wds_url() : str_replace( 'plugins.php?page=options-framework', 'plugins.php?page=optionsframework', $this->get_wds_url() ); ?>" method="post">
-				<?php// endif; ?>
+				<form id="wds-plugins" action="<?php echo ( ! $included ) ? $this->get_wds_url() : str_replace( 'plugins.php?page=webdogs-support', 'plugins.php?page=wds-plugins', $this->get_wds_url() ); ?>" method="post">
 					<input type="hidden" name="wds-page" value="<?php echo esc_attr( $this->menu ); ?>" />
 					<input type="hidden" name="plugin_status" value="<?php echo esc_attr( $plugin_table->view_context ); ?>" />
 					<?php $plugin_table->display(); ?>
-				<?php// if( ! $included ) : ?>
 				</form>
-				<?php //endif; ?>
 			<?php if( ! $included ) : ?>
 			</div>
 			<?php endif;
@@ -870,15 +960,17 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 					require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 				}
 
+				$title     = ( 'update' === $install_type ) ? $this->strings['updating'] : $this->strings['installing'];
 				$skin_args = array(
 					'type'   => ( 'bundled' !== $this->plugins[ $slug ]['source_type'] ) ? 'web' : 'upload',
-					'title'  => sprintf( $this->strings['installing'], $this->plugins[ $slug ]['name'] ),
+					'title'  => sprintf( $title, $this->plugins[ $slug ]['name'] ),
 					'url'    => esc_url_raw( $url ),
 					'nonce'  => $install_type . '-plugin_' . $slug,
 					'plugin' => '',
 					'api'    => $api,
 					'extra'  => $extra,
 				);
+				unset( $title );
 
 				if ( 'update' === $install_type ) {
 					$skin_args['plugin'] = $this->plugins[ $slug ]['file_path'];
@@ -918,7 +1010,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 					}
 				}
 
-				$this->show_wds_version();
+				// $this->show_wds_version();
 
 				// Display message based on if all plugins are now active or not.
 				if ( $this->is_wds_complete() ) {
@@ -1042,11 +1134,11 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 				$subdir_name = untrailingslashit( str_replace( trailingslashit( $remote_source ), '', $source ) );
 
 				if ( ! empty( $subdir_name ) && $subdir_name !== $desired_slug ) {
-					$from = untrailingslashit( $source );
-					$to   = trailingslashit( $remote_source ) . $desired_slug;
+					$from_path = untrailingslashit( $source );
+					$to_path   = trailingslashit( $remote_source ) . $desired_slug;
 
-					if ( true === $GLOBALS['wp_filesystem']->move( $from, $to ) ) {
-						return trailingslashit( $to );
+					if ( true === $GLOBALS['wp_filesystem']->move( $from_path, $to_path ) ) {
+						return trailingslashit( $to_path );
 					} else {
 						return new WP_Error( 'rename_failed', esc_html__( 'The remote plugin package does not contain a folder with the desired slug and renaming did not work.', 'webdogs-support' ) . ' ' . esc_html__( 'Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines.', 'webdogs-support' ), array( 'found' => $subdir_name, 'expected' => $desired_slug ) );
 					}
@@ -1083,7 +1175,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 						// Make sure message doesn't display again if bulk activation is performed
 						// immediately after a single activation.
 						if ( ! isset( $_POST['action'] ) ) { // WPCS: CSRF OK.
-							echo '<div id="message" class="updated"><p>', esc_html( $this->strings['activated_successfully'] ), /*' <strong></strong>',*/ esc_html( $this->plugins[ $slug ]['name'] ), '.</p></div>';
+							echo '<div id="message" class="updated"><p>', esc_html( $this->strings['activated_successfully'] ), esc_html( $this->plugins[ $slug ]['name'] ), '.</p></div>';
 						}
 					} else {
 						// Simpler message layout for use on the plugin install page.
@@ -1096,7 +1188,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 				echo '<div id="message" class="error"><p>',
 					sprintf(
 						esc_html( $this->strings['plugin_already_active'] ),
-						/*'<strong>' . */esc_html( $this->plugins[ $slug ]['name'] ) /*. '</strong>'*/
+						esc_html( $this->plugins[ $slug ]['name'] )
 					),
 					'</p></div>';
 			} elseif ( $this->does_plugin_require_update( $slug ) ) {
@@ -1107,7 +1199,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 						echo '<div id="message" class="error"><p>',
 							sprintf(
 								esc_html( $this->strings['plugin_needs_higher_version'] ),
-								/*'<strong>' . */esc_html( $this->plugins[ $slug ]['name'] ) /*. '</strong>'*/
+								esc_html( $this->plugins[ $slug ]['name'] )
 							),
 							'</p></div>';
 					}
@@ -1145,9 +1237,10 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 			$message = array();
 
 			// Initialize counters used to determine plurality of action link texts.
-			$install_link_count  = 0;
-			$update_link_count   = 0;
-			$activate_link_count = 0;
+			$install_link_count          = 0;
+			$update_link_count           = 0;
+			$activate_link_count         = 0;
+			$total_required_action_count = 0;
 
 			foreach ( $this->plugins as $slug => $plugin ) {
 				if ( $this->is_plugin_active( $slug ) && false === $this->does_plugin_have_update( $slug ) ) {
@@ -1170,6 +1263,9 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 						// Need higher privileges to install the plugin.
 						$message['notice_cannot_install'][] = $slug;
 					}
+					if ( true === $plugin['required'] ) {
+						$total_required_action_count++;
+					}
 				} else {
 					if ( ! $this->is_plugin_active( $slug ) && $this->can_plugin_activate( $slug ) ) {
 						if ( current_user_can( 'activate_plugins' ) ) {
@@ -1183,6 +1279,9 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 						} else {
 							// Need higher privileges to activate the plugin.
 							$message['notice_cannot_activate'][] = $slug;
+						}
+						if ( true === $plugin['required'] ) {
+							$total_required_action_count++;
 						}
 					}
 
@@ -1200,19 +1299,22 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 							// Need higher privileges to update the plugin.
 							$message['notice_cannot_update'][] = $slug;
 						}
+						if ( true === $plugin['required'] ) {
+							$total_required_action_count++;
+						}
 					}
 				}
 			}
 			unset( $slug, $plugin );
 
 			// If we have notices to display, we move forward.
-			if ( ! empty( $message ) ) {
+			if ( ! empty( $message ) || $total_required_action_count > 0 ) {
 				krsort( $message ); // Sort messages.
 				$rendered = array();
 
 				// As add_settings_error() wraps the final message in a <p> and as the final message can't be
 				// filtered, using <p>'s in our html would render invalid html output.
-				$line_template = /*<span style="display: block; margin: 0.5em 0.5em 0 0; clear: both;">*/'%s'/*</span>'*/ . "\n";
+				$line_template = '%s' . "\n";
 
 				// If dismissable is false and a message is set, output it now.
 				if ( ! $this->dismissable && ! empty( $this->dismiss_msg ) ) {
@@ -1306,8 +1408,91 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 			}
 
 			// Admin options pages already output settings_errors, so this is to avoid duplication.
-			if ( 'options-general' !== $GLOBALS['current_screen']->parent_base ) {
-				$this->display_settings_errors();
+			// if ( 'options-general' !== $GLOBALS['current_screen']->parent_base ) {
+			// 	$this->display_settings_errors();
+			// }
+		}
+
+		/**
+		 * Generate the user action links for the admin notice.
+		 *
+		 * @since 2.6.0
+		 *
+		 * @param int $install_count  Number of plugins to install.
+		 * @param int $update_count   Number of plugins to update.
+		 * @param int $activate_count Number of plugins to activate.
+		 * @param int $line_template  Template for the HTML tag to output a line.
+		 * @return string Action links.
+		 */
+		protected function create_user_action_links_for_notice( $install_count, $update_count, $activate_count, $line_template ) {
+			// Setup action links.
+			$action_links = array(
+				'install'  => '',
+				'update'   => '',
+				'activate' => '',
+				'dismiss'  => $this->dismissable ? '<a href="' . esc_url( wp_nonce_url( add_query_arg( 'webdogs-support-dismiss', 'dismiss_admin_notices' ), 'webdogs-support-dismiss-' . get_current_user_id() ) ) . '" class="dismiss-notice" target="_parent">' . esc_html( $this->strings['dismiss'] ) . '</a>' : '',
+			);
+
+			$link_template = '<a href="%2$s">%1$s</a>';
+
+			if ( current_user_can( 'install_plugins' ) ) {
+				if ( $install_count > 0 ) {
+					$action_links['install'] = sprintf(
+						$link_template,
+						translate_nooped_plural( $this->strings['install_link'], $install_count, 'webdogs-support' ),
+						esc_url( $this->get_wds_status_url( 'install' ) )
+					);
+				}
+				if ( $update_count > 0 ) {
+					$action_links['update'] = sprintf(
+						$link_template,
+						translate_nooped_plural( $this->strings['update_link'], $update_count, 'webdogs-support' ),
+						esc_url( $this->get_wds_status_url( 'update' ) )
+					);
+				}
+			}
+
+			if ( current_user_can( 'activate_plugins' ) && $activate_count > 0 ) {
+				$action_links['activate'] = sprintf(
+					$link_template,
+					translate_nooped_plural( $this->strings['activate_link'], $activate_count, 'webdogs-support' ),
+					esc_url( $this->get_wds_status_url( 'activate' ) )
+				);
+			}
+
+			$action_links = apply_filters( 'wds_notice_action_links', $action_links );
+
+			$action_links = array_filter( (array) $action_links ); // Remove any empty array items.
+
+			if ( ! empty( $action_links ) ) {
+				$action_links = sprintf( $line_template, implode( ' | ', $action_links ) );
+				return apply_filters( 'wds_notice_rendered_action_links', $action_links );
+			} else {
+				return '';
+			}
+		}
+
+		/**
+		 * Get admin notice class.
+		 *
+		 * Work around all the changes to the various admin notice classes between WP 4.4 and 3.7
+		 * (lowest supported version by TGMPA).
+		 *
+		 * @since 2.6.0
+		 *
+		 * @return string
+		 */
+		protected function get_admin_notice_class() {
+			if ( ! empty( $this->strings['nag_type'] ) ) {
+				return sanitize_html_class( strtolower( $this->strings['nag_type'] ) );
+			} else {
+				if ( version_compare( $this->wp_version, '4.2', '>=' ) ) {
+					return 'notice-warning';
+				} elseif ( version_compare( $this->wp_version, '4.1', '>=' ) ) {
+					return 'notice';
+				} else {
+					return 'updated';
+				}
 			}
 		}
 
@@ -1330,14 +1515,15 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		}
 
 		/**
-		 * Add dismissable admin notices.
+		 * Register dismissal of admin notices.
 		 *
-		 * Appends a link to the admin nag messages. If clicked, the admin notice disappears and no longer is visible to users.
+		 * Acts on the dismiss link in the admin nag messages.
+		 * If clicked, the admin notice disappears and will no longer be visible to this user.
 		 *
 		 * @since 2.1.0
 		 */
 		public function dismiss() {
-			if ( isset( $_GET['wds-dismiss'] ) ) {
+			if ( isset( $_GET['wds-dismiss'] ) && check_admin_referer( 'wds-dismiss-' . get_current_user_id() ) ) {
 				update_user_meta( get_current_user_id(), 'wds_dismissed_notice_' . $this->id, 1 );
 			}
 		}
@@ -1566,10 +1752,10 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 * @since 2.0.0
 		 *
 		 * @param array $install_actions Existing array of actions.
-		 * @return array Amended array of actions.
+		 * @return false|array Amended array of actions.
 		 */
 		public function actions( $install_actions ) {
-			// Remove action links on the Options Framework install page.
+			// Remove action links on the TGMPA install page.
 			if ( $this->is_wds_page() ) {
 				return false;
 			}
@@ -1766,21 +1952,50 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		}
 
 		/**
-		 * Determine if we're on the Options Framework Install page.
+		 * Determine if we're on the TGMPA Install page.
 		 *
 		 * @since 2.1.0
 		 *
-		 * @return boolean True when on the Options Framework page, false otherwise.
+		 * @return boolean True when on the TGMPA page, false otherwise.
 		 */
 		protected function is_wds_page() {
 			return isset( $_GET['page'] ) && $this->menu === $_GET['page'];
 		}
 
 		/**
-		 * Retrieve the URL to the Options Framework Install page.
+		 * Determine if we're on a WP Core installation/upgrade page.
+		 *
+		 * @since 2.6.0
+		 *
+		 * @return boolean True when on a WP Core installation/upgrade page, false otherwise.
+		 */
+		protected function is_core_update_page() {
+			// Current screen is not always available, most notably on the customizer screen.
+			if ( ! function_exists( 'get_current_screen' ) ) {
+				return false;
+			}
+
+			$screen = get_current_screen();
+
+			if ( 'update-core' === $screen->base ) {
+				// Core update screen.
+				return true;
+			} elseif ( 'plugins' === $screen->base && ! empty( $_POST['action'] ) ) { // WPCS: CSRF ok.
+				// Plugins bulk update screen.
+				return true;
+			} elseif ( 'update' === $screen->base && ! empty( $_POST['action'] ) ) { // WPCS: CSRF ok.
+				// Individual updates (ajax call).
+				return true;
+			}
+
+			return false;
+		}
+
+		/**
+		 * Retrieve the URL to the TGMPA Install page.
 		 *
 		 * I.e. depending on the config settings passed something along the lines of:
-		 * http://example.com/wp-admin/themes.php?page=wds-install-plugins
+		 * http://example.com/wp-admin/themes.php?page=tgmpa-install-plugins
 		 *
 		 * @since 2.5.0
 		 *
@@ -1813,10 +2028,10 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		}
 
 		/**
-		 * Retrieve the URL to the Options Framework Install page for a specific plugin status (view).
+		 * Retrieve the URL to the TGMPA Install page for a specific plugin status (view).
 		 *
 		 * I.e. depending on the config settings passed something along the lines of:
-		 * http://example.com/wp-admin/themes.php?page=wds-install-plugins&plugin_status=install
+		 * http://example.com/wp-admin/themes.php?page=tgmpa-install-plugins&plugin_status=install
 		 *
 		 * @since 2.5.0
 		 *
@@ -1833,7 +2048,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		}
 
 		/**
-		 * Determine whether there are open actions for plugins registered with Options Framework.
+		 * Determine whether there are open actions for plugins registered with TGMPA.
 		 *
 		 * @since 2.5.0
 		 *
@@ -1847,12 +2062,6 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 					break;
 				}
 			}
-			// foreach (  $this->themes as $slug => $theme ) {
-			// 	if ( ! $this->is_theme_active( $slug ) ) {
-			// 		$complete = false;
-			// 		break;
-			// 	}
-			// }
 
 			return $complete;
 		}
@@ -1909,7 +2118,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 			$api = $this->get_plugins_api( $slug );
 
 			if ( false !== $api && isset( $api->requires ) ) {
-				return version_compare( $GLOBALS['wp_version'], $api->requires, '>=' );
+				return version_compare( $this->wp_version, $api->requires, '>=' );
 			}
 
 			// No usable info received from the plugins API, presume we can update.
@@ -1917,8 +2126,25 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		}
 
 		/**
+		 * Check to see if the plugin is 'updatetable', i.e. installed, with an update available
+		 * and no WP version requirements blocking it.
+		 *
+		 * @since 2.6.0
+		 *
+		 * @param string $slug Plugin slug.
+		 * @return bool True if OK to proceed with update, false otherwise.
+		 */
+		public function is_plugin_updatetable( $slug ) {
+			if ( ! $this->is_plugin_installed( $slug ) ) {
+				return false;
+			} else {
+				return ( false !== $this->does_plugin_have_update( $slug ) && $this->can_plugin_update( $slug ) );
+			}
+		}
+
+		/**
 		 * Check if a plugin can be activated, i.e. is not currently active and meets the minimum
-		 * plugin version requirements set in Options Framework (if any).
+		 * plugin version requirements set in TGMPA (if any).
 		 *
 		 * @since 2.5.0
 		 *
@@ -2105,10 +2331,16 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 * @since 2.2.0
 		 */
 		public function force_deactivation() {
+			$deactivated = array();
+
 			foreach ( $this->plugins as $slug => $plugin ) {
-				// Only proceed forward if the parameter is set to true and plugin is active.
-				if ( true === $plugin['force_deactivation'] && $this->is_plugin_active( $slug ) ) {
+				/*
+				 * Only proceed forward if the parameter is set to true and plugin is active
+				 * as a 'normal' (not must-use) plugin.
+				 */
+				if ( true === $plugin['force_deactivation'] && is_plugin_active( $plugin['file_path'] ) ) {
 					deactivate_plugins( $plugin['file_path'] );
+					$deactivated[ $plugin['file_path'] ] = time();
 				}
 			}
 		}
@@ -2208,20 +2440,11 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		}
 
 		/**
-		 * Echo the current Options Framework version number to the page.<strong></strong>
-		 */
-		public function show_wds_version() {
-			// echo '<p style="float: right; padding: 0em 1.5em 0.5em 0;"><small>',
-				// esc_html( sprintf( _x( 'Options Framework v%s', '%s = version number', 'webdogs-support' ), self::OPTIONS_FRAMEWORK_VERSION ) ),
-				// '</small></p>';
-		}
-
-		/**
 		 * Returns the singleton instance of the class.
 		 *
 		 * @since 2.4.0
 		 *
-		 * @return object The Webdogs_Plugin_Activation object.
+		 * @return \TGM_Plugin_Activation The TGM_Plugin_Activation object.
 		 */
 		public static function get_instance() {
 			if ( ! isset( self::$instance ) && ! ( self::$instance instanceof self ) ) {
@@ -2230,6 +2453,24 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 
 			return self::$instance;
 		}
+	}
+
+
+	if ( ! function_exists( 'load_wds_plugin_activation' ) ) {
+		/**
+		 * Ensure only one instance of the class is ever invoked.
+		 *
+		 * @since 2.5.0
+		 */
+		function load_wds_plugin_activation() {
+			$GLOBALS['wds_plugin_activation'] = Webdogs_Plugin_Activation::get_instance();
+		}
+	}
+
+	if ( did_action( 'plugins_loaded' ) ) {
+		load_wds_plugin_activation();
+	} else {
+		add_action( 'plugins_loaded', 'load_wds_plugin_activation' );
 	}
 }
 
@@ -2244,10 +2485,11 @@ if ( ! function_exists( 'Webdogs_Install_Plugins_Page' ) ) {
 	 * @param array $config  Optional. An array of configuration values.
 	 */
 	function Webdogs_Install_Plugins_Page() {
-		$instance = $GLOBALS['wds_plugin_activation'];
+		$instance = call_user_func( array( get_class( $GLOBALS['wds_plugin_activation'] ), 'get_instance' ) );
 		$instance->install_plugins_page();
 	}
 }
+
 if ( ! function_exists( 'Is_Webdogs_Plugins_Page' ) ) {
 	/**
 	 * Helper function to register a collection of required plugins.
@@ -2274,7 +2516,7 @@ if ( ! function_exists( 'Webdogs_Register_Plugins' ) ) {
 	 * @param array $config  Optional. An array of configuration values.
 	 */
 	function Webdogs_Register_Plugins( $plugins, $themes, $config = array() ) {
-		$instance = $GLOBALS['wds_plugin_activation'];
+		$instance = call_user_func( array( get_class( $GLOBALS['wds_plugin_activation'] ), 'get_instance' ) );
 
 		foreach ( $plugins as $plugin ) {
 			call_user_func( array( $instance, 'register' ), $plugin );
@@ -2287,17 +2529,17 @@ if ( ! function_exists( 'Webdogs_Register_Plugins' ) ) {
 		if ( ! empty( $config ) && is_array( $config ) ) {
 			// Send out notices for deprecated arguments passed.
 			if ( isset( $config['notices'] ) ) {
-				_deprecated_argument( __FUNCTION__, '2.2.0', 'The `notices` config parameter was renamed to `has_notices` in Options Framework 2.2.0. Please adjust your configuration.' );
+				_deprecated_argument( __FUNCTION__, '2.2.0', 'The `notices` config parameter was renamed to `has_notices` in TGMPA 2.2.0. Please adjust your configuration.' );
 				if ( ! isset( $config['has_notices'] ) ) {
 					$config['has_notices'] = $config['notices'];
 				}
 			}
 
 			if ( isset( $config['parent_menu_slug'] ) ) {
-				_deprecated_argument( __FUNCTION__, '2.4.0', 'The `parent_menu_slug` config parameter was removed in Options Framework 2.4.0. In Options Framework 2.5.0 an alternative was (re-)introduced. Please adjust your configuration. For more information visit the website: http://tgmpluginactivation.com/configuration/#h-configuration-options.' );
+				_deprecated_argument( __FUNCTION__, '2.4.0', 'The `parent_menu_slug` config parameter was removed in TGMPA 2.4.0. In TGMPA 2.5.0 an alternative was (re-)introduced. Please adjust your configuration. For more information visit the website: http://tgmpluginactivation.com/configuration/#h-configuration-options.' );
 			}
 			if ( isset( $config['parent_url_slug'] ) ) {
-				_deprecated_argument( __FUNCTION__, '2.4.0', 'The `parent_url_slug` config parameter was removed in Options Framework 2.4.0. In Options Framework 2.5.0 an alternative was (re-)introduced. Please adjust your configuration. For more information visit the website: http://tgmpluginactivation.com/configuration/#h-configuration-options.' );
+				_deprecated_argument( __FUNCTION__, '2.4.0', 'The `parent_url_slug` config parameter was removed in TGMPA 2.4.0. In TGMPA 2.5.0 an alternative was (re-)introduced. Please adjust your configuration. For more information visit the website: http://tgmpluginactivation.com/configuration/#h-configuration-options.' );
 			}
 
 			call_user_func( array( $instance, 'config' ), $config );
@@ -2330,13 +2572,13 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 	 *
 	 * @since 2.2.0
 	 *
-	 * @package Options-Framework-Plugin-Activation
+	 * @package TGM-Plugin-Activation
 	 * @author  Thomas Griffin
 	 * @author  Gary Jones
 	 */
 	class Webdogs_List_Table extends WP_List_Table {
 		/**
-		 * Options Framework instance.
+		 * TGMPA instance.
 		 *
 		 * @since 2.5.0
 		 *
@@ -2373,7 +2615,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 		 * @since 2.2.0
 		 */
 		public function __construct() {
-			$this->wds_plugin_activation = $GLOBALS['wds_plugin_activation'];
+			$this->wds_plugin_activation = call_user_func( array( get_class( $GLOBALS['wds_plugin_activation'] ), 'get_instance' ) );
 
 			parent::__construct(
 				array(
@@ -2436,7 +2678,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 
 				$table_data[ $i ]['sanitized_plugin']  = $plugin['name'];
 				$table_data[ $i ]['slug']              = $slug;
-				$table_data[ $i ]['plugin']            = /*'<strong>' . */$this->wds_plugin_activation->get_info_link( $slug )/* . '</strong>'*/;
+				$table_data[ $i ]['plugin']            = $this->wds_plugin_activation->get_info_link( $slug );
 				$table_data[ $i ]['source']            = $this->get_plugin_source_type_text( $plugin['source_type'] );
 				$table_data[ $i ]['type']              = $this->get_plugin_advise_type_text( $plugin['required'] );
 				$table_data[ $i ]['status']            = $this->get_plugin_status_text( $slug );
@@ -2461,7 +2703,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 		}
 
 		/**
-		 * Categorize the plugins which have open actions into views for the Options Framework page.
+		 * Categorize the plugins which have open actions into views for the TGMPA page.
 		 *
 		 * @since 2.5.0
 		 */
@@ -2775,7 +3017,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 		 * @since 2.2.0
 		 */
 		public function no_items() {
-			printf( wp_kses_post( __( 'No plugins to install, update or activate. <a href="%1$s">Return to the Dashboard</a>', 'webdogs-support' ) ), esc_url( self_admin_url() ) );
+			echo esc_html__( 'No plugins to install, update or activate.', 'webdogs-support' ) . ' <a href="' . esc_url( self_admin_url() ) . '"> ' . esc_html__( 'Return to the Dashboard', 'webdogs-support' ) . '</a>';
 			echo '<style type="text/css">#adminmenu .wp-submenu li.current { display: none !important; }</style>';
 		}
 
@@ -2882,7 +3124,6 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 			return apply_filters( "wds_{$prefix}plugin_action_links", array_filter( $action_links ), $item['slug'], $item, $this->view_context );
 		}
 
-		
 		/**
 		 * Generates content for a single row of the table.
 		 *
@@ -2927,7 +3168,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 			echo '</tr>';
 
 			/**
-			 * Fires after each specific row in the Options Framework Plugins list table.
+			 * Fires after each specific row in the TGMPA Plugins list table.
 			 *
 			 * The dynamic portion of the hook name, `$item['slug']`, refers to the slug
 			 * for the plugin.
@@ -3050,7 +3291,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 
 				// Sanitize the received input.
 				$plugins_to_install = array_map( 'urldecode', $plugins_to_install );
-				$plugins_to_install = array_map( array( $this->optionsframework, 'sanitize_key' ), $plugins_to_install );
+				$plugins_to_install = array_map( array( $this->wds_plugin_activation, 'sanitize_key' ), $plugins_to_install );
 
 				// Validate the received input.
 				foreach ( $plugins_to_install as $key => $slug ) {
@@ -3152,7 +3393,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 					'<h1>', esc_html( get_admin_page_title() ), '</h1>';
 
 				// Process the bulk installation submissions.
-				add_filter( 'upgrader_source_selection', array( $this->optionsframework, 'maybe_adjust_source_dir' ), 1, 3 );
+				add_filter( 'upgrader_source_selection', array( $this->wds_plugin_activation, 'maybe_adjust_source_dir' ), 1, 3 );
 
 				if ( 'wds-bulk-update' === $this->current_action() ) {
 					// Inject our info into the update transient.
@@ -3163,7 +3404,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 					$installer->bulk_install( $sources );
 				}
 
-				remove_filter( 'upgrader_source_selection', array( $this->optionsframework, 'maybe_adjust_source_dir' ), 1, 3 );
+				remove_filter( 'upgrader_source_selection', array( $this->wds_plugin_activation, 'maybe_adjust_source_dir' ), 1, 3 );
 
 				echo '</div>';
 
@@ -3185,7 +3426,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 				$plugins = array();
 				if ( isset( $_POST['plugin'] ) ) {
 					$plugins = array_map( 'urldecode', (array) $_POST['plugin'] );
-					$plugins = array_map( array( $this->optionsframework, 'sanitize_key' ), $plugins );
+					$plugins = array_map( array( $this->wds_plugin_activation, 'sanitize_key' ), $plugins );
 				}
 
 				$plugins_to_activate = array();
@@ -3214,7 +3455,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 					echo '<div id="message" class="error"><p>', wp_kses_post( $activate->get_error_message() ), '</p></div>';
 				} else {
 					$count        = count( $plugin_names ); // Count so we can use _n function.
-					$plugin_names =  $plugin_names; //array_map( array( 'Webdogs_Utils', 'wrap_in_strong' ), $plugin_names );
+					$plugin_names =  $plugin_names;
 					$last_plugin  = array_pop( $plugin_names ); // Pop off last name to prep for readability.
 					$imploded     = empty( $plugin_names ) ? $last_plugin : ( implode( ', ', $plugin_names ) . ' ' . esc_html_x( 'and', 'plugin A *and* plugin B', 'webdogs-support' ) . ' ' . $last_plugin );
 
@@ -3269,8 +3510,8 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 		 * Retrieve plugin data, given the plugin name.
 		 *
 		 * @since      2.2.0
-		 * @deprecated 2.5.0 use {@see Webdogs_Plugin_Activation::_get_plugin_data_from_name()} instead.
-		 * @see        Webdogs_Plugin_Activation::_get_plugin_data_from_name()
+		 * @deprecated 2.5.0 use {@see TGM_Plugin_Activation::_get_plugin_data_from_name()} instead.
+		 * @see        TGM_Plugin_Activation::_get_plugin_data_from_name()
 		 *
 		 * @param string $name Name of the plugin, as it was registered.
 		 * @param string $data Optional. Array key of plugin data to return. Default is slug.
@@ -3324,8 +3565,8 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 			return;
 		}
 
-		// Get Options Framework class instance.
-		$wds_instance = $GLOBALS['wds_plugin_activation'];
+		// Get TGMPA class instance.
+		$wds_instance = call_user_func( array( get_class( $GLOBALS['wds_plugin_activation'] ), 'get_instance' ) );
 
 		if ( isset( $_GET['page'] ) && $wds_instance->menu === $_GET['page'] ) {
 			if ( ! class_exists( 'Plugin_Upgrader', false ) ) {
@@ -3342,11 +3583,11 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 				 *
 				 * @since 2.2.0
 				 *
-				 * @internal Since 2.5.0 the class is an extension of Plugin_Upgrader rather than WP_Upgrader
-				 * @internal Since 2.5.2 the class has been renamed from Webdogs_Bulk_Installer to Webdogs_Bulk_Installer.
-				 *           This was done to prevent backward compatibility issues with v2.3.6.
+				 * {@internal Since 2.5.0 the class is an extension of Plugin_Upgrader rather than WP_Upgrader.}}
+				 * {@internal Since 2.5.2 the class has been renamed from TGM_Bulk_Installer to TGMPA_Bulk_Installer.
+				 *            This was done to prevent backward compatibility issues with v2.3.6.}}
 				 *
-				 * @package Options-Framework-Plugin-Activation
+				 * @package TGM-Plugin-Activation
 				 * @author  Thomas Griffin
 				 * @author  Gary Jones
 				 */
@@ -3370,13 +3611,13 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 					public $bulk = false;
 
 					/**
-					 * Options Framework instance
+					 * TGMPA instance
 					 *
 					 * @since 2.5.0
 					 *
 					 * @var object
 					 */
-					protected $optionsframework;
+					protected $wds_plugin_activation;
 
 					/**
 					 * Whether or not the destination directory needs to be cleared ( = on update).
@@ -3395,8 +3636,8 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 					 * @param \Bulk_Upgrader_Skin|null $skin Installer skin.
 					 */
 					public function __construct( $skin = null ) {
-						// Get Options Framework class instance.
-						$this->wds_plugin_activation = $GLOBALS['wds_plugin_activation'];
+						// Get TGMPA class instance.
+						$this->wds_plugin_activation = call_user_func( array( get_class( $GLOBALS['wds_plugin_activation'] ), 'get_instance' ) );
 
 						parent::__construct( $skin );
 
@@ -3408,7 +3649,7 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 							$this->activate_strings();
 						}
 
-						add_action( 'upgrader_process_complete', array( $this->optionsframework, 'populate_file_path' ) );
+						add_action( 'upgrader_process_complete', array( $this->wds_plugin_activation, 'populate_file_path' ) );
 					}
 
 					/**
@@ -3451,20 +3692,22 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 					 *
 					 * @since 2.2.0
 					 *
-					 * @internal This is basically a near identical copy of the WP Core Plugin_Upgrader::bulk_upgrade()
-					 * method, with minor adjustments to deal with new installs instead of upgrades.
+					 * {@internal This is basically a near identical copy of the WP Core
+					 * Plugin_Upgrader::bulk_upgrade() method, with minor adjustments to deal with
+					 * new installs instead of upgrades.
 					 * For ease of future synchronizations, the adjustments are clearly commented, but no other
-					 * comments are added. Code style has been made to comply.
+					 * comments are added. Code style has been made to comply.}}
 					 *
 					 * @see Plugin_Upgrader::bulk_upgrade()
 					 * @see https://core.trac.wordpress.org/browser/tags/4.2.1/src/wp-admin/includes/class-wp-upgrader.php#L838
+					 * (@internal Last synced: Dec 31st 2015 against https://core.trac.wordpress.org/browser/trunk?rev=36134}}
 					 *
 					 * @param array $plugins The plugin sources needed for installation.
 					 * @param array $args    Arbitrary passed extra arguments.
-					 * @return string|bool Install confirmation messages on success, false on failure.
+					 * @return array|false   Install confirmation messages on success, false on failure.
 					 */
 					public function bulk_install( $plugins, $args = array() ) {
-						// [Options Framework + ] Hook auto-activation in.
+						// [TGMPA + ] Hook auto-activation in.
 						add_filter( 'upgrader_post_install', array( $this, 'auto_activate' ), 10 );
 
 						$defaults    = array(
@@ -3475,11 +3718,11 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 						$this->init();
 						$this->bulk = true;
 
-						$this->install_strings(); // [Options Framework + ] adjusted.
+						$this->install_strings(); // [TGMPA + ] adjusted.
 
-						/* [Options Framework - ] $current = get_site_transient( 'update_plugins' ); */
+						/* [TGMPA - ] $current = get_site_transient( 'update_plugins' ); */
 
-						/* [Options Framework - ] add_filter('upgrader_clear_destination', array($this, 'delete_old_plugin'), 10, 4); */
+						/* [TGMPA - ] add_filter('upgrader_clear_destination', array($this, 'delete_old_plugin'), 10, 4); */
 
 						$this->skin->header();
 
@@ -3487,20 +3730,21 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 						$res = $this->fs_connect( array( WP_CONTENT_DIR, WP_PLUGIN_DIR ) );
 						if ( ! $res ) {
 							$this->skin->footer();
-
 							return false;
 						}
 
 						$this->skin->bulk_header();
 
-						// Only start maintenance mode if:
-						// - running Multisite and there are one or more plugins specified, OR
-						// - a plugin with an update available is currently active.
-						// @TODO: For multisite, maintenance mode should only kick in for individual sites if at all possible.
+						/*
+						 * Only start maintenance mode if:
+						 * - running Multisite and there are one or more plugins specified, OR
+						 * - a plugin with an update available is currently active.
+						 * @TODO: For multisite, maintenance mode should only kick in for individual sites if at all possible.
+						 */
 						$maintenance = ( is_multisite() && ! empty( $plugins ) );
 
 						/*
-						[Options Framework - ]
+						[TGMPA - ]
 						foreach ( $plugins as $plugin )
 							$maintenance = $maintenance || ( is_plugin_active( $plugin ) && isset( $current->response[ $plugin] ) );
 						*/
@@ -3516,7 +3760,7 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 							$this->update_current++;
 
 							/*
-							[Options Framework - ]
+							[TGMPA - ]
 							$this->skin->plugin_info = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin, false, true);
 
 							if ( !isset( $current->response[ $plugin ] ) ) {
@@ -3528,22 +3772,24 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 								continue;
 							}
 
-							// Get the URL to the zip file
+							// Get the URL to the zip file.
 							$r = $current->response[ $plugin ];
 
 							$this->skin->plugin_active = is_plugin_active($plugin);
 							*/
 
-							$result = $this->run( array(
-								'package'           => $plugin, // [Options Framework + ] adjusted.
-								'destination'       => WP_PLUGIN_DIR,
-								'clear_destination' => false, // [Options Framework + ] adjusted.
-								'clear_working'     => true,
-								'is_multi'          => true,
-								'hook_extra'        => array(
-									'plugin' => $plugin,
-								),
-							) );
+							$result = $this->run(
+								array(
+									'package'           => $plugin, // [TGMPA + ] adjusted.
+									'destination'       => WP_PLUGIN_DIR,
+									'clear_destination' => false, // [TGMPA + ] adjusted.
+									'clear_working'     => true,
+									'is_multi'          => true,
+									'hook_extra'        => array(
+										'plugin' => $plugin,
+									),
+								)
+							);
 
 							$results[ $plugin ] = $this->result;
 
@@ -3558,7 +3804,7 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 						/**
 						 * Fires when the bulk upgrader process is complete.
 						 *
-						 * @since WP 3.6.0 / Options Framework 2.5.0
+						 * @since WP 3.6.0 / TGMPA 2.5.0
 						 *
 						 * @param Plugin_Upgrader $this Plugin_Upgrader instance. In other contexts, $this, might
 						 *                              be a Theme_Upgrader or Core_Upgrade instance.
@@ -3572,7 +3818,7 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 						 * }
 						 */
 						do_action( 'upgrader_process_complete', $this, array(
-							'action'  => 'install', // [Options Framework + ] adjusted.
+							'action'  => 'install', // [TGMPA + ] adjusted.
 							'type'    => 'plugin',
 							'bulk'    => true,
 							'plugins' => $plugins,
@@ -3583,9 +3829,9 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 						$this->skin->footer();
 
 						// Cleanup our hooks, in case something else does a upgrade on this connection.
-						/* [Options Framework - ] remove_filter('upgrader_clear_destination', array($this, 'delete_old_plugin')); */
+						/* [TGMPA - ] remove_filter('upgrader_clear_destination', array($this, 'delete_old_plugin')); */
 
-						// [Options Framework + ] Remove our auto-activation hook.
+						// [TGMPA + ] Remove our auto-activation hook.
 						remove_filter( 'upgrader_post_install', array( $this, 'auto_activate' ), 10 );
 
 						// Force refresh of plugin update information.
@@ -3666,13 +3912,13 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 				 *
 				 * @since 2.2.0
 				 *
-				 * @internal Since 2.5.2 the class has been renamed from Webdogs_Bulk_Installer_Skin to
-				 *           Webdogs_Bulk_Installer_Skin.
-				 *           This was done to prevent backward compatibility issues with v2.3.6.
+				 * {@internal Since 2.5.2 the class has been renamed from TGM_Bulk_Installer_Skin to
+				 *            TGMPA_Bulk_Installer_Skin.
+				 *            This was done to prevent backward compatibility issues with v2.3.6.}}
 				 *
 				 * @see https://core.trac.wordpress.org/browser/trunk/src/wp-admin/includes/class-wp-upgrader-skins.php
 				 *
-				 * @package Options-Framework-Plugin-Activation
+				 * @package TGM-Plugin-Activation
 				 * @author  Thomas Griffin
 				 * @author  Gary Jones
 				 */
@@ -3705,7 +3951,7 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 					public $i = 0;
 
 					/**
-					 * Options Framework instance
+					 * TGMPA instance
 					 *
 					 * @since 2.5.0
 					 *
@@ -3721,8 +3967,8 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 					 * @param array $args Arguments to pass for use within the class.
 					 */
 					public function __construct( $args = array() ) {
-						// Get Options Framework class instance.
-						$this->wds_plugin_activation = $GLOBALS['wds_plugin_activation'];
+						// Get TGMPA class instance.
+						$this->wds_plugin_activation = call_user_func( array( get_class( $GLOBALS['wds_plugin_activation'] ), 'get_instance' ) );
 
 						// Parse default and new args.
 						$defaults = array(
@@ -3858,7 +4104,7 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 					 * @see        Bulk_Upgrader_Skin::flush_output()
 					 */
 					public function before_flush_output() {
-						_deprecated_function( __FUNCTION__, 'Options Framework 2.5.0', 'Bulk_Upgrader_Skin::flush_output()' );
+						_deprecated_function( __FUNCTION__, 'TGMPA 2.5.0', 'Bulk_Upgrader_Skin::flush_output()' );
 						$this->flush_output();
 					}
 
@@ -3871,7 +4117,7 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 					 * @see        Bulk_Upgrader_Skin::flush_output()
 					 */
 					public function after_flush_output() {
-						_deprecated_function( __FUNCTION__, 'Options Framework 2.5.0', 'Bulk_Upgrader_Skin::flush_output()' );
+						_deprecated_function( __FUNCTION__, 'TGMPA 2.5.0', 'Bulk_Upgrader_Skin::flush_output()' );
 						$this->flush_output();
 						$this->i++;
 					}
@@ -3884,15 +4130,15 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 if ( ! class_exists( 'Webdogs_Utils' ) ) {
 
 	/**
-	 * Generic utilities for Options Framework.
+	 * Generic utilities for TGMPA.
 	 *
 	 * All methods are static, poor-dev name-spacing class wrapper.
 	 *
-	 * Class was called Webdogs_Utils in 2.5.0 but renamed Webdogs_Utils in 2.5.1 as this was conflicting with Soliloquy.
+	 * Class was called TGM_Utils in 2.5.0 but renamed TGMPA_Utils in 2.5.1 as this was conflicting with Soliloquy.
 	 *
 	 * @since 2.5.0
 	 *
-	 * @package Options-Framework-Plugin-Activation
+	 * @package TGM-Plugin-Activation
 	 * @author  Juliette Reinders Folmer
 	 */
 	class Webdogs_Utils {
@@ -3934,7 +4180,7 @@ if ( ! class_exists( 'Webdogs_Utils' ) ) {
 		 * @return string
 		 */
 		public static function wrap_in_strong( $string ) {
-			return /*'<strong>' .*/ wp_kses_post( $string ) /*. '</strong>'*/;
+			return wp_kses_post( $string );
 		}
 
 		/**
@@ -3989,15 +4235,15 @@ if ( ! class_exists( 'Webdogs_Utils' ) ) {
 
 			if ( is_bool( $value ) ) {
 				return $value;
-			} else if ( is_int( $value ) && ( 0 === $value || 1 === $value ) ) {
+			} elseif ( is_int( $value ) && ( 0 === $value || 1 === $value ) ) {
 				return (bool) $value;
-			} else if ( ( is_float( $value ) && ! is_nan( $value ) ) && ( (float) 0 === $value || (float) 1 === $value ) ) {
+			} elseif ( ( is_float( $value ) && ! is_nan( $value ) ) && ( (float) 0 === $value || (float) 1 === $value ) ) {
 				return (bool) $value;
-			} else if ( is_string( $value ) ) {
+			} elseif ( is_string( $value ) ) {
 				$value = trim( $value );
 				if ( in_array( $value, $true, true ) ) {
 					return true;
-				} else if ( in_array( $value, $false, true ) ) {
+				} elseif ( in_array( $value, $false, true ) ) {
 					return false;
 				} else {
 					return false;
@@ -4006,5 +4252,5 @@ if ( ! class_exists( 'Webdogs_Utils' ) ) {
 
 			return false;
 		}
-	} // End of class Webdogs_Utils
+	} // End of class TGMPA_Utils
 } // End of class_exists wrapper
