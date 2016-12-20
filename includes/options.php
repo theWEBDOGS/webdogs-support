@@ -43,7 +43,7 @@ function wds_options() {
 	// check if set in cutomizer
 	$custom_logo_id = get_theme_mod( 'custom_logo' );
 	$image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
-	$login_logo = ( ! empty( $image[0] ) ) ? $image[0] : Webdogs_Login_Logo::$instance->get_location('url');
+	$login_logo = ( ! empty( $image[0] ) ) ? $image[0] : '';//Webdogs_Login_Logo::$instance->get_location('url');
 
 	$background_defaults = array(
 		'color' => '#f1f1f1',
@@ -104,22 +104,22 @@ function wds_options() {
 	$active_deletion_notice = false;
 
 	$delete_plugins = array();
-	foreach ( $plugins as $slug => $plugin ) {
-		if ( true === $plugin['force_deletion'] /*&& ! empty( $installed_plugins[ $plugin['file_path'] ] )*/ ) {
-			if ( is_plugin_active( $plugin['file_path'] ) ) {
-				$active_deletion_notice = true;
-				$delete_plugins[] = $plugin['name'] . '<span style="position: absolute;"><sup>*</sup></span>' ;
-			} else { 
-				$delete_plugins[] = $plugin['name'];
-			}
-		}
-	}
+	// foreach ( $plugins as $slug => $plugin ) {
+	// 	if ( true === $plugin['force_deletion'] /*&& ! empty( $installed_plugins[ $plugin['file_path'] ] )*/ ) {
+	// 		if ( is_plugin_active( $plugin['file_path'] ) ) {
+	// 			$active_deletion_notice = true;
+	// 			$delete_plugins[] = $plugin['name'] . '<span style="position: absolute;"><sup>*</sup></span>' ;
+	// 		} else { 
+	// 			$delete_plugins[] = $plugin['name'];
+	// 		}
+	// 	}
+	// }
 
 	$recommend_plugins = array();
-	foreach ( $plugins as $slug => $plugin ) {
-		if ( true === $plugin['force_deletion'] ) continue;
-		$recommend_plugins[] = $plugin['name'];
-	}
+	// foreach ( $plugins as $slug => $plugin ) {
+	// 	if ( true === $plugin['force_deletion'] ) continue;
+	// 	$recommend_plugins[] = $plugin['name'];
+	// }
 
 	$delete_themes = array();
 	$delete_themes[] = 'Authored by the WordPress team';

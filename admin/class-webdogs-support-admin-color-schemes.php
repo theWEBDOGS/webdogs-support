@@ -225,7 +225,7 @@ class Webdogs_Support_Admin_Color_Schemes {
 		include( $this->base . '/templates/empty-scheme.php' );
 	}
 
-	public function get_Sass_JS() {
+	public static function get_Sass_JS() {
 		if( ! is_admin() || ! current_user_can('manage_support_options' ) ) return;
 
 		$wp_upload_dir = wp_upload_dir();

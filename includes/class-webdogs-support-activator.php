@@ -31,6 +31,14 @@ class Webdogs_Support_Activator {
 	 */
 	public static function activate() {
 
+        if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php');
+
+        if(!function_exists('is_plugin_active')) include_once( ABSPATH . 'wp-admin/includes/plugin.php');
+
+        if(!function_exists('wp_prepare_themes_for_js')) include_once( ABSPATH . 'wp-admin/includes/theme.php');
+
+        if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');
+
         $deactivate_plugins = apply_filters( 'webdogs_support_activator_deactivate_plugins', 
             array(
                 WP_PLUGIN_DIR . '/webdogs-support-dashboard-widget/webdogs-support-dashboard-widget.php',
@@ -76,17 +84,31 @@ class Webdogs_Support_Activator {
 
 	}
 
+        ///////////////////////////////
+        //                           //
+        //   ADD NOTIFICATION CRON   //
+        //                           //
+        ///////////////////////////////
     public static function init_schedule() { 
         if(!class_exists('Webdogs_Support_Maintenance_Notifications') ) {
             require_once WEBDOGS_SUPPORT_DIR . 'includes/class-webdogs-support-maintainance-notifications.php'; }
             Webdogs_Support_Maintenance_Notifications::create_daily_notification_schedule(); }
 
+        ///////////////////////////////
+        //                           //
+        //   REWRITE API ENDPOINTS   //
+        //                           //
+        ///////////////////////////////
     public static function init_endpoint() { 
         if(!class_exists('Webdogs_Support_Endpoint') ) {
             require_once WEBDOGS_SUPPORT_DIR . 'includes/class-webdogs-support-endpoint.php'; }
-            $endpoint = new Webdogs_Support_Endpoint; $endpoint->add_endpoint(); flush_rewrite_rules();
-    }
+            $endpoint = new Webdogs_Support_Endpoint; $endpoint->add_endpoint(); flush_rewrite_rules(); }
 
+        ///////////////////////////////
+        //                           //
+        //   UNPACK WATCHDOG TO MU   //
+        //                           //
+        ///////////////////////////////
     public static function init_watchdog() {
         require_once(ABSPATH .'/wp-admin/includes/file.php'); $creds = request_filesystem_credentials( site_url() . '/wp-admin/', '', false, false, array());
         if ( ! WP_Filesystem($creds) ) { return false; } global $wp_filesystem;
@@ -101,6 +123,5 @@ class Webdogs_Support_Activator {
 
         if( defined('WPMU_PLUGIN_DIR')) { $WATCHDOG_FROM = WEBDOGS_SUPPORT_DIR . 'watchdog/watchdog.zip'; $WATCHDOG_TO = WPMU_PLUGIN_DIR .'/watchdog/'; 
         if( file_exists( $WATCHDOG_FROM ) && !file_exists( $WATCHDOG_TO) ) { $unzip_file = unzip_file( $WATCHDOG_FROM, $WATCHDOG_TO );
-        if( is_wp_error( $unzip_file ) ) { wp_die( $unzip_file->get_error_message() /*'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.'*/ ); } } }
-    }
+        if( is_wp_error( $unzip_file ) ) { wp_die( $unzip_file->get_error_message() /*'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.'*/ ); } } } }
 }

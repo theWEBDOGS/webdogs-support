@@ -3,28 +3,11 @@
 defined( 'WPINC' ) or die;
 
 /**
- * WEBDOGS Contact Support Widget
+ * Webdogs Support Dashboard Widget
  */
 
-class Webdogs_Support_Widget
+class Webdogs_Support_Dashboard_Widget
 {
-   
-    /**
-     * Initialize globals and magic hooks.
-     */
-    public static function init() {
-        
-        if(!is_admin()) return;
-        
-        add_action( 'wp_dashboard_setup',               array( __CLASS__, 'add_dashboard_widget' ));
-    
-        add_action( 'admin_enqueue_scripts',            array( __CLASS__, 'enqueue_scripts'      ));
-    
-        add_action( 'wp_ajax_webdogs_result_dashboard', array( __CLASS__, 'result_dashboard'     )); 
-
-        add_action( 'wp_ajax_webdogs_reset_dashboard',  array( __CLASS__, 'reset_dashboard'      )); 
-        
-    }
 
     /**
      * Register dashboard widget
@@ -41,9 +24,9 @@ class Webdogs_Support_Widget
     public static function dashboard_widget() { 
          if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php' );
 
-        $current_user = wp_get_current_user(); ?>
+        $current_user = wp_get_current_user(); 
 
-        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;text-size-adjust:100%;-webkit-text-size-adjust:100%;min-width:100%;width:auto;position:relative;" id="webdogs_support_intro">
+        ?><div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;text-size-adjust:100%;-webkit-text-size-adjust:100%;min-width:100%;width:auto;position:relative;" id="webdogs_support_intro">
             <p>Contact support for assistance with updating WordPress or making changes to your website.</p>
         </div>
         <div id="webdogs_support_form_wrapper">
@@ -58,9 +41,7 @@ class Webdogs_Support_Widget
                 <textarea type="textarea" rows="4" style="width:100%" name="webdogs_support_form_message" id="webdogs_support_form_message"></textarea></label><br>
                 <input type="submit" class="button" value="Send Request">
             </form>
-        </div>
-
-        <?php
+        </div><?php
     }
 
     /**
@@ -122,12 +103,12 @@ class Webdogs_Support_Widget
     public static function result_dashboard() {
 
         $site       = get_bloginfo('name');
-        $username   = $_POST['username'];
-        $email      = $_POST['email'];
-        $message    = $_POST['message'];
+        $username   = sanitize_text_field( $_POST['username'] );
+        $email      = sanitize_email( $_POST['email'] );
+        $message    = sanitize_text_field( $_POST['message'] );
         $to         = WEBDOGS_SUPPORT;
 
-        $subject = "[".WEBDOGS_TITLE."] ". html_entity_decode( $site ) ." - ". $_POST['subject'];
+        $subject = html_entity_decode( sprintf( "[%s] %s - %s", WEBDOGS_TITLE, $site, sanitize_text_field( $_POST['subject'] ) ) );
 
         $headers  = "From: \"". $username ."\" <". $email .">\r\n"; 
         $headers .= "MIME-Version: 1.0\r\n";
@@ -135,14 +116,11 @@ class Webdogs_Support_Widget
 
         if(!function_exists('wp_mail')) include_once( ABSPATH . 'wp-includes/pluggable.php');
 
-        if ( wp_mail( $to, $subject, $message, $headers ) )
-        {   
+        if ( wp_mail( $to, $subject, $message, $headers ) ) {
            echo "<p style='color:#2a8d9d;'><b>Request Sent</b></p> \r\n";
            echo "<p>A ".WEBDOGS_TITLE." agent will respond to your case via email. To submit another request, click the Reset Form button.</p> \r\n";
            echo "<input id='webdogs_support_form_reset' type='button' class='button' value='Reset Form' /> \r\n";
-        } 
-        else 
-        {   
+        } else {
            echo "<p style='color:#2a8d9d;'><b>Error sending</b></p> \r\n";
            echo "<p>Something went wrong. Please, use your email service to notify <a href='mailto:support@webdogs.com' target='_blank' style='color: #D0F2FC;'>support@webdogs.com</a>.</p> \r\n";
         }

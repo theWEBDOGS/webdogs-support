@@ -330,7 +330,7 @@ class Webdogs_Admin {
 	 
 	    $title = "";
 
-	    // $custom_logo_icon = $this->get_logo_icon();
+	    $custom_logo_icon = $this->get_logo_icon();
 
 	    if( $custom_logo_icon ) {
 
@@ -507,7 +507,7 @@ class Webdogs_Admin {
 
 	<div id="wds-wrap" class="wrap">
 		
-		<?php Webdogs_Admin_Color_Schemes::get_Sass_JS(); ?>
+		<?php Webdogs_Support_Admin_Color_Schemes::get_Sass_JS(); ?>
 
 		<?php $menu = Self::menu_settings(); ?>
 

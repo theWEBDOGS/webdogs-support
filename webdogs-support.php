@@ -16,7 +16,7 @@
  * Plugin Name:       WEBDOGS Support
  * Plugin URI:        https://github.com/theWEBDOGS/webdogs-support
  * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
- * Version:           1.0.0
+ * Version:           2.3.4
  * Author:            WEBDOGS Support Team
  * Author URI:        WEBDOGS.COM
  * License:           GPL-2.0+
@@ -56,6 +56,8 @@ define( 'WEBDOGS_LATEST_VERSION', function_exists(
          WEBDOGS_LATEST_VERSION() : 
          WEBDOGS_VERSION() );
 
+  
+
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-webdogs-support-activator.php
@@ -74,7 +76,7 @@ function deactivate_webdogs_support() {
 	Webdogs_Support_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_webdogs_support' );
+  register_activation_hook( __FILE__, 'activate_webdogs_support' );
 register_deactivation_hook( __FILE__, 'deactivate_webdogs_support' );
 
 /**
@@ -110,23 +112,17 @@ if ( ! function_exists( 'wds_get_option' ) ) {
     }
 }
 
-if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php');
-
-
-
-if(!function_exists('is_plugin_active')) include_once( ABSPATH . 'wp-admin/includes/plugin.php');
-
-if(!function_exists('wp_prepare_themes_for_js')) include_once( ABSPATH . 'wp-admin/includes/theme.php');
-
-if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');
-
-
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/webdogs-support-common-functions.php';
 
+function webdogs_support() {
+    if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php');
+
+    $GLOBALS['wds'] = new Webdogs_Support();
+}
+add_action('plugins_loaded', 'webdogs_support' );
 /**
  * Begins execution of the plugin.
  *
@@ -137,15 +133,16 @@ require plugin_dir_path( __FILE__ ) . 'includes/webdogs-support-common-functions
  * @since    1.0.0
  */
 function run_webdogs_support() {
-    /**
-     * The core plugin class that is used to define internationalization,
-     * admin-specific hooks, and public-facing site hooks.
-     */
-    require plugin_dir_path( __FILE__ ) . 'options.php';
+
+        if(!function_exists('is_plugin_active')) include_once( ABSPATH . 'wp-admin/includes/plugin.php');
+
+        if(!function_exists('wp_prepare_themes_for_js')) include_once( ABSPATH . 'wp-admin/includes/theme.php');
+
+        if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');
 
 
-	$plugin = new Webdogs_Support();
-	$plugin->run();
+    $GLOBALS['wds']->run();
 
 }
-run_webdogs_support();
+add_action('init', 'run_webdogs_support' );
+

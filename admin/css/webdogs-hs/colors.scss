@@ -1,0 +1,40 @@
+$base_color: #dbe9f0;
+$icon_color: #0c5b90;
+$highlight_color: #1274a8;
+$notification_color: #ef8f00;
+$menu_icon: #0c5b90;
+$menu_highlight_icon: #002347;
+$menu_current_icon: #ffffff;
+$button_color: #ef8f00;
+$text_color: #0c5b90;
+$body_background: #f4f4f4;
+$menu_text: #0c5b90;
+$menu_highlight_text: #ffffff;
+$menu_current_background: #0c5b90;
+$menu_current_text: #ffffff;
+$menu_submenu_background: #eff2f4;
+$menu_submenu_text: #1274a8;
+$menu_submenu_background_alt: #1be28f;
+$menu_submenu_focus_text: #002347;
+$menu_submenu_current_text: #002347;
+$menu_bubble_background: #ef8f00;
+$menu_bubble_text: #ffffff;
+$menu_bubble_current_background: #ef8f00;
+$menu_bubble_current_text: #ffffff;
+
+@import "../admin";
+
+html {
+  background: $body_background;
+
+   body {
+        background: $body_background;
+ }
+}
+
+.about-wrap h2 .nav-tab-active,
+.nav-tab-active,
+.nav-tab-active:hover {
+ background-color: #f1f1f1;
+    border-bottom-color: #f1f1f1;
+}

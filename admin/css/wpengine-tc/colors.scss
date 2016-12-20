@@ -1,0 +1,59 @@
+$base_color: #162a33;
+$icon_color: #40bac8;
+$highlight_color: #2a8792;
+$notification_color: #60bb8f;
+$button_color: #40bac8;
+$text_color: #2a8792;
+$body_background: #f0f0f0;
+$link: #40bac8;
+$link_focus: #2a8792;
+$form_checked: #2a8792;
+$menu_background: #f0f0f0;
+$menu_text: #40bac8;
+$menu_icon: #40bac8;
+$menu_highlight_text: #2a8792;
+$menu_highlight_icon: #2a8792;
+$menu_current_text: #162a33;
+$menu_current_icon: #162a33;
+$menu_submenu_text: #ffffff;
+$menu_bubble_background: #ffffff;
+
+
+@import "../_admin.scss";
+
+html {
+  background: $body_background;
+
+  body {
+        background: $body_background;
+ 	}
+}
+
+#wpadminbar:not(.mobile) li:hover .ab-icon {
+  color: $menu_highlight_icon;
+}
+
+#wpadminbar li:hover .ab-icon,
+#wpadminbar li a:focus .ab-icon,
+#wpadminbar li.hover .ab-icon {
+  color: $menu_submenu_focus_text;
+}
+
+#wpadminbar.mobile .quicklinks .ab-icon {
+  color: $menu_submenu_focus_text;
+}
+
+#wpadminbar.mobile .quicklinks .hover .ab-icon {
+  color: $menu_icon;
+}
+
+.wp-responsive-open #wpadminbar #wp-admin-bar-menu-toggle .ab-icon {
+  color: $menu_icon;
+}
+
+.about-wrap h2 .nav-tab-active,
+.nav-tab-active,
+.nav-tab-active:hover {
+   background-color: #f1f1f1;
+   border-bottom-color: #f1f1f1;
+}

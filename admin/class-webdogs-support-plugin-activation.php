@@ -1805,7 +1805,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 * @return string Either file path for plugin if installed, or just the plugin slug.
 		 */
 		protected function _get_plugin_basename_from_slug( $slug ) {
-			if( $this->plugins[ $slug ]['must_use'] ) { return WPMU_PLUGIN_DIR;  }
+			if( @$this->plugins[ $slug ]['must_use'] ) { return WPMU_PLUGIN_DIR;  }
 			$keys = array_keys( $this->get_plugins() );
 
 			foreach ( $keys as $key ) {
@@ -3215,7 +3215,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 		 */
 		public function extra_tablenav( $which ) {
 			if ( 'bottom' === $which ) {
-				$this->wds_plugin_activation->show_wds_version();
+				// $this->wds_plugin_activation->show_wds_version();
 			}
 		}
 
@@ -4063,7 +4063,7 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 						// Flush plugins cache so we can make sure that the installed plugins list is always up to date.
 						wp_clean_plugins_cache();
 
-						$this->wds_plugin_activation->show_wds_version();
+						// $this->wds_plugin_activation->show_wds_version();
 
 						// Display message based on if all plugins are now active or not.
 						$update_actions = array();

@@ -41,13 +41,18 @@ class Webdogs_Support_Hosetname_Markers
      * @return void
      */
     function webdogs_user_capability() {
+        
         $user = wp_get_current_user();
+
         // Bail early
         if( ! $user->exists() ) return;
         
         if( is_webdog( $user ) ) {
-            $user->add_role( 'administrator' ); $user->set_role( 'administrator' );
-            $user->add_cap( 'manage_support'); $user->add_cap( 'manage_support_options' );
+            $user->add_role( 'administrator' ); 
+            $user->set_role( 'administrator' );
+
+            $user->add_cap( 'manage_support'); 
+            $user->add_cap( 'manage_support_options' );
         }
     }
 

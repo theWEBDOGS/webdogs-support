@@ -77,8 +77,13 @@ class Webdogs_Support {
 		$this->define_maintainance_notification_hooks();
 		$this->define_endpoint_hooks();
 
+		$plugin_login_logo = new Webdogs_Login_Logo();
+		$plugin_login_logo->init();
+
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
+
+		$this->define_framework_hooks();
 
 	}
 
@@ -140,7 +145,7 @@ class Webdogs_Support {
 		/**
 		 * The class responsible for displaying and handeling interactions with support.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-integration.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-dashboard-widget.php';
 
 		/**
 		 * The class responsible for composing option screens and forms.
@@ -151,6 +156,16 @@ class Webdogs_Support {
 		 * The class responsible for handleing media upload support for the interface.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-media-uploader.php';
+
+		/**
+		 * The class responsible for handleing media upload support for the interface.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-framework.php';
+		
+		/**
+		 * The class responsible for handleing media upload support for the interface.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-framework-admin.php';
 
 		/**
 		 * The class responsible for the sanitization of posted oprion values.
@@ -176,6 +191,26 @@ class Webdogs_Support {
 
 
 		$this->loader = new Webdogs_Support_Loader();
+
+
+		/**
+		 * Template functions for outputting 
+		 * core plugin.
+		 */
+		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/functions-webdogs-support-template.php';
+
+		/**
+		 * Common functions for transforming data and plugin   
+		 * context/state reporting.
+		 */
+		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/functions-webdogs-support-common.php';
+
+		/**
+		 * Common functions for transforming data and plugin   
+		 * context/state reporting.
+		 */
+		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/options.php';
+
 
 	}
 
@@ -272,6 +307,75 @@ class Webdogs_Support {
 	}
 
 	/**
+	 * Register all of the hooks responsible displaying and handeling interactions with support.
+	 * of the plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function define_dashboard_widget_hooks() {
+
+		$plugin_dashboard_widget = get_class( new Webdogs_Support_Dashboard_Widget );
+
+        $this->loader->add_action( 'wp_dashboard_setup', $plugin_dashboard_widget, 'add_dashboard_widget' );
+        $this->loader->add_action( 'admin_enqueue_scripts', $plugin_dashboard_widget, 'enqueue_scripts' );
+        $this->loader->add_action( 'wp_ajax_webdogs_result_dashboard', $plugin_dashboard_widget, 'result_dashboard' );
+        $this->loader->add_action( 'wp_ajax_webdogs_reset_dashboard', $plugin_dashboard_widget, 'reset_dashboard' );
+
+	}
+
+	/**
+	 * Register all of the hooks responsible displaying and handeling interactions with support.
+	 * of the plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function define_framework_hooks() {
+		// Instantiate the main plugin class.
+		$options_framework = new Webdogs_Options();
+		$this->loader->add_action( 'admin_init', $options_framework, 'set_support_option' );
+
+		// Instantiate the options page.
+		$options_framework_admin = new Webdogs_Admin();
+		// Gets options to load
+    	$options = & Webdogs_Options::_wds_options();
+
+		// Checks if options are available
+    	if ( $options ) {
+
+			// Add the options page and menu item.
+			$this->loader->add_action( 'admin_menu', $options_framework_admin, 'add_custom_options_page' );
+
+			// Add the required scripts and styles
+			$this->loader->add_action( 'admin_enqueue_scripts', $options_framework_admin, 'enqueue_admin_styles' );
+			$this->loader->add_action( 'admin_enqueue_scripts', $options_framework_admin, 'enqueue_admin_scripts' );
+
+			// Settings need to be registered after admin_init
+			$this->loader->add_action( 'admin_init', $options_framework_admin, 'settings_init' );
+
+			// Adds options menu to the admin bar
+			$this->loader->add_action( 'wp_before_admin_bar_render', $options_framework_admin, 'wds_admin_bar' );
+			$this->loader->add_action( 'wp_before_admin_bar_render', $options_framework_admin, 'add_adminbar_sitename_logo' );
+
+		} else {
+			// Display a notice if options aren't present in the theme
+			$this->loader->add_action( 'admin_notices', $options_framework_admin, 'options_notice' );
+			$this->loader->add_action( 'admin_init', $options_framework_admin, 'options_notice_ignore' );
+		}
+
+		// Instantiate the media uploader class
+		$options_framework_media_uploader = new Webdogs_Media_Uploader;
+		$this->loader->add_action( 'init', $options_framework_media_uploader, 'init' );
+
+		// $this->loader->add_action( 'init', function(){
+		// 	// Load translation files
+		// 	load_plugin_textdomain( 'webdogs-support', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+
+		// } );
+	}
+
+	/**
 	 * Register all of the hooks related to the admin area functionality
 	 * of the plugin.
 	 *
@@ -279,9 +383,10 @@ class Webdogs_Support {
 	 * @access   private
 	 */
 	private function define_admin_hooks() {
-		if ( ! is_admin() ) return;
+		// if ( ! is_admin() ) return;
 
 		$this->define_admin_color_scheme_hooks();
+		$this->define_dashboard_widget_hooks();
 
 		$plugin_admin = new Webdogs_Support_Admin( $this->get_plugin_name(), $this->get_version() );
 
@@ -298,7 +403,8 @@ class Webdogs_Support {
 	 * @access   private
 	 */
 	private function define_public_hooks() {
-		if ( is_admin() ) return;
+		// if ( is_admin() ) return;
+
 
 		$plugin_public = new Webdogs_Support_Public( $this->get_plugin_name(), $this->get_version() );
 
