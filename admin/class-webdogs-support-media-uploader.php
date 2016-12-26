@@ -121,7 +121,7 @@ class Webdogs_Media_Uploader {
 		if ( function_exists( 'wp_enqueue_media' ) )
 			wp_enqueue_media();
 
-		wp_register_script( 'of-media-uploader', plugin_dir_url( dirname(__FILE__) ) .'js/media-uploader.js', array( 'jquery' ), Webdogs_Options::VERSION );
+		wp_register_script( 'of-media-uploader', plugin_dir_url( dirname(__FILE__) ) .'admin/js/media-uploader.js', array( 'jquery' ), Webdogs_Options::VERSION );
 		wp_enqueue_script( 'of-media-uploader' );
 		wp_localize_script( 'of-media-uploader', 'wds_l10n', array(
 			'upload' => __( 'Upload', 'webdogs-support' ),

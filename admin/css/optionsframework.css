@@ -1,4 +1,9 @@
-/* Options Framework Admin Styles */
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+ 
+ /* Options Framework Admin Styles */
 
 #optionsframework {
     max-width:840px;
@@ -37,7 +42,9 @@
     padding-bottom:43px;
     background-color: #fff;
 }
-
+#optionsframework #plugins-section.group {
+    padding-bottom: 0;
+}
 #optionsframework .group .section.top-border .heading,
 #optionsframework .group .section.inset .heading,
 #optionsframework .group .section:first-of-type > .heading,

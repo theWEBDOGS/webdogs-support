@@ -170,7 +170,7 @@ if ( ! function_exists( 'wds_extra_domain_flags' ) ) {
 
     function wds_extra_domain_flags(){
 
-        if(!function_exists('wds_extra_domain_strings')) include_once plugin_dir_path( __FILE__ ) . '/options-framework/options.php';
+        if(!function_exists('wds_extra_domain_strings')) require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/options.php';
 
         $domain_strings = apply_filters('wds_extra_domain_flags', wds_extra_domain_strings() );
 
@@ -274,19 +274,20 @@ if ( ! function_exists( 'webdogs_clear_cache' ) ) {
 
             wp_clear_scheduled_hook( 'wds_scheduled_notification' );
 
-            Webdogs_Maintenance_Notification::init();
+            Webdogs_Support_Maintenance_Notifications::init();
 
-            if( ! Webdogs_Maintenance_Notification::$deactivated ){
-                $next_send = Webdogs_Maintenance_Notification::$scheduled;
+            if( ! Webdogs_Support_Maintenance_Notifications::$deactivated ){
+                $next_send = Webdogs_Support_Maintenance_Notifications::$scheduled;
                 wp_schedule_single_event( $next_send, 'wds_scheduled_notification' ); 
             }
 
             // Refresh our own cache 
             // (after CDN purge, in case that needed to clear before we access new content)
-
-            WpeCommon::purge_memcached();
-            WpeCommon::clear_maxcdn_cache();
-            WpeCommon::purge_varnish_cache();
+            if( class_exists( 'WpeCommon' ) ) {
+                WpeCommon::purge_memcached();
+                WpeCommon::clear_maxcdn_cache();
+                WpeCommon::purge_varnish_cache();
+            }
 
             $prev_date = wp_next_scheduled( 'wds_scheduled_notification' );
 

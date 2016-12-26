@@ -217,7 +217,7 @@ add_filter( 'wds_sanitize_background', 'wds_sanitize_background' );
  */
 function wds_sanitize_scheme( $input ) {
 
-	$admin_schemes = Webdogs_Admin_Color_Schemes::get_instance();
+	$admin_schemes = Webdogs_Support_Admin_Color_Schemes::get_instance();
 
 	$output = array();
 

@@ -46,8 +46,8 @@ class Webdogs_Support_Maintenance_Notifications {
             if ( ! function_exists( 'wp_prepare_themes_for_js' ) ) include_once ABSPATH . 'wp-admin/includes/theme.php';
             if ( ! function_exists( 'get_core_updates' ) )         include_once ABSPATH . 'wp-admin/includes/update.php';
             if ( ! function_exists( 'wp_mail' ) )                  include_once ABSPATH . 'wp-includes/pluggable.php';
-            if ( ! function_exists( 'wds_domain_exculded' ) )      include_once WEBDOGS_SUPPORT_DIR_PATH . 'maintenance-support/webdogs-common.php';
-            if ( ! function_exists( 'wds_base_strings' ) )         include_once WEBDOGS_SUPPORT_DIR_PATH . 'options-framework/options.php';
+            if ( ! function_exists( 'wds_domain_exculded' ) )      include_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/functions-webdogs-support-common.php';
+            if ( ! function_exists( 'wds_base_strings' ) )         include_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/options.php';
             
             //count and updates
             Self::set_maintenance_updates();

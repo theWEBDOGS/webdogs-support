@@ -1,28 +1,52 @@
 <?php
 
 defined( 'WPINC' ) or die;
+
 /**
- * @package   Webdogs
+ * @package   Options Framework
  * @author    Devin Price <devin@wptheming.com>
  * @license   GPL-2.0+
  * @link      http://wptheming.com
  * @copyright 2010-2016 WP Theming
  */
 
-
 class Webdogs_Interface {
 
-	
+	private static $filtered_options = array();
+
 	/**
 	 * Generates the tabs that are used in the options menu
 	 */
-	static function wds_tabs() {
-		$counter = 0;
+	static private function wds_get_filtered_options() {
+
+		if( ! empty( Self::$filtered_options ) ) return Self::$filtered_options;
+
 		$options = & Webdogs_Options::_wds_options();
-		$options = apply_filters( 'wds_options', $options );
+		Self::$filtered_options = apply_filters( 'wds_options', $options );
+
+		return Self::$filtered_options;
+	}
+
+	/**
+	 * Generates the index ordered tabs that are used in the options menu
+	 */
+	static function wds_tabs() {
+
+		$options = Self::wds_get_filtered_options();
+
+		$counter = 0;
 		$menu = array();
 
-		$indexes = array_values( array_map( 'absint', wp_list_pluck( array_values($options), 'order' ) ) );
+		$indexes = array();
+
+		foreach (array_values( $options ) as $option) {
+			if( empty( $option['order'] ) ) 
+				continue;
+			else
+				$indexes[] = $option['order'];
+		}
+
+		// $indexes = (empty($options[0]['order']))?array():array_values( array_map( 'absint', wp_list_pluck( array_values($options), 'order' ) ) );
 
 		foreach ( $options as $value ) {
 			// Heading for Navigation
@@ -118,20 +142,17 @@ class Webdogs_Interface {
 	static function wds_fields() {
 
 		global $allowedtags;
-		$wds_settings = get_option( 'webdogs_support' );
 
-		// Gets the unique option id
+		$wds_settings = get_option( 'webdogs_support'  );
+
 		if ( isset( $wds_settings['id'] ) ) {
 			$option_name = $wds_settings['id'];
-		}
-		else {
-			$option_name = 'webdogs-support';
+		} else {
+			$option_name = 'wds_support_options';
 		};
 
-		$settings = get_option($option_name);
-		$options = & Webdogs_Options::_wds_options();
-
-		$options = apply_filters( 'wds_options', $options );
+		$settings = get_option( $option_name );
+		$options  = Self::wds_get_filtered_options();
 
 		$counter = 0;
 		$wrapper = 0;
@@ -488,8 +509,7 @@ class Webdogs_Interface {
 					
 					// $output .= '<p class="explain">' . esc_html( $explain_value ) . '</p>';
 
-
-					$output .= wp_nonce_field( Webdogs_Admin_Color_Schemes::NONCE, '_acs_ofnonce', null, false );
+					$output .= wp_nonce_field( Webdogs_Support_Admin_Color_Schemes::NONCE, '_acs_ofnonce', null, false );
 
 					$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][name]' ) . '" id="' . esc_attr( $value['id'] . '_name' ) . '" class="of-hidden of-scheme"  type="hidden" value="' . esc_attr( get_bloginfo( 'name' ) ) . '" />';
 					
@@ -510,7 +530,7 @@ class Webdogs_Interface {
 
 					$default = array();
 
-					$admin_schemes = Webdogs_Admin_Color_Schemes::get_instance();
+					$admin_schemes = Webdogs_Support_Admin_Color_Schemes::get_instance();
 
 					$scheme = $admin_schemes->get_color_scheme();
 
@@ -764,9 +784,9 @@ class Webdogs_Interface {
 
 			echo $output;
 
-			if ( $value['type'] === "form" && isset( $value['wrap']['start'] ) && null== $value['wrap']['end'] ) {
+			if ( $value['type'] === "form" && isset( $value['wrap']['start'] ) && empty($value['wrap']['end']) ) {
 				settings_fields( 'webdogs-support' );
-			}elseif ( $value['type'] === "form" && isset( $value['wrap']['end'] ) && null == $value['wrap']['start'] ) {
+			}elseif ( $value['type'] === "form" && isset( $value['wrap']['end'] ) && empty($value['wrap']['start']) ) {
 				/* <submit></form> */
 				
 				if ( $form ) { 
@@ -790,9 +810,6 @@ class Webdogs_Interface {
 		// OUTPUT DYNAMIC JS 
 		// FOR CONDITIONAL FIEILD UX 
 		Self::wds_rules();
-
-		// var_export(Webdogs_Login_Logo::$instance);
-
 	}
 
 	/**
@@ -800,8 +817,7 @@ class Webdogs_Interface {
 	 */
 	static function wds_rules() {
 		$counter = 0;
-		$options = &Webdogs_Options::_wds_options();
-		$options = apply_filters( 'wds_options', $options );
+		$options  = Self::wds_get_filtered_options();
 
 		/////////////////
 		// JQUERY SCRIPT 
@@ -852,7 +868,17 @@ class Webdogs_Interface {
 		$allswch = array();
 		$allvalu = array();
 
-		$rule_index = wp_list_pluck( array_values( $options ), 'rule', 'id' );
+		$rule_index = array();
+
+		foreach (array_values( $options ) as $option) {
+			if( empty( $option['rule'] ) ) 
+				continue; // $rule_index[ $option['id'] ] = array();
+			else
+				$rule_index[ $option['id'] ] = $option['rule'];
+		}
+
+		// $rule_index = wp_list_pluck( array_values($options), 'rule', 'id' );
+
 
 		foreach ( $rule_index as $id => $rule ) {
 
@@ -864,7 +890,6 @@ class Webdogs_Interface {
 			if ( isset( $rule['set'] ) ) {
 
 				$el     = sprintf( $format['this'],  $rule['id']);
-				// $on     = sprintf( $format['on'],    $rule['on']);
 				$val    = sprintf( $format['val'],   $rule['id'], $filter, $not);
 				$field  = sprintf( $format['field'], $id, $find);
 
@@ -926,12 +951,12 @@ class Webdogs_Interface {
 						// SET MASTER METHOD INDEXES
 						////////////////////////////
 						array_push( $allfunc, $callback );
-						$allfunc = array_unique( $allfunc );
+						// $allfunc = array_unique( $allfunc );
 						//INDEX FOR TRIGGERED METHODS
-						$funcindex = strval(array_search( $callback, $allfunc ));
+						$funcindex = strval( array_search( $callback, $allfunc ) );
 
 						array_push( $allvalu, $val );
-						$allvalu = array_unique( $allvalu );
+						// $allvalu = array_unique( $allvalu );
 						//INDEX FOR VALUE RETURNING METHODS
 						$valuindex = strval( array_search( $val, $allvalu ) );
 
@@ -958,7 +983,6 @@ class Webdogs_Interface {
 			if( isset( $rule['exe'] ) ) {
 
 				$el     = sprintf( $format['this'],   $id);
-				// $on     = sprintf( $format['on'],     $rule['on']);
 				$val    = sprintf( $format['val'],    $id, $filter, $not );
 				$target = sprintf( $format['target'], $rule['id'], $find );
 
@@ -990,12 +1014,12 @@ class Webdogs_Interface {
 				// SET MASTER METHOD INDEXES
 				////////////////////////////
 				array_push( $allfunc, $callback );
-				$allfunc = array_unique( $allfunc );
+				// $allfunc = array_unique( $allfunc );
 				//INDEX FOR TRIGGERED METHODS
-				$funcindex = array_search( $callback, $allfunc );
+				$funcindex = strval( array_search( $callback, $allfunc ) );
 
 				array_push( $allvalu, $val );
-				$allvalu = array_unique( $allvalu );
+				// $allvalu = array_unique( $allvalu );
 				//INDEX FOR VALUE RETURNING METHODS
 				$valuindex = strval( array_search( $val, $allvalu ) );
 
@@ -1087,8 +1111,5 @@ var wds_options = {
 	<?php echo $conditions; ?>
 
 </script>
-<?
-
-		return $allrulez;
-	}
-}
+<? }
+} 

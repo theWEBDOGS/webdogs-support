@@ -295,8 +295,8 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 			 * {@internal IMPORTANT! If this code changes, review the regex in the custom TGMPA
 			 * generator on the website.}}
 			 */
-			add_action( 'init', array( $this, 'load_textdomain' ), 5 );
-			add_filter( 'load_textdomain_mofile', array( $this, 'overload_textdomain_mofile' ), 10, 2 );
+			// add_action( 'init', array( $this, 'load_textdomain' ), 5 );
+			// add_filter( 'load_textdomain_mofile', array( $this, 'overload_textdomain_mofile' ), 10, 2 );
 
 			// When the rest of WP has loaded, kick-start the rest of the class.
 			add_action( 'init', array( $this, 'init' ) );
@@ -331,7 +331,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 * @return mixed The property value.
 		 */
 		public function __get( $name ) {
-			return $this->{$name};
+			return isset( $this->{$name} ) ? $this->{$name} : null;
 		}
 
 		/**
@@ -1408,9 +1408,9 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 			}
 
 			// Admin options pages already output settings_errors, so this is to avoid duplication.
-			// if ( 'options-general' !== $GLOBALS['current_screen']->parent_base ) {
-			// 	$this->display_settings_errors();
-			// }
+			if ( 'options-general' !== $GLOBALS['current_screen']->parent_base ) {
+				$this->display_settings_errors();
+			}
 		}
 
 		/**
@@ -1805,7 +1805,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 		 * @return string Either file path for plugin if installed, or just the plugin slug.
 		 */
 		protected function _get_plugin_basename_from_slug( $slug ) {
-			if( @$this->plugins[ $slug ]['must_use'] ) { return WPMU_PLUGIN_DIR;  }
+			if( ! empty( $this->plugins[ $slug ]['must_use'] ) && $this->plugins[ $slug ]['must_use'] ) { return WPMU_PLUGIN_DIR;  }
 			$keys = array_keys( $this->get_plugins() );
 
 			foreach ( $keys as $key ) {
@@ -2456,22 +2456,22 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 	}
 
 
-	if ( ! function_exists( 'load_wds_plugin_activation' ) ) {
-		/**
-		 * Ensure only one instance of the class is ever invoked.
-		 *
-		 * @since 2.5.0
-		 */
-		function load_wds_plugin_activation() {
-			$GLOBALS['wds_plugin_activation'] = Webdogs_Plugin_Activation::get_instance();
-		}
-	}
+	// if ( ! function_exists( 'load_wds_plugin_activation' ) ) {
+	// 	/**
+	// 	 * Ensure only one instance of the class is ever invoked.
+	// 	 *
+	// 	 * @since 2.5.0
+	// 	 */
+	// 	function load_wds_plugin_activation() {
+	// 		$GLOBALS['wds_plugin_activation'] = Webdogs_Plugin_Activation::get_instance();
+	// 	}
+	// }
 
-	if ( did_action( 'plugins_loaded' ) ) {
-		load_wds_plugin_activation();
-	} else {
-		add_action( 'plugins_loaded', 'load_wds_plugin_activation' );
-	}
+	// if ( did_action( 'plugins_loaded' ) ) {
+	// 	load_wds_plugin_activation();
+	// } else {
+	// 	add_action( 'plugins_loaded', 'load_wds_plugin_activation' );
+	// }
 }
 
 if ( ! function_exists( 'Webdogs_Install_Plugins_Page' ) ) {
@@ -2485,7 +2485,7 @@ if ( ! function_exists( 'Webdogs_Install_Plugins_Page' ) ) {
 	 * @param array $config  Optional. An array of configuration values.
 	 */
 	function Webdogs_Install_Plugins_Page() {
-		$instance = call_user_func( array( get_class( $GLOBALS['wds_plugin_activation'] ), 'get_instance' ) );
+		$instance = $GLOBALS['wds_plugin_activation'];
 		$instance->install_plugins_page();
 	}
 }
@@ -2516,7 +2516,7 @@ if ( ! function_exists( 'Webdogs_Register_Plugins' ) ) {
 	 * @param array $config  Optional. An array of configuration values.
 	 */
 	function Webdogs_Register_Plugins( $plugins, $themes, $config = array() ) {
-		$instance = call_user_func( array( get_class( $GLOBALS['wds_plugin_activation'] ), 'get_instance' ) );
+		$instance = $GLOBALS['wds_plugin_activation'];
 
 		foreach ( $plugins as $plugin ) {
 			call_user_func( array( $instance, 'register' ), $plugin );
@@ -2615,7 +2615,7 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 		 * @since 2.2.0
 		 */
 		public function __construct() {
-			$this->wds_plugin_activation = call_user_func( array( get_class( $GLOBALS['wds_plugin_activation'] ), 'get_instance' ) );
+			$this->wds_plugin_activation = $GLOBALS['wds_plugin_activation'];
 
 			parent::__construct(
 				array(
@@ -3566,7 +3566,7 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 		}
 
 		// Get TGMPA class instance.
-		$wds_instance = call_user_func( array( get_class( $GLOBALS['wds_plugin_activation'] ), 'get_instance' ) );
+		$wds_instance = $GLOBALS['wds_plugin_activation'];
 
 		if ( isset( $_GET['page'] ) && $wds_instance->menu === $_GET['page'] ) {
 			if ( ! class_exists( 'Plugin_Upgrader', false ) ) {
@@ -3637,7 +3637,7 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 					 */
 					public function __construct( $skin = null ) {
 						// Get TGMPA class instance.
-						$this->wds_plugin_activation = call_user_func( array( get_class( $GLOBALS['wds_plugin_activation'] ), 'get_instance' ) );
+						$this->wds_plugin_activation = $GLOBALS['wds_plugin_activation'];
 
 						parent::__construct( $skin );
 
@@ -3968,7 +3968,7 @@ if ( ! function_exists( 'wds_load_bulk_installer' ) ) {
 					 */
 					public function __construct( $args = array() ) {
 						// Get TGMPA class instance.
-						$this->wds_plugin_activation = call_user_func( array( get_class( $GLOBALS['wds_plugin_activation'] ), 'get_instance' ) );
+						$this->wds_plugin_activation = $GLOBALS['wds_plugin_activation'];
 
 						// Parse default and new args.
 						$defaults = array(

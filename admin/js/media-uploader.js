@@ -4,7 +4,7 @@ var wds_upload,
 	wds_adminbar;
 
 
-var wds_current_schema = ( window.isSecureContext ) ? 'https://' : 'http://';
+var wds_current_schema = window.location.protocol + '//'
 
 jQuery(document).ready(function($){
 

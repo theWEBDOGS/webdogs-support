@@ -408,12 +408,13 @@ class WDS_Site extends WDS_Object
             switch ( $key ) {
 
                 case 'bloginfo':
-                    $value = ( false !== ( $object = new WDS_Object( array(), 'get_bloginfo', array( 'url' , 'wpurl' , 'description', 'rdf_url', 'rss_url', 'rss2_url', 'atom_url', 'comments_atom_url', 'comments_rss2_url', 'pingback_url', 'stylesheet_directory', 'template_directory', 'template_url', 'admin_email', 'charset', 'html_type', 'version', 'language', 'text_direction', 'name' ) ) ) ) ? $object->to_array() : $value ;
+                    $value = ( false !== ( $object = new WDS_Object( array(), 'get_bloginfo', array( 'url' , 'wpurl' , 'description', 'rdf_url', 'rss_url', 'rss2_url', 'atom_url', 'comments_atom_url', 'comments_rss2_url', 'pingback_url', 'stylesheet_directory', 'template_directory', 'template_url', 'admin_email', 'charset', 'html_type', 'version', 'language', 'rtl', 'name' ) ) ) ) ? $object->to_array() : $value ;
                     break;
                 
                 
                 case 'core':
-                    $value = ( false !== ( $object = array_shift( get_core_updates( array( 'available' => true, 'dismissed' => true ) ) ) ) && ( ( is_array( $object ) || is_object( $object ) ) && ! empty( $object ) ) ) ? $object : $value ;
+                    $core_updates = get_core_updates( array( 'available' => true, 'dismissed' => true ) );
+                    $value = ( false !== ( $object = array_shift( $core_updates ) ) && ( ( is_array( $object ) || is_object( $object ) ) && ! empty( $object ) ) ) ? $object : $value ;
                     break;
                 
                 

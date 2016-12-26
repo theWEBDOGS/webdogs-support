@@ -39,15 +39,16 @@ class Webdogs_Support_Admin_Color_Schemes {
 	private $colors;
 
 	public function __construct() {
-		self::$instance = $this;
-		$this->base = WEBDOGS_SUPPORT_DIR_PATH . 'options-framework';
+		Self::$instance = $this;
+		$this->base = WEBDOGS_SUPPORT_DIR_PATH . 'admin';
+		require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/options.php';
 	}
 
 	public static function get_instance() {
-		if ( ! isset( self::$instance ) ) {
-			new self;
+		if ( ! isset( Self::$instance ) ) {
+			new Self;
 		}
-		return self::$instance;
+		return Self::$instance;
 	}
 
 	public function init() {
@@ -436,7 +437,7 @@ commands.split(' ').forEach(function(command) {
 // automatically set the workerUrl in case we're loaded by a simple
 // <script src="path/to/sass.js">
 // see https://github.com/medialize/sass.js/pull/32#issuecomment-103142214
-Sass.setWorkerUrl('<?php echo plugins_url( 'js/sass.worker.js',  dirname( __FILE__ ) ) ?>');
+Sass.setWorkerUrl('<?php echo plugins_url( 'admin/js/sass.worker.js',  dirname( __FILE__ ) ) ?>');
 return Sass;
 }));
 var SassWorker = new Sass();
@@ -465,7 +466,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 	}
 
 	public function get_option( $key, $default = null ) {
-		$option = get_option( self::OPTION );
+		$option = get_option( Self::OPTION );
 		if ( ! is_array( $option ) || ! isset( $option[$key] ) ) {
 			return $default;
 		} else {
@@ -474,10 +475,10 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 	}
 
 	public function set_option( $key, $value ) {
-		$option = get_option( self::OPTION );
+		$option = get_option( Self::OPTION );
 		is_array( $option ) || $option = array();
 		$option[$key] = $value;
-		update_option( self::OPTION, $option );
+		update_option( Self::OPTION, $option );
 	}
 
 	public function get_color_scheme( $id = null ) {
@@ -505,6 +506,10 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 	}
 
 	public function get_colors( $set = null ) {
+		if( ! is_array( $this->colors ) ) {
+			remove_action( 'init', array( $this, 'init' ) );
+			$this->init();
+		}
 		if ( 'basic' === $set ) {
 			return array_merge( $this->colors['basic'], $this->colors['icon'] );
 		} elseif ( 'advanced' === $set ) {
@@ -525,13 +530,15 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 	}
 
 	public function admin_url() {
-		return admin_url( 'admin.php?page=options-framework' );
+		return admin_url( 'admin.php?page=webdogs-support' );
 	}
 
 	public function save() {
 		current_user_can( 'manage_support_options' ) || die;
-		check_admin_referer( self::NONCE, '_acs_ofnonce' );
+
+		check_admin_referer( Self::NONCE, '_acs_ofnonce' );
 		$_post = stripslashes_deep( $_POST );
+		
 		$doing_ajax = defined( 'DOING_AJAX' ) && DOING_AJAX;
 
 		if ( $doing_ajax ) {
@@ -687,7 +694,7 @@ SassWorker.writeFile('_admin.scss', <?php echo json_encode( apply_filters( '_adm
 
 		if( ! current_user_can( 'manage_support_options' )){ return; }
 
-		check_admin_referer( self::NONCE, '_acs_ofnonce' );
+		check_admin_referer( Self::NONCE, '_acs_ofnonce' );
 		$_post = stripslashes_deep( $_POST );
 
 		$scheme = $this->get_color_scheme();
@@ -851,14 +858,14 @@ class Webdogs_Support_Admin_Bar {
 	private $base;
 
 	public function __construct() {
-		$this->base = WEBDOGS_SUPPORT_DIR_PATH . 'options-framework';
-		add_action( 'wp_before_admin_bar_render', array( $this, 'save_wp_admin_color_schemes_list' ) );
+		$this->base = WEBDOGS_SUPPORT_DIR_PATH . 'admin';
+		// add_action( 'wp_before_admin_bar_render', array( $this, 'save_wp_admin_color_schemes_list' ) );
 
-		add_action( 'admin_enqueue_scripts', array( $this, 'wp_enqueue_style' ) );
-		add_action( 'wp_enqueue_scripts',    array( $this, 'wp_enqueue_style' ) );
-		add_action( 'wp_enqueue_scripts',    array( $this, 'enqueue_admin_bar_color' ) );
+		// add_action( 'admin_enqueue_scripts', array( $this, 'wp_enqueue_style' ) );
+		// add_action( 'wp_enqueue_scripts',    array( $this, 'wp_enqueue_style' ) );
+		// add_action( 'wp_enqueue_scripts',    array( $this, 'enqueue_admin_bar_color' ) );
 
-		add_action( 'wds_after_validate',     array( $this, 'save_logo_icon_css_file' ), 100 );
+		// add_action( 'wds_after_validate',     array( $this, 'save_logo_icon_css_file' ), 100 );
 	}
 
 	public function wp_enqueue_style(){ ?>
@@ -890,14 +897,14 @@ class Webdogs_Support_Admin_Bar {
 	}
 
 	public function admin_url() {
-		return admin_url( 'admin.php?page=options-framework' );
+		return admin_url( 'admin.php?page=webdogs-support' );
 	}
 
 	public function save_logo_icon_css_file() {
 
 		if( ! current_user_can( 'manage_support_options' )){ return; }
 
-		check_admin_referer( Webdogs_Admin_Color_Schemes::NONCE, '_acs_ofnonce' );
+		check_admin_referer( Webdogs_Support_Admin_Color_Schemes::NONCE, '_acs_ofnonce' );
 		$_post = stripslashes_deep( $_POST );
 
 		$wds_settings = get_option( 'webdogs_support' );
@@ -980,9 +987,17 @@ class Webdogs_Support_Admin_Bar {
 		}
 		$user_color = get_user_option( 'admin_color' );
 		if ( isset( $user_color ) ) {
-			$admin_scheme = Webdogs_Admin_Color_Schemes::get_instance();
+			$admin_scheme = Webdogs_Support_Admin_Color_Schemes::get_instance();
 			$schemes = apply_filters( 'get_color_scheme_options', $admin_scheme->get_option( 'schemes', array() ) );
-			$schemes_slugs = wp_list_pluck( $schemes, 'slug' );
+			$schemes_slugs = array();
+
+			foreach (array_values( $schemes ) as $scheme ) {
+				if( empty( $scheme['slug'] ) ) 
+					continue;
+				else
+					$schemes_slugs[] = $scheme['slug'];
+			}
+			$schemes_slugs = ( sizeof( $schemes_slugs ) !== sizeof( $schemes ) ) ? wp_list_pluck( $schemes, 'slug' ) : $schemes_slugs;
 			$schemes = array_combine( array_values( $schemes_slugs ), array_values( $schemes ) );
 			// wp_enqueue_style( $user_color, $schemes[$user_color]['uri'] );
 		}
@@ -1016,7 +1031,7 @@ class Admin_Color_Scheme {
 
 	public function __construct( $attr = NULL ) {
 		// extend accessors
-		$admin_scheme = Webdogs_Admin_Color_Schemes::get_instance();
+		$admin_scheme = Webdogs_Support_Admin_Color_Schemes::get_instance();
 		$this->accessors = array_merge( $this->accessors, array_keys( $admin_scheme->get_colors() ) );
 
 		// set slug
@@ -1107,15 +1122,15 @@ class Webdogs_Admin_Color_Schemes_Version_Check {
 	private static $instance;
 
 	protected function __construct() {
-		self::$instance = $this;
+		Self::$instance = $this;
 		add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ) );
 	}
 
 	public static function get_instance() {
-		if ( ! isset( self::$instance ) ) {
+		if ( ! isset( Self::$instance ) ) {
 			new self;
 		}
-		return self::$instance;
+		return Self::$instance;
 	}
 
 	public function passes() {
@@ -1124,7 +1139,7 @@ class Webdogs_Admin_Color_Schemes_Version_Check {
 
 	public function plugins_loaded() {
 		if ( ! $this->passes() ) {
-			remove_action( 'init', array( Webdogs_Admin_Color_Schemes::get_instance(), 'init' ) );
+			remove_action( 'init', array( Webdogs_Support_Admin_Color_Schemes::get_instance(), 'init' ) );
   		if ( current_user_can( 'activate_plugins' ) ) {
 				add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 			}

@@ -1,6 +1,16 @@
 <?php
-
 /**
+ * Plugin Name:       WEBDOGS Support
+ * Plugin URI:        https://github.com/theWEBDOGS/webdogs-support
+ * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Version:           2.3.4
+ * Author:            WEBDOGS Support Team
+ * Author URI:        WEBDOGS.COM
+ * License:           GPL-2.0+
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Text Domain:       webdogs-support
+ * Domain Path:       /languages
+ *
  * The plugin bootstrap file
  *
  * This file is read by WordPress to generate the plugin information in the plugin
@@ -13,16 +23,6 @@
  * @package           Webdogs_Support
  *
  * @wordpress-plugin
- * Plugin Name:       WEBDOGS Support
- * Plugin URI:        https://github.com/theWEBDOGS/webdogs-support
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
- * Version:           2.3.4
- * Author:            WEBDOGS Support Team
- * Author URI:        WEBDOGS.COM
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       webdogs-support
- * Domain Path:       /languages
  */
 
 // If this file is called directly, abort.
@@ -118,11 +118,14 @@ if ( ! function_exists( 'wds_get_option' ) ) {
  */
 
 function webdogs_support() {
-    if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php');
+    if(!function_exists('wp_get_current_user') ) require_once( ABSPATH . 'wp-includes/pluggable.php');
 
     $GLOBALS['wds'] = new Webdogs_Support();
+
+    $GLOBALS['wds']->run();
+    // $GLOBALS['wds']->run();
 }
-add_action('plugins_loaded', 'webdogs_support' );
+add_action('plugins_loaded', 'webdogs_support', 200 );
 /**
  * Begins execution of the plugin.
  *
@@ -133,16 +136,17 @@ add_action('plugins_loaded', 'webdogs_support' );
  * @since    1.0.0
  */
 function run_webdogs_support() {
-
+    
+/*
         if(!function_exists('is_plugin_active')) include_once( ABSPATH . 'wp-admin/includes/plugin.php');
 
         if(!function_exists('wp_prepare_themes_for_js')) include_once( ABSPATH . 'wp-admin/includes/theme.php');
 
-        if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');
+        if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');*/
 
-
-    $GLOBALS['wds']->run();
 
 }
-add_action('init', 'run_webdogs_support' );
+add_action('after_setup_theme', 'run_webdogs_support', 200 );
 
+
+    

@@ -109,7 +109,7 @@ if( !function_exists('wds_get_template_html') ) {
 }
 
 
-if( !function_exists('wds_get_template_html') ) {
+if( !function_exists('wds_template_hooks') ) {
 	/**************************************************************
 	 * Template hooks
 	 *************************************************************/
@@ -125,11 +125,11 @@ if( !function_exists('wds_get_template_html') ) {
 	function wds_template_hooks() {
 
 		// Email
-		$this->logger->add_action( 'wds_email_footer', 'wds_default_email_footer', 10 );
-		$this->logger->add_action( 'wds_email_header', 'wds_default_email_header', 10 );
+		add_action( 'wds_email_footer', 'wds_default_email_footer', 10 );
+		add_action( 'wds_email_header', 'wds_default_email_header', 10 );
 
 	}
-	$this->logger->add_action( 'init', 'wds_template_hooks' );
+	add_action( 'init', 'wds_template_hooks' );
 }
 
 if( !function_exists('wds_default_email_header') ) {

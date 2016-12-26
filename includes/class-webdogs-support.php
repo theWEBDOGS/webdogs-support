@@ -71,19 +71,19 @@ class Webdogs_Support {
 		$this->plugin_name = 'webdogs-support';
 		$this->version = '1.0.0';
 
-		$this->load_dependencies();
-		$this->set_locale();
-
-		$this->define_maintainance_notification_hooks();
-		$this->define_endpoint_hooks();
-
-		$plugin_login_logo = new Webdogs_Login_Logo();
-		$plugin_login_logo->init();
-
-		$this->define_admin_hooks();
-		$this->define_public_hooks();
-
-		$this->define_framework_hooks();
+		$this->load_dependencies()
+		     ->set_locale()
+		     ->define_hostname_markers_hooks()
+		     ->define_maintainance_notification_hooks()
+		     ->define_endpoint_hooks()
+		     ->define_login_logo_hooks()
+		     ->define_admin_color_scheme_hooks()
+		     ->define_plugin_activation_hooks()
+		     ->define_framework_hooks()
+		     ->define_media_uploader_hooks()
+		     ->define_dashboard_widget_hooks()
+		     ->define_admin_hooks()
+		     ->define_public_hooks();
 
 	}
 
@@ -105,6 +105,25 @@ class Webdogs_Support {
 	 */
 	private function load_dependencies() {
 
+
+		/**
+		 * Template functions for outputting 
+		 * core plugin.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/functions-webdogs-support-template.php';
+
+		/**
+		 * Common functions for transforming data and plugin   
+		 * context/state reporting.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/functions-webdogs-support-common.php';
+
+		/**
+		 * Common functions for transforming data and plugin   
+		 * context/state reporting.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/options.php';
+
 		/**
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
@@ -118,6 +137,11 @@ class Webdogs_Support {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-i18n.php';
 
 		/**
+		 * The class responsible for the sanitization of posted oprion values.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-hostname-markers.php';
+
+		/**
 		 * The class responsible for scheduling and sending maintainance notifications.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-maintainance-notifications.php';
@@ -126,6 +150,11 @@ class Webdogs_Support {
 		 * The class responsible for providing a JSON data endpoint.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-endpoint.php';
+
+		/**
+		 * The class responsible for customization of the login page logo and background.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-webdogs-support-login-logo.php';
 
 		/**
 		 * The class responsible for customization of the admin color schemes.
@@ -138,14 +167,14 @@ class Webdogs_Support {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-plugin-activation.php';
 
 		/**
-		 * The class responsible for defining all actions that occur in the admin area.
+		 * The class responsible for handleing media upload support for the interface.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-admin.php';
-
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-framework.php';
+		
 		/**
-		 * The class responsible for displaying and handeling interactions with support.
+		 * The class responsible for handleing media upload support for the interface.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-dashboard-widget.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-framework-admin.php';
 
 		/**
 		 * The class responsible for composing option screens and forms.
@@ -158,19 +187,18 @@ class Webdogs_Support {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-media-uploader.php';
 
 		/**
-		 * The class responsible for handleing media upload support for the interface.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-framework.php';
-		
-		/**
-		 * The class responsible for handleing media upload support for the interface.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-framework-admin.php';
-
-		/**
 		 * The class responsible for the sanitization of posted oprion values.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-sanitization.php';
+
+		/**
+		 * The class responsible for displaying and handeling interactions with support.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-dashboard-widget.php';
+		/**
+		 * The class responsible for defining all actions that occur in the admin area.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
@@ -178,40 +206,11 @@ class Webdogs_Support {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-webdogs-support-public.php';
 
-		/**
-		 * The class responsible for the sanitization of posted oprion values.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-hostname-markers.php';
-
-		/**
-		 * The class responsible for customization of the login page logo and background.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-webdogs-support-login-logo.php';
-
-
 
 		$this->loader = new Webdogs_Support_Loader();
 
 
-		/**
-		 * Template functions for outputting 
-		 * core plugin.
-		 */
-		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/functions-webdogs-support-template.php';
-
-		/**
-		 * Common functions for transforming data and plugin   
-		 * context/state reporting.
-		 */
-		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/functions-webdogs-support-common.php';
-
-		/**
-		 * Common functions for transforming data and plugin   
-		 * context/state reporting.
-		 */
-		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/options.php';
-
-
+		return $this;
 	}
 
 	/**
@@ -229,6 +228,25 @@ class Webdogs_Support {
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
 
+		return $this;
+	}
+
+	/**
+	 * Register all of the hooks related to maintainance notifications
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function define_hostname_markers_hooks() {
+
+		$plugin_hostname_markers = new Webdogs_Support_Hosetname_Markers();
+
+        $this->loader->add_action( 'set_current_user', $plugin_hostname_markers, 'webdogs_user_capability' );
+        $this->loader->add_action( 'admin_enqueue_scripts', $plugin_hostname_markers, 'webdogs_enqueue_domain_flags' );
+        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_hostname_markers, 'webdogs_enqueue_domain_flags' );
+        $this->loader->add_filter( 'admin_bar_menu', $plugin_hostname_markers, 'webdogs_howdy', 25, 1 );
+	
+		return $this;
 	}
 
 	/**
@@ -247,6 +265,8 @@ class Webdogs_Support {
 		$this->loader->add_action( 'wds_scheduled_notification', $plugin_maintainance_notifications, 'send_maintenance_notification' );
 		$this->loader->add_action( 'wds_test_maintenance_notification', $plugin_maintainance_notifications, 'send_test_maintenance_notification', 10, 1 );
 
+		return $this;
+
 	}
 
 	/**
@@ -264,6 +284,23 @@ class Webdogs_Support {
         $this->loader->add_action( 'wds_scheduled_notification', $plugin_endpoint, 'post_site_data', 0 );
         $this->loader->add_action( 'wds_after_validate', $plugin_endpoint, 'post_site_data', 0 );
         $this->loader->add_action( 'wds_test_maintenance_notification', $plugin_endpoint, 'post_site_data', 0 );
+
+        return $this;
+	}
+
+	/**
+	 * Register all of the hooks related to the public-facing functionality
+	 * of the plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function define_login_logo_hooks() {
+
+		$plugin_login_logo = new Webdogs_Login_Logo();
+		$plugin_login_logo->init();
+
+		return $this;
 
 	}
 
@@ -287,10 +324,10 @@ class Webdogs_Support {
 		$this->loader->add_action( 'wds_after_validate', $plugin_admin_color_schemes, 'wds_save', 10, 1 );
 
 		// filter cplor scheme options
-		$this->loader->add_filter( 'get_color_scheme_options', get_class( $plugin_admin_color_schemes ), 'filter_color_scheme_options', 10, 1 );
+		$this->loader->add_filter( 'get_color_scheme_options', 'Webdogs_Support_Admin_Color_Schemes', 'filter_color_scheme_options', 10, 1 );
 
 		// Override the user's admin color scheme.
-		$this->loader->add_filter( 'get_user_option_admin_color', get_class( $plugin_admin_color_schemes ), 'must_use_admin_color', 10, 1 );
+		$this->loader->add_filter( 'get_user_option_admin_color', 'Webdogs_Support_Admin_Color_Schemes', 'must_use_admin_color', 10, 1 );
 
 		// Hide the Admin Color Scheme field from users who can't set a forced color scheme.
 		$this->loader->add_action( 'admin_color_scheme_picker', $plugin_admin_color_schemes, 'hide_admin_color_input', 8 );
@@ -304,6 +341,7 @@ class Webdogs_Support {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_admin_bar, 'enqueue_admin_bar_color' );
 		$this->loader->add_action( 'wds_after_validate', $plugin_admin_bar, 'save_logo_icon_css_file' , 100 );
 
+		return $this;
 	}
 
 	/**
@@ -313,15 +351,11 @@ class Webdogs_Support {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_dashboard_widget_hooks() {
+	private function define_plugin_activation_hooks() {
 
-		$plugin_dashboard_widget = get_class( new Webdogs_Support_Dashboard_Widget );
+		$plugin_activation = Webdogs_Plugin_Activation::get_instance();
 
-        $this->loader->add_action( 'wp_dashboard_setup', $plugin_dashboard_widget, 'add_dashboard_widget' );
-        $this->loader->add_action( 'admin_enqueue_scripts', $plugin_dashboard_widget, 'enqueue_scripts' );
-        $this->loader->add_action( 'wp_ajax_webdogs_result_dashboard', $plugin_dashboard_widget, 'result_dashboard' );
-        $this->loader->add_action( 'wp_ajax_webdogs_reset_dashboard', $plugin_dashboard_widget, 'reset_dashboard' );
-
+		return $this;
 	}
 
 	/**
@@ -348,8 +382,8 @@ class Webdogs_Support {
 			$this->loader->add_action( 'admin_menu', $options_framework_admin, 'add_custom_options_page' );
 
 			// Add the required scripts and styles
-			$this->loader->add_action( 'admin_enqueue_scripts', $options_framework_admin, 'enqueue_admin_styles' );
-			$this->loader->add_action( 'admin_enqueue_scripts', $options_framework_admin, 'enqueue_admin_scripts' );
+			$this->loader->add_action( 'admin_enqueue_scripts', $options_framework_admin, 'enqueue_admin_styles', 10, 1 );
+			$this->loader->add_action( 'admin_enqueue_scripts', $options_framework_admin, 'enqueue_admin_scripts', 10, 1 );
 
 			// Settings need to be registered after admin_init
 			$this->loader->add_action( 'admin_init', $options_framework_admin, 'settings_init' );
@@ -364,15 +398,48 @@ class Webdogs_Support {
 			$this->loader->add_action( 'admin_init', $options_framework_admin, 'options_notice_ignore' );
 		}
 
-		// Instantiate the media uploader class
-		$options_framework_media_uploader = new Webdogs_Media_Uploader;
-		$this->loader->add_action( 'init', $options_framework_media_uploader, 'init' );
-
 		// $this->loader->add_action( 'init', function(){
 		// 	// Load translation files
 		// 	load_plugin_textdomain( 'webdogs-support', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 
 		// } );
+		return $this;
+	}
+
+	/**
+	 * Register all of the hooks related to the admin area functionality
+	 * of the plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function define_media_uploader_hooks() {
+
+		$plugin_media_uploader = new Webdogs_Media_Uploader();
+
+		$this->loader->add_action( 'init', $plugin_media_uploader, 'init' );
+
+		return $this;
+
+	}
+
+	/**
+	 * Register all of the hooks responsible displaying and handeling interactions with support.
+	 * of the plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function define_dashboard_widget_hooks() {
+
+		$plugin_dashboard_widget = get_class( new Webdogs_Support_Dashboard_Widget );
+
+        $this->loader->add_action( 'wp_dashboard_setup', $plugin_dashboard_widget, 'add_dashboard_widget' );
+        $this->loader->add_action( 'admin_enqueue_scripts', $plugin_dashboard_widget, 'enqueue_scripts' );
+        $this->loader->add_action( 'wp_ajax_webdogs_result_dashboard', $plugin_dashboard_widget, 'result_dashboard' );
+        $this->loader->add_action( 'wp_ajax_webdogs_reset_dashboard', $plugin_dashboard_widget, 'reset_dashboard' );
+
+		return $this;
 	}
 
 	/**
@@ -385,13 +452,12 @@ class Webdogs_Support {
 	private function define_admin_hooks() {
 		// if ( ! is_admin() ) return;
 
-		$this->define_admin_color_scheme_hooks();
-		$this->define_dashboard_widget_hooks();
-
 		$plugin_admin = new Webdogs_Support_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+
+		return $this;
 
 	}
 
@@ -405,11 +471,12 @@ class Webdogs_Support {
 	private function define_public_hooks() {
 		// if ( is_admin() ) return;
 
-
 		$plugin_public = new Webdogs_Support_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+
+		return $this;
 
 	}
 

@@ -208,7 +208,16 @@ class Webdogs_Admin {
 		$options = apply_filters( 'wds_options', $options );
 		$menu = array();
 
-		$indexes = array_values( array_map( 'absint', wp_list_pluck( array_values($options), 'order' ) ) );
+		$indexes = array();
+
+		foreach (array_values( $options ) as $option) {
+			if( empty( $option['order'] ) ) 
+				continue;
+			else
+				$indexes[] = absint( $option['order'] );
+		}
+
+		// $indexes = array_values( array_map( 'absint', wp_list_pluck( array_values($options), 'order' ) ) );
 
 		foreach ( $options as $value ) {
 			// Heading for Navigation
@@ -330,12 +339,12 @@ class Webdogs_Admin {
 	 
 	    $title = "";
 
-	    $custom_logo_icon = $this->get_logo_icon();
+	    // $custom_logo_icon = $this->get_logo_icon();
 
-	    if( $custom_logo_icon ) {
+	    // if( $custom_logo_icon ) {
 
-	    	$title .= $custom_logo_icon;
-	    }
+	    // 	$title .= $custom_logo_icon;
+	    // }
 
 	    
 	    $title .= wp_html_excerpt( $blogname, 40, '&hellip;' );
@@ -428,7 +437,7 @@ class Webdogs_Admin {
 
 		wp_enqueue_style( 'login' );
 		wp_enqueue_style( 'forms' );
-		wp_enqueue_style( 'webdogs-support', plugin_dir_url( dirname(__FILE__) ) . 'css/optionsframework.css', array(),  Webdogs_Options::VERSION );
+		// wp_enqueue_style( 'webdogs-support', plugin_dir_url( dirname(__FILE__) ) . 'admmin/css/optionsframework.css', array(),  Webdogs_Options::VERSION );
 		wp_enqueue_style( 'wp-color-picker' );
 	}
 
@@ -461,20 +470,20 @@ class Webdogs_Admin {
 		if ( $this->options_screen != $hook )
 	        return;
 
-		wp_enqueue_script( 'svg-icon-font', plugin_dir_url( dirname(__FILE__) ) . 'js/svgiconfont.js', array(), Webdogs_Options::VERSION, true );
+		wp_enqueue_script( 'svg-icon-font', plugin_dir_url( dirname(__FILE__) ) . 'admin/js/svgiconfont.js', array(), Webdogs_Options::VERSION, true );
 
 		// wp_enqueue_script( 'jquery-parallaxify', plugin_dir_url( dirname(__FILE__) ) . 'js/jquery.parallaxify.min.js', array( 'jquery' ), Webdogs_Options::VERSION, false );
 		// wp_enqueue_script( 'wds_sass', plugin_dir_url( dirname(__FILE__) ) . 'js/sass.js', array(), false, Webdogs_Options::VERSION );
 		
 		// Enqueue custom option panel JS
-		wp_enqueue_script( 'options-custom', plugin_dir_url( dirname(__FILE__) ) . 'js/options-custom.js', array( 'jquery','wp-color-picker' ), Webdogs_Options::VERSION, true );
+		wp_enqueue_script( 'options-custom', plugin_dir_url( dirname(__FILE__) ) . 'admin/js/options-custom.js', array( 'jquery','wp-color-picker' ), Webdogs_Options::VERSION, true );
 
 		if( $this->get_current_tab() ) {
 			$current = $this->get_current_tab();
 			wp_localize_script( 'options-custom', 'options_framework_tab', $current );
 		}
 
-		wp_enqueue_script( 'admin-color-schemes', plugin_dir_url( dirname(__FILE__) ) . 'js/admin-color-schemes.js', array( 'jquery', 'wp-color-picker' ), Webdogs_Options::VERSION, true );
+		wp_enqueue_script( 'admin-color-schemes', plugin_dir_url( dirname(__FILE__) ) . 'admin/js/admin-color-schemes.js', array( 'jquery', 'wp-color-picker' ), Webdogs_Options::VERSION, true );
 		
 		// Inline scripts from options-interface.php
 		add_action( 'admin_head', array( $this, 'wds_admin_head' ) );
@@ -667,6 +676,8 @@ class Webdogs_Admin {
 
 	function wds_admin_bar() {
 
+ 		// include_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/options.php';
+
 		// Don't show for logged out users.
 	    if ( ! is_user_logged_in() )
 	        return;
@@ -785,13 +796,17 @@ class Webdogs_Admin {
 		);
 		$wp_admin_bar->add_group( $args );
 
-		$plugin_activation = $GLOBALS['wds_plugin_activation'];
+		$plugin_activation = Webdogs_Plugin_Activation::get_instance();
+
+		if( empty( $plugin_activation->strings['menu_title'] ) ) {
+			wds_register_base_activation();
+		}
 
 		$href = $plugin_activation->get_wds_url();
 		
 		$args = array(
 			'parent' => 'plugin_recomendation',
-			'id' => $plugin_activation->slug,
+			'id' => $plugin_activation->menu,
 			'title' => $plugin_activation->strings['menu_title'],
 			'href' => $href
 		);

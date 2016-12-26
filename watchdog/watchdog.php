@@ -3,7 +3,7 @@
 Plugin Name: WATCHDOG
 Plugin URI: https://github.com/theWEBDOGS/watchdog
 Description: WEBDOGS Version Support
-Version: 1.0.0
+Version: 1.0.1
 Author: WEBDOGS Support Team
 Author URI: http://WEBDOGS.COM
 License: GPLv2

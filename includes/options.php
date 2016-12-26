@@ -30,6 +30,15 @@ function wds_options() {
 	//                     //
 	/////////////////////////
 
+	if ( current_user_can( 'manage_options' ) ) {
+
+        if(!function_exists('is_plugin_active')) include_once( ABSPATH . 'wp-admin/includes/plugin.php');
+
+        if(!function_exists('wp_prepare_themes_for_js')) include_once( ABSPATH . 'wp-admin/includes/theme.php');
+
+        if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');
+    }
+
 	// Retrieve a list of all 
 	// installed plugins (WP cached).
 	$installed_plugins = get_plugins(); 
@@ -43,7 +52,7 @@ function wds_options() {
 	// check if set in cutomizer
 	$custom_logo_id = get_theme_mod( 'custom_logo' );
 	$image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
-	$login_logo = ( ! empty( $image[0] ) ) ? $image[0] : '';//Webdogs_Login_Logo::$instance->get_location('url');
+	$login_logo = ( ! empty( $image[0] ) ) ? $image[0] : Webdogs_Login_Logo::$instance->get_location('url');
 
 	$background_defaults = array(
 		'color' => '#f1f1f1',
@@ -104,29 +113,29 @@ function wds_options() {
 	$active_deletion_notice = false;
 
 	$delete_plugins = array();
-	// foreach ( $plugins as $slug => $plugin ) {
-	// 	if ( true === $plugin['force_deletion'] /*&& ! empty( $installed_plugins[ $plugin['file_path'] ] )*/ ) {
-	// 		if ( is_plugin_active( $plugin['file_path'] ) ) {
-	// 			$active_deletion_notice = true;
-	// 			$delete_plugins[] = $plugin['name'] . '<span style="position: absolute;"><sup>*</sup></span>' ;
-	// 		} else { 
-	// 			$delete_plugins[] = $plugin['name'];
-	// 		}
-	// 	}
-	// }
+	foreach ( $plugins as $slug => $plugin ) {
+		if ( !empty($plugin['force_deletion']) && true === $plugin['force_deletion'] /*&& ! empty( $installed_plugins[ $plugin['file_path'] ] )*/ ) {
+			if ( is_plugin_active( $plugin['file_path'] ) ) {
+				$active_deletion_notice = true;
+				$delete_plugins[] = $plugin['name'] . '<span style="position: absolute;"><sup>*</sup></span>' ;
+			} else { 
+				$delete_plugins[] = $plugin['name'];
+			}
+		}
+	}
 
 	$recommend_plugins = array();
-	// foreach ( $plugins as $slug => $plugin ) {
-	// 	if ( true === $plugin['force_deletion'] ) continue;
-	// 	$recommend_plugins[] = $plugin['name'];
-	// }
+	foreach ( $plugins as $slug => $plugin ) {
+		if ( !empty($plugin['force_deletion']) && true === $plugin['force_deletion'] ) continue;
+		$recommend_plugins[] = $plugin['name'];
+	}
 
 	$delete_themes = array();
 	$delete_themes[] = 'Authored by the WordPress team';
 	foreach ( $themes as $slug => $theme ) { 
-		if ( true === $theme['force_deletion'] ) {
+		if ( !empty($theme['force_deletion']) && true === $theme['force_deletion'] ) {
 
-			if ( true === $theme['active'] ) {
+			if ( !empty($theme['active']) && true === $theme['active'] ) {
 				$active_deletion_notice = true;
 				$delete_themes[] = $theme['name'] . '<span style="position: absolute;"><sup>*</sup></span>' ;
 			} else { 
@@ -678,7 +687,7 @@ function wds_internal_greetings(){
  *
  */
 function wds_bundled_themes(){
-
+	
     if(!function_exists('wp_prepare_themes_for_js')) include_once( ABSPATH . 'wp-admin/includes/theme.php');
 
 	$themes = wp_prepare_themes_for_js();
@@ -722,7 +731,7 @@ function wds_base_plugins(){
 		array(
 			'name'      => 'WATCHDOG',
 			'slug'      => 'watchdog',
-			'source'    => WEBDOGS_SUPPORT_DIR. '/watchdog.zip',
+			'source'    => WEBDOGS_SUPPORT_DIR_PATH. 'watchdog.zip',
 			'file_path' => WPMU_PLUGIN_DIR . '/watchdog',
 			'must_use'           => true, // If false, the plugin is only 'recommended' instead of required.
 			'required'           => true, // If false, the plugin is only 'recommended' instead of required.
@@ -1033,7 +1042,7 @@ function wds_admin_color_schemes( $scheme = null ) {
 			'id' => 2,
 			'slug' => 'webdogs_ps',
 			'name' => 'WEBDOGS PS',
-			'uri' => plugins_url( "css/webdogs-ps/colors$suffix.css", __FILE__ ),
+			'uri' => plugins_url( "admin/css/webdogs-ps/colors$suffix.css",  dirname( __FILE__ ) ),
 			'icon_focus' => '#ECFFD3',
 			'icon_current' => '#ECFFD3',
 			'base_color' => '#F7FBFC',
@@ -1077,7 +1086,7 @@ function wds_admin_color_schemes( $scheme = null ) {
 			'id' => 5,
 			'slug' => 'webdogs_hs',
 			'name' => 'Webdogs HS',
-			'uri' => plugins_url( "css/webdogs-hs/colors$suffix.css", __FILE__ ),
+			'uri' => plugins_url( "admin/css/webdogs-hs/colors$suffix.css",  dirname( __FILE__ ) ),
 			'icon_focus' => '#002347',
 			'icon_current' => '#ffffff',
 			'base_color' => '#dbe9f0',
@@ -1113,7 +1122,7 @@ function wds_admin_color_schemes( $scheme = null ) {
 			'id' => 3,
 			'slug' => 'webdogs_ds',
 			'name' => 'WEBDOGS DS',
-			'uri' => plugins_url( "css/webdogs-ds/colors$suffix.css", __FILE__ ),
+			'uri' => plugins_url( "admin/css/webdogs-ds/colors$suffix.css",  dirname( __FILE__ ) ),
 			'icon_focus' => '#ECFFD3',
 			'icon_current' => '#ECFFD3',
 			'base_color' => '#666666',
@@ -1156,7 +1165,7 @@ function wds_admin_color_schemes( $scheme = null ) {
 			'id' => 4,
 			'slug' => 'webdogs_wpe',
 			'name' => 'WEBDOGS WPE',
-			'uri' => plugins_url( "css/webdogs-wpe/colors$suffix.css", __FILE__ ),
+			'uri' => plugins_url( "admin/css/webdogs-wpe/colors$suffix.css",  dirname( __FILE__ ) ),
 			'icon_focus' => '#80d8de',
 			'icon_current' => '#80d8de',
 			'base_color' => '#f7fbfc',
@@ -1200,7 +1209,7 @@ function wds_admin_color_schemes( $scheme = null ) {
 			'id' => 5,
 			'slug' => 'wpengine_tc',
 			'name' => 'WPEngine TC',
-			'uri' => plugins_url( "css/wpengine-tc/colors$suffix.css", __FILE__ ),
+			'uri' => plugins_url( "admin/css/wpengine-tc/colors$suffix.css",  dirname( __FILE__ ) ),
 			'icon_focus' => '#162a33',
 			'icon_current' => '#162a33',
 			'base_color' => '#162a33',

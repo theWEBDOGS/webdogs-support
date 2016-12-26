@@ -11,19 +11,12 @@ class Webdogs_Support_Hosetname_Markers
 
     function __construct() 
     {
+        if ( ! isset( Self::$instance ) && ! ( Self::$instance instanceof Self ) ) {
+            Self::$instance = $this;
+        }
                     
         if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php'        );
        
-        
-        add_action( 'set_current_user',                     array(&$this,'webdogs_user_capability'              ));
-
-        add_action( 'admin_enqueue_scripts',                array(&$this,'webdogs_enqueue_domain_flags'         ));
-
-        add_action( 'wp_enqueue_scripts',                   array(&$this,'webdogs_enqueue_domain_flags'         ));
-    
-        add_filter( 'admin_bar_menu',                       array(&$this,'webdogs_howdy'), 25                    );
-
-     
         //  If user can't edit theme options, exit
         if ( current_user_can( 'manage_options' ) ) {
 
@@ -64,7 +57,7 @@ class Webdogs_Support_Hosetname_Markers
         $user = wp_get_current_user();
 
         // Bail early
-        if( ! $user->exists() ) return;
+        if( ! $user->exists() ) return $wp_admin_bar;
 
         $user_greeting = get_user_meta( $user->ID, 'user_greeting' );
              $greeting = ( ! $user_greeting ) ? wds_get_option( 'custom_greeting', false ) : $user_greeting ;
@@ -89,6 +82,8 @@ class Webdogs_Support_Hosetname_Markers
         }
 
         $wp_admin_bar->add_node( array( 'id' => 'my-account', 'title' => $newtitle, ) );
+
+        return $wp_admin_bar;
     }
 
 
@@ -172,7 +167,7 @@ class Webdogs_Support_Hosetname_Markers
                 </ul>
             </div>
         </div>
-        <script type="text/javascript"> window.onload = function() { webdogs_flags_wrap.className='active'; } </script>
+        <script type="text/javascript"> window.onload = function() { webdogs_flags_wrap.className='active'; window.setTimeout(function(){webdogs_flags_wrap.className='';}, <?php echo ( $base_delay*1000 )*5 ; ?>); } </script>
         
         <?php 
     }
@@ -186,11 +181,11 @@ class Webdogs_Support_Hosetname_Markers
      * @return object The Webdogs_Plugin_Activation object.
      */
     public static function instance() {
-        if ( ! isset( self::$instance ) && ! ( self::$instance instanceof self ) ) {
-            self::$instance = new self();
+        if ( ! isset( Self::$instance ) && ! ( Self::$instance instanceof self ) ) {
+            Self::$instance = new self();
         }
 
-        return self::$instance;
+        return Self::$instance;
     }
 
 }
