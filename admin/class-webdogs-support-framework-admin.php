@@ -498,7 +498,23 @@ class Webdogs_Admin {
 
 
 
+	/**
+	 * Display settings errors and remove those which have been displayed to avoid duplicate messages showing
+	 *
+	 * @since 2.5.0
+	 */
+	protected function display_settings_errors() {
+		global $wp_settings_errors;
 
+		settings_errors( 'webdogs-support' );
+
+		foreach ( (array) $wp_settings_errors as $key => $details ) {
+			if ( 'webdogs-support' === $details['setting'] ) {
+				unset( $wp_settings_errors[ $key ] );
+				break;
+			}
+		}
+	}
 
 	/**
      * Builds out the options panel.
@@ -522,7 +538,7 @@ class Webdogs_Admin {
 
 		<h1><?php echo esc_html( $menu['page_title'] ); ?> <span class="subtitle alignright">v<?php print WEBDOGS_VERSION; ?></span></h1>
 
-	    <?php //settings_errors( 'webdogs-support' ); ?>
+	    <?php $this->display_settings_errors(); ?>
 
 	    <h2 class="nav-tab-wrapper">
 	        <?php echo Webdogs_Interface::wds_tabs(); ?>

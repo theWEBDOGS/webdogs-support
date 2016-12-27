@@ -223,16 +223,16 @@ ul#adminmenu > li.current > a.current:after {
 /*
  * Admin Menu: collapse button
  */
-#collapse-menu {
+#collapse-menu, #collapse-button {
   color: #919191; }
 
-#collapse-menu:hover {
+#collapse-menu:hover, #collapse-menu:focus, #collapse-button:hover, #collapse-button:focus {
   color: #9cb4bc; }
 
-#collapse-button div:after {
+#collapse-button span:after {
   color: #919191; }
 
-#collapse-menu:hover #collapse-button div:after {
+#collapse-menu:hover #collapse-button span:after {
   color: #9cb4bc; }
 
 /*

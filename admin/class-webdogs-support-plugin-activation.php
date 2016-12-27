@@ -1408,7 +1408,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 			}
 
 			// Admin options pages already output settings_errors, so this is to avoid duplication.
-			if ( 'options-general' !== $GLOBALS['current_screen']->parent_base ) {
+			if ( 'options-general' !== $GLOBALS['current_screen']->parent_base && 'webdogs-support' !== $GLOBALS['current_screen']->parent_base ) {
 				$this->display_settings_errors();
 			}
 		}
@@ -2078,7 +2078,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 			$installed_plugins = $this->get_plugins(); // Retrieve a list of all installed plugins (WP cached).
 			if(true===$this->plugins[ $slug ]['must_use']){
 
-				print_r(file_exists( $this->plugins[ $slug ]['file_path'] ));
+				// print_r(file_exists( $this->plugins[ $slug ]['file_path'] ));
 				
 				return file_exists( $this->plugins[ $slug ]['file_path'] );
 			}
@@ -3197,10 +3197,10 @@ if ( ! class_exists( 'Webdogs_List_Table' ) ) {
 
 			echo '
 				<tr class="plugin-update-tr">
-					<td colspan="', absint( $this->get_column_count() ), '" class="plugin-update colspanchange">
-						<div class="update-message">',
-							esc_html__( 'Upgrade message from the plugin author:', 'webdogs-support' ),
-							'', wp_kses_data( $item['upgrade_notice'] ), '
+					<td colspan="'. absint( $this->get_column_count() ) . '" class="plugin-update colspanchange">
+						<div class="update-message">'.
+							esc_html__( 'Upgrade message from the plugin author:', 'webdogs-support' ).
+							''. wp_kses_data( $item['upgrade_notice'] ). '
 						</div>
 					</td>
 				</tr>';

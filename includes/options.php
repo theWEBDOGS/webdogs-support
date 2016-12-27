@@ -728,17 +728,18 @@ function wds_base_plugins(){
 			'force_deactivation' => false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins.
 			'external_url'       => 'https://github.com/theWEBDOGS/webdogs-support',
 		),
-		array(
+		/*array(
 			'name'      => 'WATCHDOG',
 			'slug'      => 'watchdog',
 			'source'    => WEBDOGS_SUPPORT_DIR_PATH. 'watchdog.zip',
-			'file_path' => WPMU_PLUGIN_DIR . '/watchdog',
+			'file_path' => WPMU_PLUGIN_DIR . '/watchdog.php',
 			'must_use'           => true, // If false, the plugin is only 'recommended' instead of required.
 			'required'           => true, // If false, the plugin is only 'recommended' instead of required.
+			// 'version'            => '1.0.1',
 			'force_activation'   => false, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch.
 			'force_deactivation' => false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins.
 			'external_url'       => 'https://github.com/theWEBDOGS/watchdog',
-		),
+		),*/
 		array(
 			'name'      => 'Simple History',
 			'slug'      => 'simple-history',
@@ -835,6 +836,7 @@ function wds_base_strings( $key = null ){
 		'page_title'                      => __( 'Recommended Plugins', 'webdogs-support' ),
 		'menu_title'                      => __( 'Recommended Plugins', 'webdogs-support' ),
 		'installing'                      => __( 'Installing Plugin: %s', 'webdogs-support' ), // %s = plugin name.
+		'updating'                        => __( 'Updating Plugin: %s', 'webdogs-support' ), // %s = plugin name.
 		'oops'                            => __( 'Something went wrong with the plugin API.', 'webdogs-support' ),
 		'notice_can_install_required'     => _n_noop(
 			'Required plugin: %1$s.',

@@ -83,10 +83,10 @@ ul#adminmenu a.wp-has-current-submenu:after, ul#adminmenu > li.current > a.curre
 /*
  * Admin Menu: collapse button
  */
-#collapse-menu { color: #0c5b90; }
-#collapse-menu:hover { color: #0c5b90; }
-#collapse-button div:after { color: #0c5b90; }
-#collapse-menu:hover #collapse-button div:after { color: #002347; }
+#collapse-menu, #collapse-button { color: #0c5b90; }
+#collapse-menu:hover, #collapse-menu:focus, #collapse-button:hover, #collapse-button:focus { color: #0c5b90; }
+#collapse-button span:after { color: #0c5b90; }
+#collapse-menu:hover #collapse-button span:after { color: #002347; }
 /*
  * Admin Bar
  */

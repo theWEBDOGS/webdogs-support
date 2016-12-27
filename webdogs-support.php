@@ -63,8 +63,8 @@ define( 'WEBDOGS_LATEST_VERSION', function_exists(
  * This action is documented in includes/class-webdogs-support-activator.php
  */
 function activate_webdogs_support() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-activator.php';
-	Webdogs_Support_Activator::activate();
+    require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-activator.php';
+    Webdogs_Support_Activator::activate();
 }
 
 /**
@@ -78,6 +78,26 @@ function deactivate_webdogs_support() {
 
   register_activation_hook( __FILE__, 'activate_webdogs_support' );
 register_deactivation_hook( __FILE__, 'deactivate_webdogs_support' );
+
+/**
+ * The code that runs during plugin upgrades.
+ * This action is documented in includes/class-webdogs-support-upgrader.php
+ */
+function upgrade_webdogs_support( $upgrader_object, $options ) {
+    $current_plugin_path_name = plugin_basename( __FILE__ );
+
+    if ( $options['action'] == 'update' && $options['type'] == 'plugin' ){
+
+       foreach( $options['packages'] as $each_plugin ){
+            if ( $each_plugin == $current_plugin_path_name ) {
+                
+                require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-upgrader.php';
+                Webdogs_Support_Upgrader::upgrade();
+            }
+        }
+    }
+}
+add_action( 'upgrader_process_complete', 'upgrade_webdogs_support', 10, 2 );
 
 /**
  * The core plugin class that is used to define internationalization,

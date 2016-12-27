@@ -254,7 +254,7 @@ if ( ! function_exists( 'wds_maybe_clear_cache' ) ) {
 
     function wds_maybe_clear_cache( $current_screen ){
 
-        $clear = ( 'toplevel_page_webdogs-support' !== $current_screen->base || did_action( 'webdogs_do_clear_cache' ) || wds_is_staging_site() ) ? FALSE : TRUE ;
+        $clear = ( !class_exists( 'WpeCommon' ) || 'toplevel_page_webdogs-support' !== $current_screen->base || did_action( 'webdogs_do_clear_cache' ) || wds_is_staging_site() ) ? FALSE : TRUE ;
         
         if( $clear ){
 
@@ -294,5 +294,3 @@ if ( ! function_exists( 'webdogs_clear_cache' ) ) {
         }
     }
 }
-
-?>

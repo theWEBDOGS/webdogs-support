@@ -157,5 +157,3 @@ if( !function_exists('wds_default_email_footer') ) {
 		// wds_get_template( 'emails/parts/footer.php', $template_args  );
 	}
 }
-
-?>

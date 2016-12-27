@@ -1111,5 +1111,5 @@ var wds_options = {
 	<?php echo $conditions; ?>
 
 </script>
-<? }
+<?php }
 } 
