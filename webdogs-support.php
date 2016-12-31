@@ -47,7 +47,9 @@ if(!function_exists('WEBDOGS_VERSION')) {
 
 if(class_exists('Webdogs_Support')) { return; }
 
-            <style type="text/css">
+define( 'WEBDOGS_TITLE', "WEBDOGS Support" );
+define( 'WEBDOGS_SUPPORT', "support@webdogs.com" );
+define( 'WEBDOGS_DOMAIN', "webdogs.com" );
 
 define( 'WEBDOGS_VERSION', WEBDOGS_VERSION() );
 define( 'WEBDOGS_LATEST_VERSION', function_exists( 
@@ -93,10 +95,7 @@ function upgrade_webdogs_support( $upgrader_object, $options ) {
                 require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-upgrader.php';
                 Webdogs_Support_Upgrader::upgrade();
             }
-
-            return self::$instance;
         }
-
     }
 }
 add_action( 'upgrader_process_complete', 'upgrade_webdogs_support', 10, 2 );
