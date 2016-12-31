@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name:       WEBDOGS Support
+ * Plugin Name:       WEBDOGS Support + Maintenance
  * Plugin URI:        https://github.com/theWEBDOGS/webdogs-support
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Description:       Support + Maintenance Configuration Tools: scheduled maintenance notifications, login page customizations, base plugin recommendations and more.
  * Version:           2.3.4
  * Author:            WEBDOGS Support Team
  * Author URI:        WEBDOGS.COM
@@ -23,6 +23,7 @@
  * @package           Webdogs_Support
  *
  * @wordpress-plugin
+ *
  */
 
 // If this file is called directly, abort.
