@@ -702,7 +702,7 @@ class Webdogs_Interface {
 					$class = '';
 					$class = ! empty( $value['id'] ) ? $value['id'] : $value['name'];
 					$class = preg_replace('/[^a-zA-Z0-9._\-]/', '', strtolower($class) );
-					$output .= '<div id="' . $class . '-section" class="group ' . $class . '">';
+					$output .= '<div id="' . $class . '-section" class="group hide-if-js ' . $class . '">';
 					$output .= '<h3>' . esc_html( $value['name'] ) . '</h3>' . "\n";
 					
 					if ( isset( $value['function'] ) ) {
