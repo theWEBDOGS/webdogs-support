@@ -12,26 +12,11 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Version:     2.3.3
 */
 
-/*
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this program; if not, write to the Free Software Foundation, Inc.,
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
-
 // If this file is called directly, abort.
 defined( 'WPINC' ) or die;
 
-define( 'WEBDOGS_SUPPORT_DIR', dirname( __FILE__ ) );
+define( 'WEBDOGS_SUPPORT_DIR', trailingslashit( __DIR__ ) );
+define( 'WEBDOGS_SUPPORT_DIR_PATH', plugin_dir_path( __FILE__ ) );
 
 if(!function_exists('WEBDOGS_VERSION')) {
 
@@ -47,33 +32,38 @@ if(!function_exists('WEBDOGS_VERSION')) {
 
 if(!class_exists('WEBDOGS')) {
 
-    define( 'WEBDOGS_TITLE', "WEBDOGS Support" );
-    define( 'WEBDOGS_SUPPORT', "support@webdogs.com" );
-    define( 'WEBDOGS_DOMAIN', "webdogs.com" );
+define( 'WEBDOGS_TITLE', "WEBDOGS Support" );
+define( 'WEBDOGS_SUPPORT', "support@webdogs.com" );
+define( 'WEBDOGS_DOMAIN', "webdogs.com" );
 
-    define( 'WEBDOGS_VERSION', WEBDOGS_VERSION() );
-    define( 'WEBDOGS_LATEST_VERSION', function_exists( 
-            'WEBDOGS_LATEST_VERSION' ) ? 
-             WEBDOGS_LATEST_VERSION() : 
-             WEBDOGS_VERSION() );
+define( 'WEBDOGS_VERSION', WEBDOGS_VERSION() );
+define( 'WEBDOGS_LATEST_VERSION', function_exists( 
+        'WEBDOGS_LATEST_VERSION' ) ? 
+         WEBDOGS_LATEST_VERSION() : 
+         WEBDOGS_VERSION() );
 
-    /////////////////////////////////////////////////
-    //
-    // when plugins are loaded let's start the class.
-    //
-    add_action ( 'plugins_loaded', 'WEBDOGS' ); 
+  
 
-    if(!function_exists('WEBDOGS')) {
+/**
+ * The code that runs during plugin activation.
+ * This action is documented in includes/class-webdogs-support-activator.php
+ */
+function activate_webdogs_support() {
+    require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-activator.php';
+    Webdogs_Support_Activator::activate();
+}
 
-        function WEBDOGS() { return WEBDOGS::instance(); }
-    }
+/**
+ * The code that runs during plugin deactivation.
+ * This action is documented in includes/class-webdogs-support-deactivator.php
+ */
+function deactivate_webdogs_support() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-deactivator.php';
+	Webdogs_Support_Deactivator::deactivate();
+}
 
-    /**
-     * WEBDOGS
-     */
-    class WEBDOGS
-    {
-        protected static $instance;
+  register_activation_hook( __FILE__, 'activate_webdogs_support' );
+register_deactivation_hook( __FILE__, 'deactivate_webdogs_support' );
 
         function __construct() 
         {
@@ -110,9 +100,6 @@ if(!class_exists('WEBDOGS')) {
 
                 if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');
             }
-            
-            include_once plugin_dir_path( __FILE__ ) . '/options-framework/options-framework.php';
-            
         }
 
         /**
@@ -268,8 +255,8 @@ if(!class_exists('WEBDOGS')) {
         }
 
     }
-
 }
+add_action( 'upgrader_process_complete', 'upgrade_webdogs_support', 10, 2 );
 
 /**
  * Helper function to return the theme option value.
