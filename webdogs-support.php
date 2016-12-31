@@ -28,7 +28,7 @@
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
-	die;
+    die;
 }
 
 define( 'WEBDOGS_SUPPORT_DIR', trailingslashit( __DIR__ ) );
@@ -73,8 +73,8 @@ function activate_webdogs_support() {
  * This action is documented in includes/class-webdogs-support-deactivator.php
  */
 function deactivate_webdogs_support() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-deactivator.php';
-	Webdogs_Support_Deactivator::deactivate();
+    require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-deactivator.php';
+    Webdogs_Support_Deactivator::deactivate();
 }
 
   register_activation_hook( __FILE__, 'activate_webdogs_support' );

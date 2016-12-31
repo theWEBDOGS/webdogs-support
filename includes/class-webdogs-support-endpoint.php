@@ -115,9 +115,10 @@ class Webdogs_Support_Endpoint {
 
     function endpoint_check( $endpoint_hash, $stored_value ) {
 
-        $endpoint = array_shift( explode('?', ( is_ssl() ) ? 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] : 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ) );
+        $endpoint_array = explode('?', ( is_ssl() ) ? 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] : 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+        $endpoint = array_shift( $endpoint_array );
 
-       if (strlen( $stored_value ) != 50 )
+        if (strlen( $stored_value ) != 50 )
             return FALSE;
 
         $stored_seed = substr( $stored_value , 40, 10 );
@@ -132,8 +133,9 @@ class Webdogs_Support_Endpoint {
 
     function verify_nonce( $endpoint_hash, $stored_value ) {
 
-        $endpoint = array_shift( explode('?', ( is_ssl() ) ? 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] : 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ) );
-
+        $endpoint_array = explode('?', ( is_ssl() ) ? 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] : 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+        $endpoint = array_shift( $endpoint_array );
+        
         $expected = substr( wp_hash( 'wds_site|' . $endpoint . '|webdogs', 'nonce' ), -12, 10 );
 
         if ( hash_equals( $expected, $endpoint_hash ) ) {
