@@ -3,7 +3,7 @@
  * Plugin Name:       WEBDOGS Support + Maintenance
  * Plugin URI:        https://github.com/theWEBDOGS/webdogs-support
  * Description:       Support + Maintenance Configuration Tools: scheduled maintenance notifications, login page customizations, base plugin recommendations and more.
- * Version:           2.3.4.1
+ * Version:           2.3.5
  * Author:            WEBDOGS Support Team
  * Author URI:        WEBDOGS.COM
  * License:           GPL-2.0+
@@ -33,6 +33,8 @@ if ( ! defined( 'WPINC' ) ) {
 
 define( 'WEBDOGS_SUPPORT_DIR', trailingslashit( __DIR__ ) );
 define( 'WEBDOGS_SUPPORT_DIR_PATH', plugin_dir_path( __FILE__ ) );
+
+define( 'WEBDOGS_SUPPORT_ID', "wds" );
 
 if(!function_exists('WEBDOGS_VERSION')) {
 
@@ -133,41 +135,28 @@ if ( ! function_exists( 'wds_get_option' ) ) {
     }
 }
 
-/**
- * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
- */
+
 
 function webdogs_support() {
-    if(!function_exists('wp_get_current_user') ) require_once( ABSPATH . 'wp-includes/pluggable.php');
+    if(!function_exists('wp_get_current_user') ) 
+        require_once( ABSPATH . 'wp-includes/pluggable.php');
 
-    $GLOBALS['wds'] = new Webdogs_Support();
+    /**
+     * The core plugin class that is used to define internationalization,
+     * admin-specific hooks, and public-facing site hooks.
+     */
+    $GLOBALS[ WEBDOGS_SUPPORT_ID ] = new Webdogs_Support();
 
-    $GLOBALS['wds']->run();
-    // $GLOBALS['wds']->run();
-}
-add_action('plugins_loaded', 'webdogs_support', 200 );
-/**
- * Begins execution of the plugin.
- *
- * Since everything within the plugin is registered via hooks,
- * then kicking off the plugin from this point in the file does
- * not affect the page life cycle.
- *
- * @since    1.0.0
- */
-function run_webdogs_support() {
-    
-/*
-        if(!function_exists('is_plugin_active')) include_once( ABSPATH . 'wp-admin/includes/plugin.php');
-
-        if(!function_exists('wp_prepare_themes_for_js')) include_once( ABSPATH . 'wp-admin/includes/theme.php');
-
-        if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');*/
-
+    /**
+     * Begins execution of the plugin.
+     *
+     * Since everything within the plugin is registered via hooks,
+     * then kicking off the plugin from this point in the file does
+     * not affect the page life cycle.
+     *
+     * @since    1.0.0
+     */
+    $GLOBALS[ WEBDOGS_SUPPORT_ID ]->run();
 
 }
-add_action('after_setup_theme', 'run_webdogs_support', 200 );
-
-
-    
+add_action('plugins_loaded', 'webdogs_support', 200 );    

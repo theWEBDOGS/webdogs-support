@@ -1,14 +1,16 @@
-var wds_upload,
-	wds_upload_accept = "image/*",
-	wds_selector,
-	wds_adminbar;
+var wds = window.wds?window.wds:{};
+
+wds.upload,
+wds.upload_accept = "image/*",
+wds.upload_selector,
+wds.adminbar;
 
 
-var wds_current_schema = window.location.protocol + '//'
+wds.current_schema = window.location.protocol + '//'
 
 jQuery(document).ready(function($){
 
-	wds_adminbar = $('#wpadminbar').clone()[0];
+	wds.adminbar = $('#wpadminbar').clone()[0];
 
 	var previewLoginColorTimeout;
 	var parallaxifyArgs = {
@@ -39,11 +41,11 @@ jQuery(document).ready(function($){
 			$uploadElement = false;
 
 		var $el = $( event.target );
-		wds_selector = selector;
+		wds.upload_selector = selector;
 
 		event.preventDefault();
 
-		wds_upload = null;
+		wds.upload = null;
 
 			var mediaOptions = {
 				// Set the title of the modal.
@@ -56,53 +58,53 @@ jQuery(document).ready(function($){
 				}
 			};
 
-			if( wds_selector.attr('id') === "section-logo_icon" ){
+			if( wds.upload_selector.attr('id') === "section-logo_icon" ){
 				mediaOptions.library = { type : 'image/svg+xml' }; 
 			} else {
 				mediaOptions.library = { type : 'image' }; 
 			} 
 
 			// Create the media frame.
-			wds_upload = wp.media.frames.wds_upload =  wp.media( mediaOptions );
+			wds.upload = wp.media.frames.wds_upload =  wp.media( mediaOptions );
 
 			// When an image is selected, run a callback.
-			wds_upload.on( 'select', function() {
+			wds.upload.on( 'select', function() {
 				// Grab the selected attachment.
-				var attachment = wds_upload.state().get('selection').first();
+				var attachment = wds.upload.state().get('selection').first();
 
-				wds_upload.close();
+				wds.upload.close();
 
-				wds_selector.find('.upload').val( String( attachment.attributes.url ).replace("http://", wds_current_schema ) ).trigger('change');
+				wds.upload_selector.find('.upload').val( String( attachment.attributes.url ).replace("http://", wds.current_schema ) ).trigger('change');
 				
 
 				if ( attachment.attributes.type == 'image' ) {
 
-					wds_selector.find('.screenshot').empty().hide().append('<img src="' + attachment.attributes.url.replace("http://", wds_current_schema ) + '"><a class="remove-image">Remove</a>');
+					wds.upload_selector.find('.screenshot').empty().hide().append('<img src="' + attachment.attributes.url.replace("http://", wds.current_schema ) + '"><a class="remove-image">Remove</a>');
 
 					// IF this is the section-logo_icon
-					if ( wds_selector.attr('id') === "section-logo_icon" ) {
-						wds_adminbar_show_preview( attachment.attributes.url.replace("http://", wds_current_schema ) );
+					if ( wds.upload_selector.attr('id') === "section-logo_icon" ) {
+						wds_adminbar_show_preview( attachment.attributes.url.replace("http://", wds.current_schema ) );
 					} else {
 
-						wds_show_preveiw( wds_selector );
+						wds_show_preveiw( wds.upload_selector );
 					}
 
-					wds_selector.find('.screenshot').appendTo( wds_selector.closest('.option').slideDown('fast') ).slideDown('fast');
-					wds_selector.find('.screenshot').slideDown('fast');
+					wds.upload_selector.find('.screenshot').appendTo( wds.upload_selector.closest('.option').slideDown('fast') ).slideDown('fast');
+					wds.upload_selector.find('.screenshot').slideDown('fast');
 				} else {
-					wds_show_preveiw( wds_selector );
+					wds_show_preveiw( wds.upload_selector );
 				}
-				wds_selector.find('.upload-button').unbind().addClass('remove-file').removeClass('upload-button').val(wds_l10n.remove);
-				wds_selector.find('.of-background-properties').slideDown();
-				wds_selector.find('.remove-image, .remove-file').on('click', function() {
+				wds.upload_selector.find('.upload-button').unbind().addClass('remove-file').removeClass('upload-button').val(wds.l10n['remove']);
+				wds.upload_selector.find('.of-background-properties').slideDown();
+				wds.upload_selector.find('.remove-image, .remove-file').on('click', function() {
 					wds_remove_file( $(this).parents('.section') );
 				});
 
 
 			});
-			wds_upload.on( 'open', function(ev){
+			wds.upload.on( 'open', function(ev){
 
-		    	var $wds_upload = wds_upload.$el;
+		    	var $wds_upload = wds.upload.$el;
 
 				$wds_upload.one( 'mouseover', function(event){
 
@@ -117,7 +119,7 @@ jQuery(document).ready(function($){
 
 					if($uploadElement.length){
 						
-						if( wds_selector.attr('id') === "section-logo_icon") {
+						if( wds.upload_selector.attr('id') === "section-logo_icon") {
 							uploadElement.accept = 'image/svg+xml,.svg,.svgz';
 						} else {
 							uploadElement.accept = 'image/*';
@@ -128,7 +130,7 @@ jQuery(document).ready(function($){
 			});
 
 			// Finally, open the modal.
-			wds_upload.open();
+			wds.upload.open();
 		    
 
 	}
@@ -139,7 +141,7 @@ jQuery(document).ready(function($){
 
 		var screenshot_background = {
 			              "opacity": "1",
-			     "background-image": "url(" + String( selector.find('.upload:input').val() ).replace("http://", wds_current_schema ) + ")",
+			     "background-image": "url(" + String( selector.find('.upload:input').val() ).replace("http://", wds.current_schema ) + ")",
 		        "background-repeat": selector.find('.of-background-repeat:input').val(),
 		      "background-position": selector.find('.of-background-position:input').val(),
 		    "background-attachment": selector.find('.of-background-attachment:input').val()
@@ -165,13 +167,13 @@ jQuery(document).ready(function($){
 	function wds_clone_adminbar(){
 
 		// adminbar preview clone. 
-		$(wds_adminbar).remove();
+		$(wds.adminbar).remove();
 
 		$default_class = ( $('#logo_icon[value*="wordpress-logo.svg"]').length > 0 ) ? 'adminbar-preview default' : 'adminbar-preview';
 
-		wds_adminbar = $('#wpadminbar').not('.adminbar-preview').clone()[0];
-		$( wds_adminbar ).prependTo('#section-login_logo_css').css({position:'relative'});
-		$( wds_adminbar ).addClass($default_class)
+		wds.adminbar = $('#wpadminbar').not('.adminbar-preview').clone()[0];
+		$( wds.adminbar ).prependTo('#section-login_logo_css').css({position:'relative'});
+		$( wds.adminbar ).addClass($default_class)
 
 			.on('click', function(e){e.preventDefault();e.stopPropagation();return false;})
 			.css({position:'static',overflow:'hidden'})
@@ -190,7 +192,7 @@ jQuery(document).ready(function($){
 		if ( selector.attr('id') === "section-logo_icon" ) {
 			buttomFileType = " SVG";
 		}
-		selector.find('.remove-file').unbind().addClass('upload-button').removeClass('remove-file').val(wds_l10n.upload + buttomFileType);
+		selector.find('.remove-file').unbind().addClass('upload-button').removeClass('remove-file').val(wds.l10n['upload'] + buttomFileType);
 		
 		// We don't display the upload button if .upload-notice is present
 		// This means the user doesn't have the WordPress 3.5 Media Library Support
@@ -202,6 +204,7 @@ jQuery(document).ready(function($){
 			$('.adminbar-preview.default').removeClass('default');
 			$("#logo_icon_css").val('');
 			$("#logo_icon_style").html('');
+			$('#logo-icon-css').removeAttr('href');
 		}
 		selector.find('.upload-button').on('click', function(event) {
 			wds_add_file(event, $(this).parents('.section'));

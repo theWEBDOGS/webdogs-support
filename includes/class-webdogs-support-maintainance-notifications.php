@@ -359,10 +359,10 @@ class Webdogs_Support_Maintenance_Notifications {
           $month = date('n');
             $day = date('j');
 
-           $freq = wds_get_option( 'maintenance_notification_frequency', 3  );
-         $offset = wds_get_option( 'maintenance_notification_offset',   '1' );
+           $freq = absint( wds_get_option( 'maintenance_notification_frequency', 3 ) );
+         $offset = absint( wds_get_option( 'maintenance_notification_offset',    1 ) );
            
-           $time = absint( $day ) > absint( $offset ) 
+           $time = absint( $day ) > $offset 
 
                 ? mktime(0, 0, 0, $month, $offset, $year ) + wp_timezone_override_offset()
                 : mktime(0, 0, 0, date('n', strtotime('first day of previous month') ), $offset, date('Y', strtotime('first day of previous month') ) ) + wp_timezone_override_offset();
@@ -376,11 +376,13 @@ class Webdogs_Support_Maintenance_Notifications {
 
         $month = ( $year === $prev_year 
                && $month === $prev_month 
-               && absint( $day ) > absint( $offset ) ) 
+               && absint( $day ) > $offset ) 
 
                     ?   $month 
                     : --$month ;
 
+        $freq = ( 0 === $freq ) ? 3 : $freq ;
+        
         $active_this_year = Self::get_active_dates( $freq, $offset, $month, $year );
         $active_next_year = Self::get_active_dates( $freq, $offset, 1,  1 + $year );
 
@@ -442,6 +444,16 @@ class Webdogs_Support_Maintenance_Notifications {
 
     }
 
+    /**
+     * wds_l10n
+     */
+    public static function maintenance_l10n( $l10n = array() ) {
+        return $l10n + array(
+            'notification_deactivated' => __( 'Notification deactivated', 'webdogs-support' ),
+            'next_notification' => __( 'Next notification', 'webdogs-support' )
+        );
+    }
+
     public static function admin_notices() {
 
         $message = get_option( 'wds_maintenance_notification_test', false );
@@ -462,7 +474,7 @@ class Webdogs_Support_Maintenance_Notifications {
         $n = 0;
         for ($i = $month; $i <= 12; $i++) {
 
-            $parsed = mktime(0, 0, 0, $i, $day, $year  );
+            $parsed = mktime(0, 0, 0, $i, $day, $year );
 
             if( $i % $freq === 0 && $parsed > $date ) {
                 $m = ( $i < 12 ) ? $i+1 : 1 ;

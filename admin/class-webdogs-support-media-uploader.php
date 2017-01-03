@@ -108,6 +108,16 @@ class Webdogs_Media_Uploader {
 		return $output;
 	}
 
+    /**
+     * wds_l10n
+     */
+    function media_uploader_l10n( $l10n = array() ) {
+        return $l10n + array(
+			'upload' => __( 'Upload', 'webdogs-support' ),
+			'remove' => __( 'Remove', 'webdogs-support' )
+		);
+    }
+
 	/**
 	 * Enqueue scripts for file uploader
 	 */
@@ -123,10 +133,10 @@ class Webdogs_Media_Uploader {
 
 		wp_register_script( 'of-media-uploader', plugin_dir_url( dirname(__FILE__) ) .'admin/js/media-uploader.js', array( 'jquery' ), Webdogs_Options::VERSION );
 		wp_enqueue_script( 'of-media-uploader' );
-		wp_localize_script( 'of-media-uploader', 'wds_l10n', array(
+		/*wp_localize_script( 'of-media-uploader', 'wds_l10n', array(
 			'upload' => __( 'Upload', 'webdogs-support' ),
 			'remove' => __( 'Remove', 'webdogs-support' )
-		) );
+		) );*/
 	}
 
 	/**
