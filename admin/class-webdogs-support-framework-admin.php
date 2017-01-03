@@ -92,8 +92,19 @@ class Webdogs_Admin {
     	// Load Options Framework Settings
         $wds_settings = get_option( 'webdogs_support' );
 
+        // Update options name for compatibility
+        $previous_options = get_option( 'webdogs', false );
+        
+        // If there are options here, 
+        // save them with the new name 
+        // and delete the previous options.
+        if( $previous_options ) {
+        	update_option( $wds_settings['id'], $previous_options );
+        	delete_option( 'webdogs' );
+        }
+
 		// Registers the settings fields and callback
-		register_setting( 'webdogs-support', $wds_settings['id'],  array ( $this, 'validate_options' ) );
+		register_setting( 'webdogs-support', $wds_settings['id'],  array( $this, 'validate_options' ) );
 
 		// Displays notice after options save
 		add_action( 'wds_after_validate', array( $this, 'save_options_notice' ) );
@@ -128,7 +139,7 @@ class Webdogs_Admin {
             // Submenu default settings
             'page_title' => __('Support', 'webdogs-support'),
 			'menu_title' => __('Support', 'webdogs-support'),
-			'capability' => 'manage_options',
+			'capability' => 'manage_support',
 			'menu_slug' => 'webdogs-support',
             'parent_slug' => 'admin.php',
 
@@ -165,13 +176,6 @@ class Webdogs_Admin {
                 	$menu['icon_url'],
                 	$menu['position']
                 );
-                /*$this->options_screen = add_submenu_page(
-                	$menu['menu_slug'],
-                	$menu['page_title'],
-                	$menu['menu_title'],
-                	$menu['capability'],
-                	$menu['menu_slug'],
-                	array( $this, 'options_page' ) );*/
                 break;
 
             default:
@@ -185,18 +189,6 @@ class Webdogs_Admin {
                 	array( $this, 'options_page' ) );
                 break;
         }
-
-        /*$submenus = Self::wds_tabs();
-        foreach ( $submenus as $submenu ) {
-			$this->options_screen = add_submenu_page(
-				$menu['menu_slug'],
-            	// add_query_arg( 'page', $menu['menu_slug'], $menu['parent_slug'] ),
-            	$menu['page_title'],
-            	$submenu['name'],
-            	$submenu['capability'],
-            	$menu['menu_slug'] . '&sub_section=' . $submenu['menu_slug'],
-            	array( $this, 'options_page' ) );
-        }*/
 	}
 
 	/**
@@ -216,8 +208,6 @@ class Webdogs_Admin {
 			else
 				$indexes[] = absint( $option['order'] );
 		}
-
-		// $indexes = array_values( array_map( 'absint', wp_list_pluck( array_values($options), 'order' ) ) );
 
 		foreach ( $options as $value ) {
 			// Heading for Navigation
@@ -242,7 +232,7 @@ class Webdogs_Admin {
 				$class = '';
 				$class = $value['name'];
 				$class = preg_replace( '/[^a-zA-Z0-9._\-]/', '', strtolower($class) );
-				$menu[ $index ] = array_merge( $value, array('menu_slug' => $class, 'options_framework_tab' => '#'. $class ."-section" ) );
+				$menu[ $index ] = array_merge( $value, array('menu_slug' => $class, 'tab' => '#'. $class ."-section" ) );
 			}
 		}
 		// sort numeric 
@@ -337,16 +327,7 @@ class Webdogs_Admin {
 	        $blogname = sprintf( __('User Dashboard: %s'), esc_html( get_current_site()->site_name ) );
 	    }
 	 
-	    $title = "";
-
-	    // $custom_logo_icon = $this->get_logo_icon();
-
-	    // if( $custom_logo_icon ) {
-
-	    // 	$title .= $custom_logo_icon;
-	    // }
-
-	    
+	    $title = "";	    
 	    $title .= wp_html_excerpt( $blogname, 40, '&hellip;' );
 	 
 	    $wp_admin_bar->add_menu( array(
@@ -446,19 +427,36 @@ class Webdogs_Admin {
 		$tabs = Self::wds_tabs();
 
         foreach ( $tabs as $tab ) {
+
         	if( ! empty( $tab['active_tab'] ) && function_exists( $tab['active_tab'] ) ) {
+        		
         		add_filter( 'wds_filter_active_tab', $tab['active_tab'], 10, 1 );
+				
+				$is_current = apply_filters( 'wds_filter_active_tab', false );
+	    	
+	    		if( $is_current ) {
+	    			return $tab['tab'];
+	    		}
 
-        		$is_current = apply_filters( 'wds_filter_active_tab', false );
-
-        		if( $is_current ) {
-        			return $tab['options_framework_tab'];
-        		}
         	}
+
+
 		}
 		return false;
 	}
 
+	/**
+     * localize_script
+     *
+     * @since 2.3.4
+     */
+	function localize_script( $localize_script = array() ) {
+		if( $this->get_current_tab() ) {
+			$current = $this->get_current_tab();
+			return $localize_script + array( 'tab' => $current );
+		}
+		return $localize_script;
+	}
 
 	/**
      * Loads the required javascript
@@ -470,18 +468,13 @@ class Webdogs_Admin {
 		if ( $this->options_screen != $hook )
 	        return;
 
-		wp_enqueue_script( 'svg-icon-font', plugin_dir_url( dirname(__FILE__) ) . 'admin/js/svgiconfont.js', array(), Webdogs_Options::VERSION, true );
+		wp_enqueue_script( WEBDOGS_SUPPORT_ID . '-svg-icon-font', plugin_dir_url( dirname(__FILE__) ) . 'admin/js/svgiconfont.js', array(), Webdogs_Options::VERSION, true );
 
 		// wp_enqueue_script( 'jquery-parallaxify', plugin_dir_url( dirname(__FILE__) ) . 'js/jquery.parallaxify.min.js', array( 'jquery' ), Webdogs_Options::VERSION, false );
-		// wp_enqueue_script( 'wds_sass', plugin_dir_url( dirname(__FILE__) ) . 'js/sass.js', array(), false, Webdogs_Options::VERSION );
+		wp_enqueue_script( WEBDOGS_SUPPORT_ID . '-sass', plugin_dir_url( dirname(__FILE__) ) . 'admin/js/sass.js', array(), Webdogs_Options::VERSION, false );
 		
 		// Enqueue custom option panel JS
-		wp_enqueue_script( 'options-custom', plugin_dir_url( dirname(__FILE__) ) . 'admin/js/options-custom.js', array( 'jquery','wp-color-picker' ), Webdogs_Options::VERSION, true );
-
-		if( $this->get_current_tab() ) {
-			$current = $this->get_current_tab();
-			wp_localize_script( 'options-custom', 'options_framework_tab', $current );
-		}
+		wp_enqueue_script( WEBDOGS_SUPPORT_ID . '-options-custom', plugin_dir_url( dirname(__FILE__) ) . 'admin/js/options-custom.js', array( 'jquery','wp-color-picker' ), Webdogs_Options::VERSION, true );
 
 		wp_enqueue_script( 'admin-color-schemes', plugin_dir_url( dirname(__FILE__) ) . 'admin/js/admin-color-schemes.js', array( 'jquery', 'wp-color-picker' ), Webdogs_Options::VERSION, true );
 		
@@ -532,7 +525,7 @@ class Webdogs_Admin {
 
 	<div id="wds-wrap" class="wrap">
 		
-		<?php Webdogs_Support_Admin_Color_Schemes::get_Sass_JS(); ?>
+		<?php //Webdogs_Support_Admin_Color_Schemes::get_Sass_JS(); ?>
 
 		<?php $menu = Self::menu_settings(); ?>
 
@@ -691,8 +684,6 @@ class Webdogs_Admin {
 	 */
 
 	function wds_admin_bar() {
-
- 		// include_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/options.php';
 
 		// Don't show for logged out users.
 	    if ( ! is_user_logged_in() )

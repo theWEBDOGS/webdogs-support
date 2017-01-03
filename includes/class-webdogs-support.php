@@ -265,6 +265,9 @@ class Webdogs_Support {
 		$this->loader->add_action( 'wds_scheduled_notification', $plugin_maintainance_notifications, 'send_maintenance_notification' );
 		$this->loader->add_action( 'wds_test_maintenance_notification', $plugin_maintainance_notifications, 'send_test_maintenance_notification', 10, 1 );
 
+		// wds_l10n
+		$this->loader->add_filter( 'wds_l10n', $plugin_maintainance_notifications, 'maintenance_l10n', 12, 1 );
+
 		return $this;
 
 	}
@@ -318,7 +321,7 @@ class Webdogs_Support {
 		$this->loader->add_action( 'init', $plugin_admin_color_schemes, 'init' );
 		$this->loader->add_action( 'admin_init', $plugin_admin_color_schemes, 'admin_init' );
 
-		$this->loader->add_action( 'admin_menu', $plugin_admin_color_schemes, 'admin_menu' );
+		// $this->loader->add_action( 'admin_menu', $plugin_admin_color_schemes, 'admin_menu' );
 		$this->loader->add_action( 'admin_post_admin-color-schemes-save', $plugin_admin_color_schemes, 'save' );
 		$this->loader->add_action( 'wp_ajax_admin-color-schemes-save', $plugin_admin_color_schemes, 'save' );
 		$this->loader->add_action( 'wds_after_validate', $plugin_admin_color_schemes, 'wds_save', 10, 1 );
@@ -328,6 +331,9 @@ class Webdogs_Support {
 
 		// Override the user's admin color scheme.
 		$this->loader->add_filter( 'get_user_option_admin_color', 'Webdogs_Support_Admin_Color_Schemes', 'must_use_admin_color', 10, 1 );
+		
+		// Add sass_localize_script.
+		$this->loader->add_filter( 'wds_localize_script', 'Webdogs_Support_Admin_Color_Schemes', 'sass_localize_script', 10, 1 );
 
 		// Hide the Admin Color Scheme field from users who can't set a forced color scheme.
 		$this->loader->add_action( 'admin_color_scheme_picker', $plugin_admin_color_schemes, 'hide_admin_color_input', 8 );
@@ -385,6 +391,9 @@ class Webdogs_Support {
 			$this->loader->add_action( 'admin_enqueue_scripts', $options_framework_admin, 'enqueue_admin_styles', 10, 1 );
 			$this->loader->add_action( 'admin_enqueue_scripts', $options_framework_admin, 'enqueue_admin_scripts', 10, 1 );
 
+			// wds_localize_script
+			$this->loader->add_filter( 'wds_localize_script', $options_framework_admin, 'localize_script', 12, 1 );
+
 			// Settings need to be registered after admin_init
 			$this->loader->add_action( 'admin_init', $options_framework_admin, 'settings_init' );
 
@@ -419,6 +428,9 @@ class Webdogs_Support {
 
 		$this->loader->add_action( 'init', $plugin_media_uploader, 'init' );
 
+		// wds_l10n
+		$this->loader->add_filter( 'wds_l10n', $plugin_media_uploader, 'media_uploader_l10n', 12, 1 );
+
 		return $this;
 
 	}
@@ -438,6 +450,9 @@ class Webdogs_Support {
         $this->loader->add_action( 'admin_enqueue_scripts', $plugin_dashboard_widget, 'enqueue_scripts' );
         $this->loader->add_action( 'wp_ajax_webdogs_result_dashboard', $plugin_dashboard_widget, 'result_dashboard' );
         $this->loader->add_action( 'wp_ajax_webdogs_reset_dashboard', $plugin_dashboard_widget, 'reset_dashboard' );
+		
+		// wds_l10n
+		$this->loader->add_filter( 'wds_l10n', $plugin_dashboard_widget, 'dashboard_widget_l10n', 12, 1 );
 
 		return $this;
 	}

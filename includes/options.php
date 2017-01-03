@@ -203,7 +203,12 @@ function wds_options() {
 		'std' => 'on_demand_maintainance_notification',
 		'type' => 'select',
 		'class' => 'small alignleft mini',
-		'options' => $service_array); 
+		'options' => $service_array,
+		'rule' => array(                       // RULES w/EXE CURRENT INPUT'S ON TRIGGER CALLBACK 
+			'on' => 'change',                  // PERFORMS A JQUERY METHOD ON THE ELEMENT WITH ID
+			'id' => 'wds-submit .wds_notification_events > .wds_notification_scheduled', // OR IT'S TARGET CHILDREN
+			'exe' => array(
+				'text' => "( val == 'deactivated') ? wds.l10n['notification_deactivated'] : wds.get_next_schedule()")));
 
 	$options[] = array(
 		'name' => __('Notification Frequency', 'webdogs-support' ),
@@ -551,6 +556,21 @@ function wds_options() {
 add_filter( 'wds_options', 'wds_options');
 
 
+if ( ! function_exists( 'Is_Webdogs_Plugins_Page' ) ) {
+	/**
+	 * Helper function to register a collection of required plugins.
+	 *
+	 * @since 2.0.0
+	 * @api
+	 *
+	 * @param array $plugins An array of plugin arrays.
+	 * @param array $config  Optional. An array of configuration values.
+	 */
+	function Is_Webdogs_Plugins_Page( $boolval ) {
+		return ( ! empty( $_GET['plugin_status'] ) );
+	}
+}
+
 /**
  * Filter fields and tabs by capability.
  *
@@ -822,6 +842,15 @@ function wds_base_plugins(){
 	));
 }
 
+
+
+/**
+ *
+ *
+ */
+function wds_l10n_strings(){
+	return apply_filters( 'wds_l10n', array() );
+}
 
 
 /**
