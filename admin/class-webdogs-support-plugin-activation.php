@@ -2430,9 +2430,9 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 				    $imploded = implode(', ', $deleted_names);
 					$rendered = 
 							sprintf(
-								translate_nooped_plural( $this->strings[ 'theme_deletion' ], count($delete), 'webdogs-support' ),
+								translate_nooped_plural( $this->strings[ 'theme_deletion' ], count($deleted_names), 'webdogs-support' ),
 								$imploded,
-								count($delete)
+								count($deleted_names)
 							);
 					add_settings_error( 'webdogs-support', 'theme_deletion', $rendered, 'update-nag' );
 				}
