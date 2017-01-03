@@ -44,7 +44,7 @@
 
 	function sass_admin_colors( scss ){
 
-	    SassWorker.compile( scss, function(result){
+	    wds.SassWorker.compile( scss, function(result){
 	       
 	        var css = result.text,
 	        body = document.body || document.getElementsByTagName('body')[0],
@@ -89,7 +89,6 @@
             if ( typeof window._wpColorScheme !== 'undefined' ) {
 				window._wpColorScheme = colorScheme;
 			}
-
 
             wpSvgPainter.init();
             wpSvgPainter.setColors( colorScheme );

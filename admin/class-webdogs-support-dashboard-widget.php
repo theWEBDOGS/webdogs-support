@@ -45,6 +45,16 @@ class Webdogs_Support_Dashboard_Widget
     }
 
     /**
+     * wds_l10n
+     */
+    public static function dashboard_widget_l10n( $l10n = array() ) {
+        return $l10n + array(
+            'dashboard_widget_request_sent' => __( 'Request sent', 'webdogs-support' ),
+            'dashboard_widget_error_sending' => __( 'Error sending', 'webdogs-support' )
+        );
+    }
+
+    /**
      * load JS and the data (admin dashboard only)
      * @param  string $hook current page
      * @return void

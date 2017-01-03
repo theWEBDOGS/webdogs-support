@@ -12,9 +12,10 @@
   } else {
     root.Sass = factory();
   }
-}(this, function () {/*global document*/
+}(this, function () {
+/*global document*/
 // identify the path sass.js is located at in case we're loaded by a simple
-// <script src="path/to/sass.js"></script>
+// <script src="path/to/sass.js">
 // this path can be used to identify the location of
 // * sass.worker.js from sass.js
 // * libsass.js.mem from sass.sync.js
@@ -195,8 +196,15 @@ commands.split(' ').forEach(function(command) {
 });
 
 // automatically set the workerUrl in case we're loaded by a simple
-// <script src="path/to/sass.js"></script>
+// <script src="path/to/sass.js">
 // see https://github.com/medialize/sass.js/pull/32#issuecomment-103142214
-Sass.setWorkerUrl(SASSJS_RELATIVE_PATH + '/sass.worker.js');
+Sass.setWorkerUrl( wds.sass['url'] );
 return Sass;
 }));
+wds.SassWorker = new Sass();
+wds.SassWorker.options('defaults');
+wds.SassWorker.options({ style: wds.SassWorker.style.compressed });
+
+wds.SassWorker.writeFile('variables', wds.sass['variables'] );
+wds.SassWorker.writeFile('mixins', wds.sass['mixins'] );
+wds.SassWorker.writeFile('_admin.scss', wds.sass['admin'] );

@@ -97,6 +97,11 @@ class Webdogs_Support_Admin {
 		 */
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/webdogs-support-admin.js', array( 'jquery' ), $this->version, false );
+				// wp_localize_script( WEBDOGS_SUPPORT_ID . '-options-custom', 'wds', 0 );
+		$wds_localize_script = apply_filters( 'wds_localize_script', array( 
+				'l10n' => wds_l10n_strings(),
+			) );
+		wp_localize_script( $this->plugin_name, 'wds', $wds_localize_script );
 
 	}
 

@@ -854,11 +854,11 @@ class Webdogs_Interface {
 
 			'pass' => "function( val ){ \n\t\t\t\t%s;\n\t\t\t}",
 
-			'cases' => "\n\t\t\t\tcase '%1\$s':\n\t\t\t\t\twds_options['callback']['switch'][%2\$d]();\n\t\t\t\t\t\tbreak;\n\t\t\t\t\t",
+			'cases' => "\n\t\t\t\tcase '%1\$s':\n\t\t\t\t\twds.options['callback']['switch'][%2\$d]();\n\t\t\t\t\t\tbreak;\n\t\t\t\t\t",
 
-			'passes' => "\n\t\t\t\tvar val = wds_options['return'][%1\$d]();\n\t\t\t\twds_options['callback']['pass'][%2\$d]( val );\n\t\t\t", 
+			'passes' => "\n\t\t\t\tvar val = wds.options['return'][%1\$d]();\n\t\t\t\twds.options['callback']['pass'][%2\$d]( val );\n\t\t\t", 
 
-			'switches' => "\n\t\t\t\tvar val = wds_options['return'][%1\$d]();\n\t\t\t\tswitch( val ) { \n\t\t\t\t\t%2\$s\n\t\t\t\t}\n\t\t\t", 
+			'switches' => "\n\t\t\t\tvar val = wds.options['return'][%1\$d]();\n\t\t\t\tswitch( val ) { \n\t\t\t\t\t%2\$s\n\t\t\t\t}\n\t\t\t", 
 
 		);
 
@@ -1085,7 +1085,7 @@ class Webdogs_Interface {
 
 <script type="text/javascript">
 
-var wds_options = {
+wds.options = {
 
 	return: [ 
 
