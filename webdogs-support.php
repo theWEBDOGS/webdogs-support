@@ -3,7 +3,7 @@
  * Plugin Name:       WEBDOGS Support + Maintenance
  * Plugin URI:        https://github.com/theWEBDOGS/webdogs-support
  * Description:       Support + Maintenance Configuration Tools: scheduled maintenance notifications, login page customizations, base plugin recommendations and more.
- * Version:           2.3.5
+ * Version:           2.3.6
  * Author:            WEBDOGS Support Team
  * Author URI:        WEBDOGS.COM
  * License:           GPL-2.0+
@@ -101,6 +101,12 @@ function upgrade_webdogs_support( $upgrader_object, $options ) {
     }
 }
 add_action( 'upgrader_process_complete', 'upgrade_webdogs_support', 10, 2 );
+
+/**
+ * Common functions for transforming data and plugin   
+ * context/state reporting.
+ */
+require_once plugin_dir_path( __FILE__ ) . 'includes/functions-webdogs-support-common.php';
 
 /**
  * The core plugin class that is used to define internationalization,

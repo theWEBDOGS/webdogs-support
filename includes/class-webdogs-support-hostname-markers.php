@@ -15,7 +15,9 @@ class Webdogs_Support_Hosetname_Markers
             Self::$instance = $this;
         }
                     
-        if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php'        );
+        if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php');
+
+        add_action( 'set_current_user', array(&$this,'webdogs_user_capability'));
        
         //  If user can't edit theme options, exit
         if ( current_user_can( 'manage_options' ) ) {
@@ -33,7 +35,7 @@ class Webdogs_Support_Hosetname_Markers
      * Register user capability
      * @return void
      */
-    function webdogs_user_capability() {
+    public function webdogs_user_capability() {
         
         $user = wp_get_current_user();
 
@@ -53,7 +55,7 @@ class Webdogs_Support_Hosetname_Markers
      * WEBDOGS custom greeting
      * @return void
      */
-    function webdogs_howdy( $wp_admin_bar ) {
+    public function webdogs_howdy( $wp_admin_bar ) {
         $user = wp_get_current_user();
 
         // Bail early

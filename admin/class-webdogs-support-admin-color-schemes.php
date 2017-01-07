@@ -1,13 +1,12 @@
 <?php
 /*
-Plugin Name: Admin Color Schemer
-Plugin URI: http://wordpress.org/plugins/admin-color-schemer/
-Description: Create your own admin color schemes, right in the WordPress admin.
+Admin Color Schemer
+http://wordpress.org/plugins/admin-color-schemer/
+Create your own admin color schemes, right in the WordPress admin.
 Version: 1.0
-Author: WordPress Core Team
-Author URI: http://wordpress.org/
-Text Domain: admin-color-schemer
-Domain Path: /languages
+WordPress Core Team
+URI: http://wordpress.org/
+admin-color-schemer
 */
 
 /*

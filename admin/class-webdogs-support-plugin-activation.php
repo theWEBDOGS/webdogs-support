@@ -1358,7 +1358,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 					'install'  => '',
 					'update'   => '',
 					'activate' => '',
-					'dismiss'  => $this->dismissable ? '<a href="' . esc_url( add_query_arg( 'wds-dismiss', 'dismiss_admin_notices' ) ) . '" class="dismiss-notice" target="_parent">' . esc_html( $this->strings['dismiss'] ) . '</a>' : '',
+					'dismiss'  => $this->dismissable ? '<a href="' . esc_url( wp_nonce_url( add_query_arg( 'wds-dismiss', 'dismiss_admin_notices' ), 'wds-dismiss-' . get_current_user_id() ) ) . '" class="dismiss-notice" target="_parent">' . esc_html( $this->strings['dismiss'] ) . '</a>' : '',
 				);
 
 				$link_template = '<a href="%2$s">%1$s</a>';
@@ -1430,7 +1430,7 @@ if ( ! class_exists( 'Webdogs_Plugin_Activation' ) ) {
 				'install'  => '',
 				'update'   => '',
 				'activate' => '',
-				'dismiss'  => $this->dismissable ? '<a href="' . esc_url( wp_nonce_url( add_query_arg( 'webdogs-support-dismiss', 'dismiss_admin_notices' ), 'webdogs-support-dismiss-' . get_current_user_id() ) ) . '" class="dismiss-notice" target="_parent">' . esc_html( $this->strings['dismiss'] ) . '</a>' : '',
+				'dismiss'  => $this->dismissable ? '<a href="' . esc_url( wp_nonce_url( add_query_arg( 'wds-dismiss', 'dismiss_admin_notices' ), 'wds-dismiss-' . get_current_user_id() ) ) . '" class="dismiss-notice" target="_parent">' . esc_html( $this->strings['dismiss'] ) . '</a>' : '',
 			);
 
 			$link_template = '<a href="%2$s">%1$s</a>';
