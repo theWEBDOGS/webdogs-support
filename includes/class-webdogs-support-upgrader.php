@@ -29,7 +29,10 @@ class Webdogs_Support_Upgrader {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function upgrade() {
+	public static function upgrade() {        
+
+        if(!function_exists('wp_cookie_constants') ) require_once( ABSPATH . 'wp-includes/default-constants.php');
+        wp_cookie_constants();
 
         if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php');
 
@@ -73,17 +76,17 @@ class Webdogs_Support_Upgrader {
         if( file_exists( $WATCHDOG_TO ) ) { $delete_file = $wp_filesystem->delete( $WATCHDOG_TO ); 
         if( is_wp_error( $delete_file ) ) { wp_die( $delete_file->get_error_message()); } }
         if( file_exists( $WATCHDOG_FROM ) ) { $unzip_file = unzip_file( $WATCHDOG_FROM, $WATCHDOG_TO );
-        if( is_wp_error( $unzip_file ) ) { wp_die( $unzip_file->get_error_message() ); } }
+        if( is_wp_error( $unzip_file  ) ) { wp_die( $unzip_file->get_error_message() ); } }
 
         if( defined('WPMU_PLUGIN_DIR')) { $WATCHDOG_FROM = WEBDOGS_SUPPORT_DIR . 'watchdog/watchdog.php'; $WATCHDOG_TO = str_replace( untrailingslashit( WEBDOGS_SUPPORT_DIR ), WPMU_PLUGIN_DIR, WEBDOGS_SUPPORT_DIR . 'watchdog.php' ); 
         if( file_exists( $WATCHDOG_TO ) ) { $delete_file = $wp_filesystem->delete( $WATCHDOG_TO ); 
         if( is_wp_error( $delete_file ) ) { wp_die( $delete_file->get_error_message()); } }
         if( file_exists( $WATCHDOG_FROM ) ) { $move_file = $wp_filesystem->move( $WATCHDOG_FROM, $WATCHDOG_TO );
-        if( is_wp_error( $move_file ) ) { wp_die( $move_file->get_error_message()); } } }
+        if( is_wp_error( $move_file   ) ) { wp_die( $move_file->get_error_message()); } } }
 
         if( defined('WPMU_PLUGIN_DIR')) { $WATCHDOG_FROM = WEBDOGS_SUPPORT_DIR . 'watchdog/watchdog.zip'; $WATCHDOG_TO = WPMU_PLUGIN_DIR .'/watchdog/';
         if( file_exists( $WATCHDOG_TO ) ) { $delete_file = $wp_filesystem->delete( $WATCHDOG_TO ); 
         if( is_wp_error( $delete_file ) ) { wp_die( $delete_file->get_error_message()); } }
         if( file_exists( $WATCHDOG_FROM ) ) { $unzip_file = unzip_file( $WATCHDOG_FROM, $WATCHDOG_TO );
-        if( is_wp_error( $unzip_file ) ) { wp_die( $unzip_file->get_error_message() /*'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.'*/ ); } } } }
+        if( is_wp_error( $unzip_file  ) ) { wp_die( $unzip_file->get_error_message() /*'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.'*/ ); } } } }
 }

@@ -9,26 +9,11 @@ class Webdogs_Support_Hosetname_Markers
 {
     protected static $instance;
 
-    function __construct() 
+    public function __construct() 
     {
         if ( ! isset( Self::$instance ) && ! ( Self::$instance instanceof Self ) ) {
             Self::$instance = $this;
-        }
-                    
-        if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php');
-
-        add_action( 'set_current_user', array(&$this,'webdogs_user_capability'));
-       
-        //  If user can't edit theme options, exit
-        if ( current_user_can( 'manage_options' ) ) {
-
-            if(!function_exists('is_plugin_active')) include_once( ABSPATH . 'wp-admin/includes/plugin.php');
-
-            if(!function_exists('wp_prepare_themes_for_js')) include_once( ABSPATH . 'wp-admin/includes/theme.php');
-
-            if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');
-        }
-        
+        }        
     }
 
     /**
@@ -107,18 +92,24 @@ class Webdogs_Support_Hosetname_Markers
         if( is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX ) { return; }
 
         $domain_flags = wds_show_domain_flags();
+                         // Green  //Dark Blue
+        $color_a = array('155,181,103');
+                         // Green  //Light Blue
+        $color_b = array('55,122,159');
+
+        $color = ( wds_domain_exculded() ) ? array($color_a, $color_b) : array($color_b, $color_a);
 
         if ( ! $domain_flags ){ return; } ?>
 
         <style type="text/css">
         #wpcontent {margin-bottom: 22px; }
         
-        #webdogs_flags_wrap {right: 0; left: 0; height: 0px; position: fixed; top: auto; bottom: 0; z-index: 100000000000; display: block; opacity: 1; overflow: visible; border-bottom: 5px solid #9bb567; opacity: 0.334; } 
+        #webdogs_flags_wrap {right: 0; left: 0; height: 0px; position: fixed; top: auto; bottom: 0; z-index: 100000000000; display: block; opacity: 1; overflow: visible; border-bottom: 5px solid rgba(<?php echo $color[0][0]; ?>,1); opacity: 0.334; } 
         #webdogs_flags_inner {display: block; right: 0; overflow: hidden; height: 27px; width: auto; position: absolute; top: -18px; }
-        #webdogs_flags {color: #FFF; border: 22px solid transparent; border-bottom-color: #9bb567; line-height: 10px; font-size: 7px; text-transform: uppercase; font-family: sans-serif; letter-spacing: 1px; position: relative; display: block; float: right; height: 0; width: auto; top: -22px; right: -100%; z-index: 10000; overflow: visible; -webkit-transition: all 1.4s ease-in-out; -moz-transition: all 1.4s ease-in-out; transition: all 1.4s ease-in-out; }
+        #webdogs_flags {color: #FFF; border: 22px solid transparent; border-bottom-color: rgba(<?php echo $color[0][0]; ?>,1); line-height: 10px; font-size: 7px; text-transform: uppercase; font-family: sans-serif; letter-spacing: 1px; position: relative; display: block; float: right; height: 0; width: auto; top: -22px; right: -100%; z-index: 10000; overflow: visible; -webkit-transition: all 1.4s ease-in-out; -moz-transition: all 1.4s ease-in-out; transition: all 1.4s ease-in-out; }
         #webdogs_flags_list {position: relative; display: block; top: 8px; padding: 0 26px 0 9px; margin: 0 auto; height: 22px; min-width: 120px; text-align: center; }
         #webdogs_flags_wrap .wds-domain-flag {margin: 0 0 0 0; right: -500%; width: auto; padding: 0 44px 0 0; position: relative; display: block; float: right; } 
-        #webdogs_flags_wrap .wds-domain-flag:before {content: " "; border: 27px solid transparent; border-bottom-color: rgba(55, 122, 159, 0.36); position: absolute; z-index: -1; top: -35px; left: -36px; right: -1000%; } 
+        #webdogs_flags_wrap .wds-domain-flag:before {content: " "; border: 27px solid transparent; border-bottom-color: rgba(<?php echo $color[1][0]; ?>,0.36); position: absolute; z-index: -1; top: -35px; left: -36px; right: -1000%; } 
         #webdogs_flags_wrap .wds-domain-flag > span {display: block; text-align: center; } 
         
         #webdogs_flags_wrap.active, 
@@ -131,11 +122,11 @@ class Webdogs_Support_Hosetname_Markers
         #webdogs_flags_wrap.hover .wds-domain-flag, 
         #webdogs_flags_wrap:hover .wds-domain-flag {right: 0%; } 
         #webdogs_flags_wrap .notice-dismiss .screen-reader-text { display:none ;} 
-        #webdogs_flags_wrap .notice-dismiss {top: -4px; right: auto; z-index: 10000; position: relative; display: inline-block; float: left; margin: 0 42px 0 0; opacity: 1; border: none !important; padding: 0; background: 0 0; cursor: pointer color:rgba(255, 255, 255, 0.3); -webkit-border-radius:50%; border-radius:50%; } 
-        #webdogs_flags_wrap .notice-dismiss:before {background: 0 0; color:rgba(255, 255, 255, 0.3); content: "\f153"; display: block; font: 400 16px/20px dashicons; speak: none; height: 20px; text-align: center; margin: -1px -1px -1px 0px; width: 20px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } 
+        #webdogs_flags_wrap .notice-dismiss {top: -4px; right: auto; z-index: 10000; position: relative; display: inline-block; float: left; margin: 0 42px 0 0; opacity: 1; border: none !important; padding: 0; background: 0 0; cursor: pointer color:rgba(255,255,255,0.3); -webkit-border-radius:50%; border-radius:50%; } 
+        #webdogs_flags_wrap .notice-dismiss:before {background: 0 0; color:rgba(255,255,255,0.3); content: "\f153"; display: block; font: 400 16px/20px dashicons; speak: none; height: 20px; text-align: center; margin: -1px -1px -1px 0px; width: 20px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } 
         #webdogs_flags_wrap .notice-dismiss:active:before, 
         #webdogs_flags_wrap .notice-dismiss:focus:before, 
-        #webdogs_flags_wrap .notice-dismiss:hover:before {color:rgba(255, 255, 255, 0.5); } 
+        #webdogs_flags_wrap .notice-dismiss:hover:before {color:rgba(255,255,255,0.5); } 
         #webdogs_flags_wrap .notice-dismiss:focus {outline: 0; -webkit-box-shadow: 0 0 0 1px #5b9dd9,0 0 2px 1px rgba(30,140,190,.8); box-shadow: 0 0 0 1px #5b9dd9,0 0 2px 1px rgba(30,140,190,.8); } 
         .ie8 #webdogs_flags_wrap .notice-dismiss:focus {outline: #5b9dd9 solid 1px }
         <?php 
@@ -183,7 +174,7 @@ class Webdogs_Support_Hosetname_Markers
             display:none !important;
         }
         </style>
-        <div class="" id="webdogs_flags_wrap" onmouseenter="this.className='active';" onmouseleave="this.className='';">
+        <div class="active" id="webdogs_flags_wrap" onmouseenter="this.className='active';" onmouseleave="this.className='';">
             <div id="webdogs_flags_inner">
                 <div id="webdogs_flags">
                     <ul id="webdogs_flags_list">

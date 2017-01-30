@@ -27,7 +27,7 @@ class Webdogs_Admin {
     public function init() {
 
 		// Gets options to load
-    	$options = & Webdogs_Options::_wds_options();
+    	$options = &Webdogs_Options::_wds_options();
 
 		// Checks if options are available
     	if ( $options ) {
@@ -58,7 +58,7 @@ class Webdogs_Admin {
 	/**
      * Let's the user know that options aren't available for their theme
      */
-    function options_notice() {
+    public function options_notice() {
 		global $pagenow;
         if ( !is_multisite() && ( $pagenow == 'plugins.php' || $pagenow == 'themes.php' ) ) {
 			global $current_user ;
@@ -74,7 +74,7 @@ class Webdogs_Admin {
 	/**
      * Allows the user to hide the options notice
      */
-	function options_notice_ignore() {
+	public function options_notice_ignore() {
 		global $current_user;
 		$user_id = $current_user->ID;
 		if ( isset( $_GET['wds_nag_ignore'] ) && '0' == $_GET['wds_nag_ignore'] ) {
@@ -87,7 +87,7 @@ class Webdogs_Admin {
      *
      * @since 1.7.0
      */
-    function settings_init() {
+    public function settings_init() {
 
     	// Load Options Framework Settings
         $wds_settings = get_option( 'webdogs_support' );
@@ -158,7 +158,7 @@ class Webdogs_Admin {
      *
      * @since 1.7.0
      */
-	function add_custom_options_page() {
+	public function add_custom_options_page() {
 
 		$menu = Self::menu_settings();
 
@@ -450,7 +450,7 @@ class Webdogs_Admin {
      *
      * @since 2.3.4
      */
-	function localize_script( $localize_script = array() ) {
+	public function localize_script( $localize_script = array() ) {
 		if( $this->get_current_tab() ) {
 			$current = $this->get_current_tab();
 			return $localize_script + array( 'tab' => $current );
@@ -463,7 +463,7 @@ class Webdogs_Admin {
      *
      * @since 1.7.0
      */
-	function enqueue_admin_scripts( $hook ) {
+	public function enqueue_admin_scripts( $hook ) {
 
 		if ( $this->options_screen != $hook )
 	        return;
@@ -484,7 +484,7 @@ class Webdogs_Admin {
 
 	}
 
-	function wds_admin_head() {
+	public function wds_admin_head() {
 		// Hook to add custom scripts
 		do_action( 'wds_custom_scripts' );
 	}
@@ -521,7 +521,7 @@ class Webdogs_Admin {
 	 *
      * @since 1.7.0
      */
-	function options_page() { ?>
+	public function options_page() { ?>
 
 	<div id="wds-wrap" class="wrap">
 		
@@ -558,7 +558,7 @@ class Webdogs_Admin {
 	 *
 	 * @uses $_POST['reset'] to restore default options
 	 */
-	function validate_options( $input ) {
+	public function validate_options( $input ) {
 
 		/*
 		 * Restore Defaults.
@@ -642,7 +642,7 @@ class Webdogs_Admin {
 	 * Display message when options have been saved
 	 */
 
-	function save_options_notice() {
+	public function save_options_notice() {
 		add_settings_error( 'webdogs-support', 'save_options', __( 'Options saved.', 'webdogs-support' ), 'updated fade' );
 	}
 
@@ -659,7 +659,7 @@ class Webdogs_Admin {
 	 *
 	 */
 
-	function get_default_values() {
+	public function get_default_values() {
 		$output = array();
 		$config = & Webdogs_Options::_wds_options();
 		foreach ( (array) $config as $option ) {
@@ -683,7 +683,7 @@ class Webdogs_Admin {
 	 * Add options menu item to admin bar
 	 */
 
-	function wds_admin_bar() {
+	public function wds_admin_bar() {
 
 		// Don't show for logged out users.
 	    if ( ! is_user_logged_in() )

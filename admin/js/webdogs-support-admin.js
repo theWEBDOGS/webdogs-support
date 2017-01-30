@@ -44,6 +44,7 @@ var wds = window.wds?window.wds:{};
 	}
 
 	wds.get_next_schedule = function(){
+		// todo l10n
 		var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 		var date = new Date();
@@ -111,8 +112,8 @@ var wds = window.wds?window.wds:{};
 
 			      	var selected = $(a).attr('href');
 
-					$group.hide();
-					$(selected).fadeIn();
+					$group.slideUp();
+					$(selected).slideDown();
 			    }
 			});
 		});
@@ -133,11 +134,11 @@ var wds = window.wds?window.wds:{};
 		// If active tab is saved and exists, load it's .group
 		if ( active_tab != '' && $(active_tab).length/* && active_tab != location.hash*/ ) {
 			location.hash = active_tab;
-			$( active_tab ).fadeIn();
-			$( active_tab.replace( 'section', 'tab' ) ).addClass('nav-tab-active');
+			$( active_tab ).slideDown(function(){$( active_tab.replace( 'section', 'tab' ) ).addClass('nav-tab-active');});
+			
 		} else {
-			$('.group:first').fadeIn();
-			$('.nav-tab-wrapper a:first').addClass('nav-tab-active');
+			$('.group:first').slideDown(function(){$('.nav-tab-wrapper a:first').addClass('nav-tab-active');});
+			
 		}
 	}
 	/**
