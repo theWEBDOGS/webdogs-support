@@ -3,7 +3,7 @@
  * Plugin Name:       WEBDOGS Support + Maintenance
  * Plugin URI:        https://github.com/theWEBDOGS/webdogs-support
  * Description:       Support + Maintenance Configuration Tools: scheduled maintenance notifications, login page customizations, base plugin recommendations and more.
- * Version:           2.3.6
+ * Version:           2.3.7
  * Author:            WEBDOGS Support Team
  * Author URI:        WEBDOGS.COM
  * License:           GPL-2.0+
@@ -94,7 +94,7 @@ function upgrade_webdogs_support( $upgrader_object, $options ) {
        foreach( $options['packages'] as $each_plugin ){
             if ( $each_plugin == $current_plugin_path_name ) {
                 
-                require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-upgrader.php';
+                include_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-upgrader.php';
                 Webdogs_Support_Upgrader::upgrade();
             }
         }
@@ -106,13 +106,14 @@ add_action( 'upgrader_process_complete', 'upgrade_webdogs_support', 10, 2 );
  * Common functions for transforming data and plugin   
  * context/state reporting.
  */
-require_once plugin_dir_path( __FILE__ ) . 'includes/functions-webdogs-support-common.php';
+include_once plugin_dir_path( __FILE__ ) . 'includes/functions-webdogs-support-common.php';
+
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support.php';
+include plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support.php';
 
 /**
  * Helper function to return the theme option value.
@@ -142,27 +143,30 @@ if ( ! function_exists( 'wds_get_option' ) ) {
 }
 
 
-
+/**
+ * Begins execution of the plugin.
+ *
+ * @since    2.3.5
+ */
 function webdogs_support() {
-    if(!function_exists('wp_get_current_user') ) 
-        require_once( ABSPATH . 'wp-includes/pluggable.php');
 
     /**
      * The core plugin class that is used to define internationalization,
      * admin-specific hooks, and public-facing site hooks.
      */
     $GLOBALS[ WEBDOGS_SUPPORT_ID ] = new Webdogs_Support();
-
-    /**
-     * Begins execution of the plugin.
-     *
-     * Since everything within the plugin is registered via hooks,
-     * then kicking off the plugin from this point in the file does
-     * not affect the page life cycle.
-     *
-     * @since    1.0.0
-     */
-    $GLOBALS[ WEBDOGS_SUPPORT_ID ]->run();
+    return $GLOBALS[ WEBDOGS_SUPPORT_ID ];
 
 }
-add_action('plugins_loaded', 'webdogs_support', 200 );    
+
+
+/**
+ * Begins execution of the plugin.
+ *
+ * Since everything within the plugin is registered via hooks,
+ * then kicking off the plugin from this point in the file does
+ * not affect the page life cycle.
+ *
+ * @since    1.0.0
+ */
+webdogs_support()->run();

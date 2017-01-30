@@ -82,6 +82,12 @@ class Webdogs_Options {
 		static $options = null;
 
 		if ( !$options ) {
+
+	        if(!function_exists('wp_cookie_constants') ) require_once( ABSPATH . 'wp-includes/default-constants.php');
+	        wp_cookie_constants();
+	        
+	        if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php');
+
 	        // Load options from options.php file (if it exists)
 	        $location = apply_filters( 'wds_options_location', array('options.php') );
 	        if ( function_exists( 'wds_options' ) ) {

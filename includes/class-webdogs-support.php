@@ -71,7 +71,8 @@ class Webdogs_Support {
 		$this->plugin_name = 'webdogs-support';
 		$this->version = '1.0.0';
 
-		$this->load_dependencies()
+		$this
+		 	 ->load_dependencies()
 		     ->set_locale()
 		     ->define_hostname_markers_hooks()
 		     ->define_maintainance_notification_hooks()
@@ -79,13 +80,31 @@ class Webdogs_Support {
 		     ->define_login_logo_hooks()
 		     ->define_admin_color_scheme_hooks()
 		     ->define_plugin_activation_hooks()
-		     ->define_framework_hooks()
 		     ->define_media_uploader_hooks()
 		     ->define_dashboard_widget_hooks()
-		     ->define_admin_hooks()
-		     ->define_public_hooks();
+		        ->loader
+		        ->add_action('plugins_loaded', $this, 'init', 0);
 
 	}
+
+	/**
+	 * Define the core functionality of the plugin.
+	 *
+	 * Set the plugin name and the plugin version that can be used throughout the plugin.
+	 * Load the dependencies, define the locale, and set the hooks for the admin area and
+	 * the public-facing side of the site.
+	 *
+	 * @since    1.0.0
+	 */
+	public function init(){
+		return $this
+		     ->define_framework_hooks()
+		     ->define_admin_hooks()
+		     ->define_public_hooks()
+		     ->run();
+
+	}
+
 
 	/**
 	 * Load the required dependencies for this plugin.
@@ -379,7 +398,7 @@ class Webdogs_Support {
 		// Instantiate the options page.
 		$options_framework_admin = new Webdogs_Admin();
 		// Gets options to load
-    	$options = & Webdogs_Options::_wds_options();
+    	$options = &Webdogs_Options::_wds_options();
 
 		// Checks if options are available
     	if ( $options ) {

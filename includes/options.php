@@ -863,7 +863,7 @@ function wds_base_strings( $key = null ){
 
 	$strings = array(
 		'page_title'                      => __( 'Recommended Plugins', 'webdogs-support' ),
-		'menu_title'                      => __( 'Recommended Plugins', 'webdogs-support' ),
+		'menu_title'                      => __( 'Recommended', 'webdogs-support' ),
 		'installing'                      => __( 'Installing Plugin: %s', 'webdogs-support' ), // %s = plugin name.
 		'updating'                        => __( 'Updating Plugin: %s', 'webdogs-support' ), // %s = plugin name.
 		'oops'                            => __( 'Something went wrong with the plugin API.', 'webdogs-support' ),

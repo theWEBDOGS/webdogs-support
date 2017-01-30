@@ -431,16 +431,16 @@ class Webdogs_Support_Maintenance_Notifications {
         if( sizeof($active_this_year) > 0 ) $next_send = $active_this_year[0];
         elseif( sizeof($active_next_year) > 0 ) $next_send = $active_next_year[0];
 
-        // CLEAR NOTIFICATION
+        ////////////////////////
+        // CLEAR NOTIFICATION //
+        ////////////////////////
         if ( $clear ) wp_clear_scheduled_hook( 'wds_scheduled_notification' ); 
 
-        /////////////////////
-        // RETURN SCHEDULE //
-        /////////////////////
-        if( $return_array ) 
-            return array( 'scheduled' => $next_send, 'previous' => $prev_sent,  'previous_month' => $prev_month,  'previous_year' => $prev_year, 'offset' => $offset,  'freq' => $freq,  'active_this_year' => $active_this_year, 'active_next_year' => $active_next_year );
-        else 
-            return $next_send;
+        ////////////////////////
+        //   RETURN SCHEDULE  //
+        ////////////////////////
+        if( $return_array ) return array( 'scheduled' => $next_send, 'previous' => $prev_sent,  'previous_month' => $prev_month,  'previous_year' => $prev_year, 'offset' => $offset,  'freq' => $freq,  'active_this_year' => $active_this_year, 'active_next_year' => $active_next_year );
+        else return $next_send;
 
     }
 
