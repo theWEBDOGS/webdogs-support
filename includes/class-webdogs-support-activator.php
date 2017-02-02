@@ -31,13 +31,13 @@ class Webdogs_Support_Activator {
 	 */
 	public static function activate() {
 
-        if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php');
+        if(!function_exists('wp_cookie_constants') ) require_once( ABSPATH . 'wp-includes/default-constants.php');
 
-        if(!function_exists('is_plugin_active')) include_once( ABSPATH . 'wp-admin/includes/plugin.php');
+        if(!function_exists('wp_get_current_user') ) require_once( ABSPATH . 'wp-includes/pluggable.php');
 
-        if(!function_exists('wp_prepare_themes_for_js')) include_once( ABSPATH . 'wp-admin/includes/theme.php');
+        if(!function_exists('is_plugin_active')) require_once( ABSPATH . 'wp-admin/includes/plugin.php');
 
-        if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');
+        if(!function_exists('wp_prepare_themes_for_js')) require_once( ABSPATH . 'wp-admin/includes/theme.php');
 
         $deactivate_plugins = apply_filters( 'webdogs_support_activator_deactivate_plugins', 
             array(

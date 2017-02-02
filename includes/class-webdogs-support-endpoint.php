@@ -52,11 +52,11 @@ class Webdogs_Support_Endpoint {
             return $data;
         }
 
-        if ( ! function_exists( 'wp_version_check' ) ) include_once ABSPATH . 'wp-includes/update.php'; 
+        if ( ! function_exists( 'wp_version_check' ) ) require_once ABSPATH . 'wp-includes/update.php'; 
 
-        if ( ! function_exists( 'wp_prepare_themes_for_js' ) ) include_once ABSPATH . 'wp-admin/includes/theme.php';
+        if ( ! function_exists( 'wp_prepare_themes_for_js' ) ) require_once ABSPATH . 'wp-admin/includes/theme.php';
 
-        if ( ! function_exists( 'get_core_updates' ) ) include_once ABSPATH . 'wp-admin/includes/update.php';
+        if ( ! function_exists( 'get_core_updates' ) ) require_once ABSPATH . 'wp-admin/includes/update.php';
 
         // check for updates
          wp_version_check( array(), true );

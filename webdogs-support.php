@@ -88,17 +88,11 @@ register_deactivation_hook( __FILE__, 'deactivate_webdogs_support' );
  */
 function upgrade_webdogs_support( $upgrader_object, $options ) {
     $current_plugin_path_name = plugin_basename( __FILE__ );
-
-    if ( $options['action'] == 'update' && $options['type'] == 'plugin' ){
-
+    if ( 'update' === $options['action'] && 'plugin' === $options['type'] && !empty( $options['packages'] ) ){
        foreach( $options['packages'] as $each_plugin ){
-            if ( $each_plugin == $current_plugin_path_name ) {
-                
-                include_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-upgrader.php';
-                Webdogs_Support_Upgrader::upgrade();
-            }
-        }
-    }
+            if ( $each_plugin === $current_plugin_path_name ){
+                require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-upgrader.php';
+                Webdogs_Support_Upgrader::upgrade(); } } }
 }
 add_action( 'upgrader_process_complete', 'upgrade_webdogs_support', 10, 2 );
 
@@ -106,14 +100,14 @@ add_action( 'upgrader_process_complete', 'upgrade_webdogs_support', 10, 2 );
  * Common functions for transforming data and plugin   
  * context/state reporting.
  */
-include_once plugin_dir_path( __FILE__ ) . 'includes/functions-webdogs-support-common.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/functions-webdogs-support-common.php';
 
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-include plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support.php';
 
 /**
  * Helper function to return the theme option value.

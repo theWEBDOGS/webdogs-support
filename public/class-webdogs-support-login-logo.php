@@ -164,7 +164,8 @@ class Webdogs_Login_Logo {
 
 		$format = array(
 			'image' => "background:url(%s) %s %s %s;%s",
-			'color' => "background-color:%s;",
+			'background-color' => "background-color:%s;",
+			'color' => "color:%s;",
 			'none' => "background:none;",
 			'height' => "height:%dpx;",
 			'margin-bottom' => "margin:-10px 10px %spx;"
@@ -179,11 +180,14 @@ class Webdogs_Login_Logo {
         if ($background) :
 	    	$background = wp_parse_args( $background, $background_defaults );
 
-			$background_color  = empty($background['color']) ? "" : sprintf( $format['color'], esc_attr( $background['color' ] ) );
+			$background_color  = empty($background['color']) ? "" : sprintf( $format['background-color'], esc_attr( $background['color' ] ) );
 			$background_repeat = empty($background['repeat']) ? "" : $background['repeat'];
 
-			$login_background = sprintf( $format['image'], esc_url_raw( $this->get_location('url') ), esc_attr( $background_defaults['repeat'] ), esc_attr( $background_defaults['position'] ), esc_attr( $background_defaults['attachment'] ), "" );
-	        $body_background  = esc_attr( $background_color );
+	        $link_color        = sprintf( $format['color'], ( ( !empty($background['color']) && wd_get_brightness( $background['color'] ) < 130 ) ? '#d8dbdf' : 'inherit' ) );
+
+			$login_background  = sprintf( $format['image'], esc_url_raw( $this->get_location('url') ), esc_attr( $background_defaults['repeat'] ), esc_attr( $background_defaults['position'] ), esc_attr( $background_defaults['attachment'] ), "" );
+	        $body_background   = esc_attr( $background_color );
+
 			/*switch ($background_repeat) {
 				case 'no-repeat':
 					$login_background = sprintf( $format['image'], esc_url_raw( $this->get_location('url') ), esc_attr( $background['repeat'] ), esc_attr( $background['position'] ), esc_attr( $background['attachment'] ), "" );
@@ -215,6 +219,9 @@ class Webdogs_Login_Logo {
 			<?php echo $margin_bottom; ?> 
 			<?php echo $background_height; ?> 
 			background-size: contain;
+		}
+		.login #backtoblog a, .login #nav a {
+			<?php echo $link_color; ?>
 		}
 	</style>
 

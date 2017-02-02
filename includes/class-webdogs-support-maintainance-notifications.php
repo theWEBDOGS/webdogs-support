@@ -138,7 +138,7 @@ class Webdogs_Support_Maintenance_Notifications {
 
         $next_send = Self::get_next_schedule( FALSE, FALSE ); 
 
-        $timezone = date_default_timezone_get();
+        $timezone = date_default_timezone_get() . wp_timezone_override_offset();
 
          $message = "";
           $report = "\n\nNotice: %s\nStatus: %s\nTimezone: %s\nNow: %s\nNext: %s";
@@ -187,7 +187,7 @@ class Webdogs_Support_Maintenance_Notifications {
             Self::set_next_schedule();
             Self::set_maintenance_updates();
 
-             $timezone = date_default_timezone_get();
+             $timezone = date_default_timezone_get() . wp_timezone_override_offset();
               $message = "";
                $report = "\n\nNotice: %s\nStatus: %s\nTimezone: %s\nNow: %s\nNext: %s\nUpdates: %s";
 
@@ -276,7 +276,9 @@ class Webdogs_Support_Maintenance_Notifications {
      * MAIN SEND METHOD
      */
     public static function send_maintenance_notification(){
-        
+
+        Self::init();
+
         // Bail if excloded or deactivated
         if( wds_domain_exculded() || Self::$deactivated ) {
 
