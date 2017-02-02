@@ -43,7 +43,7 @@ var wds = window.wds?window.wds:{};
 	 	return active;
 	}
 
-	wds.get_next_schedule = function(){
+	wds.get_next_schedule = function(sep=''){
 		// todo l10n
 		var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -59,12 +59,12 @@ var wds = window.wds?window.wds:{};
 		var next_send = "";
 		var next_date = "";
 
-	 	if ( String( prev_sent ) === String( new Date(0) )  ) {
-			prev_sent = date;
-		 	next_send = wds.l10n['next_notification'] + ": ";
-		} else {
-		 	next_send = "| " + wds.l10n['next_notification'] + ": ";
-		}
+	    //	if ( String( prev_sent ) === String( new Date(0) )  ) {
+		// 	prev_sent = date;
+		//  	next_send = wds.l10n['next_notification'] + ": ";
+		// } else {
+		 	next_send = /*"| " +*/ wds.l10n['next_notification'] + ": ";
+		// }
 
 	 	var prev_month = prev_sent.getMonth()+1;
 	 	var prev_year = prev_sent.getFullYear();
@@ -91,14 +91,26 @@ var wds = window.wds?window.wds:{};
 
 		var $group = $('.group'),
 			$navtabs = $('.nav-tab-wrapper a'),
-			active_tab = '';
+			active_tab = '',
+			active_scroll = 0;
 
 		// Hides all the .group sections to start
-		$group.hide();
+		$group.slideUp();
 
-		$(window).on('hashchange', function () {
-		  
-			$navtabs.each(function (index, a) {
+		$navtabs.on('click',function(e){
+	    	
+	    	$(this).blur();
+
+			active_scroll = document.body.scrollTop;
+
+			if ( $(this).attr('href') == location.hash ) {
+		    	e.preventDefault();
+			  	document.body.scrollTop = active_scroll;
+			}
+		})
+		$(window).on('hashchange', function(e) {
+
+			$navtabs.each(function(index, a) {
 
 			    if ( $(a).attr('href') == location.hash ) {
 
@@ -113,8 +125,12 @@ var wds = window.wds?window.wds:{};
 			      	var selected = $(a).attr('href');
 
 					$group.slideUp();
-					$(selected).slideDown();
+					$(selected).slideDown(function(){$( selected.replace( 'section', 'tab' ) ).addClass('nav-tab-active');});
+			    } else {
+			    	e.preventDefault();
+				  	document.body.scrollTop = active_scroll;
 			    }
+
 			});
 		});
 		
@@ -125,16 +141,19 @@ var wds = window.wds?window.wds:{};
 		// Find if a selected tab is saved in localStorage
 		if ( location.hash != "" ) {
 			active_tab = location.hash;
+			$( active_tab ).slideDown(function(){$( active_tab.replace( 'section', 'tab' ) ).addClass('nav-tab-active');});
 		} else
 		// Find if a selected tab is saved in localStorage
 		if ( typeof(localStorage) != 'undefined' ) {
 			active_tab = localStorage.getItem('active_tab');
 		}
-		// console.log( active_tab );
+		console.log( active_tab );
 		// If active tab is saved and exists, load it's .group
-		if ( active_tab != '' && $(active_tab).length/* && active_tab != location.hash*/ ) {
+		if ( active_tab != '' && $(active_tab).length /*&& active_tab != location.hash*/ ) {
+			active_scroll = document.body.scrollTop;
 			location.hash = active_tab;
-			$( active_tab ).slideDown(function(){$( active_tab.replace( 'section', 'tab' ) ).addClass('nav-tab-active');});
+		  	document.body.scrollTop = active_scroll;
+			// $( active_tab ).slideDown(function(){$( active_tab.replace( 'section', 'tab' ) ).addClass('nav-tab-active');});
 			
 		} else {
 			$('.group:first').slideDown(function(){$('.nav-tab-wrapper a:first').addClass('nav-tab-active');});

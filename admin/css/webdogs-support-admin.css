@@ -11,6 +11,7 @@
     padding-bottom: 20px;
     position: relative;
     min-height: 63px;
+    min-height: 227px;
     border-top: none;
 }
 #wds-metabox {
@@ -43,6 +44,20 @@
 #optionsframework .group {
     padding-bottom:43px;
     background-color: #fff;
+}
+#optionsframework h3 > .wds_notification_events {
+    font-size: 13px;
+    font-weight: normal;
+}
+#optionsframework .wds_notification_events .bar_sep_before:before {
+    content: " | ";
+    font-size: 16px;
+    line-height: 1;
+}
+#optionsframework .wds_notification_events {
+    padding: 0 !important;
+    line-height: 28px;
+    margin-top: 0;
 }
 #optionsframework #plugins-section.group {
     padding-bottom: 0;
@@ -646,11 +661,6 @@
     left: 1em;
     right: 9em;
     width: auto;
-}
-#optionsframework p.wds_notification_events {
-    padding: 0 !important;
-    line-height: 28px;
-    margin-top: 0;
 }
 #optionsframework .button-primary {
     float:right;

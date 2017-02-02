@@ -112,17 +112,18 @@ class Webdogs_Interface {
 	 	if( $prev_proof ) : ?>
 
 			<p class="wds_notification_events">
+
 				<span class="wds_last_notification_sent" data-prev-notice="<?php echo $prev_proof; ?>">
 					<?php printf(__('Last notification: %s'), date(' F j, Y' , $prev_proof ) ); ?>	
 				</span>
 
-					<?php if( $next_notice ): ?>
+				<?php if( $next_notice ): ?>
 
-					<span class="wds_notification_scheduled" data-next-notice="<?php echo $next_notice; ?>"><?php print( __('Maintanace notifications are scheduled.') ); ?></span>
+					<span class="wds_notification_scheduled bar_sep_before" data-next-notice="<?php echo $next_notice; ?>"><?php print( __('Maintanace notifications are scheduled.') ); ?></span>
 				
 				<?php else: ?>
 
-					<span class="wds_notification_scheduled" data-next-notice="">
+					<span class="wds_notification_scheduled bar_sep_before" data-next-notice="">
 					</span>	
 
 				<?php endif; ?>

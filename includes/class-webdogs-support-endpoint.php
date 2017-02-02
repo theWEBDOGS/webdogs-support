@@ -22,6 +22,21 @@ class Webdogs_Support_Endpoint {
      */
     public $allowed_objects = array( 'bloginfo', 'core', 'options', 'plugins', 'themes', 'updates' );
 
+    /** LIVE
+     * Hook the plugin into WordPress
+     */
+     static public function register(){
+
+        $plugin = new Self();
+
+        add_action( 'init', array( $plugin, 'add_endpoint' ) );
+        add_action( 'template_redirect', array( $plugin, 'handle_endpoint' ) );
+        add_action( 'wds_scheduled_notification', array( $plugin, 'post_site_data' ), 0 );
+        add_action( 'wds_after_validate', array( $plugin, 'post_site_data' ), 0 );
+        add_action( 'wds_test_maintenance_notification', array( $plugin, 'post_site_data' ), 0 );
+
+        return $plugin;
+    }
     /**
      * Create an array of data for a single post that will be part
      * of the json response.
@@ -52,11 +67,11 @@ class Webdogs_Support_Endpoint {
             return $data;
         }
 
-        if ( ! function_exists( 'wp_version_check' ) ) include_once ABSPATH . 'wp-includes/update.php'; 
+        if ( ! function_exists( 'wp_version_check' ) ) require_once ABSPATH . 'wp-includes/update.php'; 
 
-        if ( ! function_exists( 'wp_prepare_themes_for_js' ) ) include_once ABSPATH . 'wp-admin/includes/theme.php';
+        if ( ! function_exists( 'wp_prepare_themes_for_js' ) ) require_once ABSPATH . 'wp-admin/includes/theme.php';
 
-        if ( ! function_exists( 'get_core_updates' ) ) include_once ABSPATH . 'wp-admin/includes/update.php';
+        if ( ! function_exists( 'get_core_updates' ) ) require_once ABSPATH . 'wp-admin/includes/update.php';
 
         // check for updates
          wp_version_check( array(), true );

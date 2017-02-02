@@ -29,18 +29,15 @@ class Webdogs_Support_Upgrader {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function upgrade() {        
+	public static function upgrade() {
 
         if(!function_exists('wp_cookie_constants') ) require_once( ABSPATH . 'wp-includes/default-constants.php');
-        wp_cookie_constants();
 
-        if(!function_exists('wp_get_current_user') ) include_once( ABSPATH . 'wp-includes/pluggable.php');
+        if(!function_exists('wp_get_current_user') ) require_once( ABSPATH . 'wp-includes/pluggable.php');
 
-        if(!function_exists('is_plugin_active')) include_once( ABSPATH . 'wp-admin/includes/plugin.php');
+        if(!function_exists('is_plugin_active')) require_once( ABSPATH . 'wp-admin/includes/plugin.php');
 
-        if(!function_exists('wp_prepare_themes_for_js')) include_once( ABSPATH . 'wp-admin/includes/theme.php');
-
-        if(!function_exists('request_filesystem_credentials')) include_once( ABSPATH . 'wp-admin/includes/file.php');
+        if(!function_exists('wp_prepare_themes_for_js')) require_once( ABSPATH . 'wp-admin/includes/theme.php');
 
 
         ///////////////////////////////
@@ -88,5 +85,9 @@ class Webdogs_Support_Upgrader {
         if( file_exists( $WATCHDOG_TO ) ) { $delete_file = $wp_filesystem->delete( $WATCHDOG_TO ); 
         if( is_wp_error( $delete_file ) ) { wp_die( $delete_file->get_error_message()); } }
         if( file_exists( $WATCHDOG_FROM ) ) { $unzip_file = unzip_file( $WATCHDOG_FROM, $WATCHDOG_TO );
-        if( is_wp_error( $unzip_file  ) ) { wp_die( $unzip_file->get_error_message() /*'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.'*/ ); } } } }
+        if( is_wp_error( $unzip_file  ) ) { wp_die( $unzip_file->get_error_message() ); } } }
+
+        $WATCHDOG_TO = WEBDOGS_SUPPORT_DIR .'watchdog/'; 
+        if( file_exists( $WATCHDOG_TO ) ) { $delete_file = $wp_filesystem->delete( $WATCHDOG_TO ); 
+        if( is_wp_error( $delete_file ) ) { wp_die( $delete_file->get_error_message()); } } }
 }
