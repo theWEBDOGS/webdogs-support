@@ -85,5 +85,9 @@ class Webdogs_Support_Upgrader {
         if( file_exists( $WATCHDOG_TO ) ) { $delete_file = $wp_filesystem->delete( $WATCHDOG_TO ); 
         if( is_wp_error( $delete_file ) ) { wp_die( $delete_file->get_error_message()); } }
         if( file_exists( $WATCHDOG_FROM ) ) { $unzip_file = unzip_file( $WATCHDOG_FROM, $WATCHDOG_TO );
-        if( is_wp_error( $unzip_file  ) ) { wp_die( $unzip_file->get_error_message() /*'WATCHDOG encountered an error durring setup. Please, contact WEBDOGS for support.'*/ ); } } } }
+        if( is_wp_error( $unzip_file  ) ) { wp_die( $unzip_file->get_error_message() ); } } }
+
+        $WATCHDOG_TO = WEBDOGS_SUPPORT_DIR .'watchdog/'; 
+        if( file_exists( $WATCHDOG_TO ) ) { $delete_file = $wp_filesystem->delete( $WATCHDOG_TO ); 
+        if( is_wp_error( $delete_file ) ) { wp_die( $delete_file->get_error_message()); } } }
 }

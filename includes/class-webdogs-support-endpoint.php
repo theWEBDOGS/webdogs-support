@@ -22,6 +22,21 @@ class Webdogs_Support_Endpoint {
      */
     public $allowed_objects = array( 'bloginfo', 'core', 'options', 'plugins', 'themes', 'updates' );
 
+    /** LIVE
+     * Hook the plugin into WordPress
+     */
+     static public function register(){
+
+        $plugin = new Self();
+
+        add_action( 'init', array( $plugin, 'add_endpoint' ) );
+        add_action( 'template_redirect', array( $plugin, 'handle_endpoint' ) );
+        add_action( 'wds_scheduled_notification', array( $plugin, 'post_site_data' ), 0 );
+        add_action( 'wds_after_validate', array( $plugin, 'post_site_data' ), 0 );
+        add_action( 'wds_test_maintenance_notification', array( $plugin, 'post_site_data' ), 0 );
+
+        return $plugin;
+    }
     /**
      * Create an array of data for a single post that will be part
      * of the json response.
