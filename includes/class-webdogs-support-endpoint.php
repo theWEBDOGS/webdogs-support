@@ -25,7 +25,7 @@ class Webdogs_Support_Endpoint {
     /** LIVE
      * Hook the plugin into WordPress
      */
-     static public function register(){
+    static public function register(){
 
         $plugin = new Self();
 
@@ -101,7 +101,7 @@ class Webdogs_Support_Endpoint {
     /**
      * Create our json endpoint by adding new rewrite rules to WordPress
      */
-    function add_endpoint(){
+    public function add_endpoint(){
 
         $object = $this->endpoint_base .'_object';
 
@@ -117,7 +117,7 @@ class Webdogs_Support_Endpoint {
             'top' );
     }
 
-    function endpoint_encode( $endpoint_hash, $endpoint ) {
+    public function endpoint_encode( $endpoint_hash, $endpoint ) {
         $seed = "";
 
        for ($i = 1; $i <= 10; $i++)
@@ -128,7 +128,7 @@ class Webdogs_Support_Endpoint {
        return sha1( $hash_seed.$endpoint.$endpoint_hash ).$seed;
     }
 
-    function endpoint_check( $endpoint_hash, $stored_value ) {
+    public function endpoint_check( $endpoint_hash, $stored_value ) {
 
         $endpoint_array = explode('?', ( is_ssl() ) ? 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] : 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
         $endpoint = array_shift( $endpoint_array );
@@ -146,7 +146,7 @@ class Webdogs_Support_Endpoint {
             return FALSE;
     }
 
-    function verify_nonce( $endpoint_hash, $stored_value ) {
+    public function verify_nonce( $endpoint_hash, $stored_value ) {
 
         $endpoint_array = explode('?', ( is_ssl() ) ? 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] : 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
         $endpoint = array_shift( $endpoint_array );
@@ -162,7 +162,7 @@ class Webdogs_Support_Endpoint {
     /**
      * Handle the request of an endpoint
      */
-    function handle_endpoint(){
+    public function handle_endpoint(){
         // Nonce generated 0-12 hours ago
 
         if ( ! isset( $_REQUEST['wds_nonce'] ) || ! $this->verify_nonce( $_REQUEST['wds_nonce'], $_REQUEST['wds_token'] ) ) {  // error_log( ."\n", 3, plugin_dir_path( dirname( __FILE__ ) ).'/activity.log');
@@ -194,7 +194,7 @@ class WEBDOGS_API {
     public $is_error;
     public $timeout = 30;
 
-    function __construct($args = array()) {
+    public function __construct($args = array()) {
         $this->wp_http = new WP_Http();
         
         //set some defaults
@@ -211,11 +211,11 @@ class WEBDOGS_API {
 
     }
     
-    function get_timeout() {
+    public function get_timeout() {
         return $this->timeout;
     }
     
-    function setup_request($method='GET') {
+    public function setup_request($method='GET') {
         if(empty($this->args['method'])) {
             return new WP_Error('error',"Please specify a method for this request.");
         } else {
@@ -232,23 +232,23 @@ class WEBDOGS_API {
         return null;
     }
     
-    function get() {
+    public function get() {
         $this->setup_request();
         $this->resp = $this->wp_http->get($this->request_uri);
         return $this;
     }
     
-    function post() {
+    public function post() {
         $this->resp = $this->wp_http->post($this->request_uri,array('body'=>$this->args));
         return $this;
     }
     
-    function set_arg($arg,$value) {
+    public function set_arg($arg,$value) {
         $this->args[$arg] = $value;
         return null;
     }
     
-    function get_arg($arg) {
+    public function get_arg($arg) {
         if(!empty($this->args[$arg])) {
             return $this->args[$arg];
         } else {
@@ -256,12 +256,12 @@ class WEBDOGS_API {
         }
     }
     
-    function message() {
+    public function message() {
         $array = json_decode($this->resp['body']); 
         return $array->error_msg;
     }
     
-    function set_notice($notice = null) {
+    public function set_notice($notice = null) {
         if(!empty($notice)) { $this->resp = new WP_Error('error',$notice); }
         if(is_network_admin()) {
             add_action('network_admin_notices',array($this,'render_notice'));
@@ -270,7 +270,7 @@ class WEBDOGS_API {
         }
     }
         
-    function render_notice() {
+    public function render_notice() {
         if(!is_wp_error($this->resp)) {     
             $notice = json_decode($this->resp['body']); 
             if($this->is_error OR $this->is_error() ) {
@@ -286,7 +286,7 @@ class WEBDOGS_API {
         }
     }
     
-    function is_error() {
+    public function is_error() {
         if(!is_wp_error($this->resp)) {
             $error = $this->resp['body'];
             $error = json_decode($error);

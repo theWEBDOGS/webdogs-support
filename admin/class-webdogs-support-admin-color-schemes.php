@@ -212,11 +212,11 @@ class Webdogs_Support_Admin_Color_Schemes {
 	}
 
 	public function updated() {
-		include( $this->base . '/templates/updated.php' );
+		include( $this->base . '/partials/updated.php' );
 	}
 
 	public function empty_scheme() {
-		include( $this->base . '/templates/empty-scheme.php' );
+		include( $this->base . '/partials/empty-scheme.php' );
 	}
 
 	public static function sass_localize_script( $localize_script = array() ) {
@@ -244,7 +244,7 @@ class Webdogs_Support_Admin_Color_Schemes {
 
 	public function admin_page() {
 		// $scheme = $this->get_color_scheme();
-		// include( $this->base . '/templates/admin-page.php' );
+		// include( $this->base . '/partials/admin-page.php' );
 	}
 
 	public function get_option( $key, $default = null ) {
@@ -431,7 +431,7 @@ class Webdogs_Support_Admin_Color_Schemes {
 		}
 
 		// Compile and write!
-		require_once( $this->base . '/lib/phpsass/SassParser.php' );
+		require_once $this->base . '/lib/phpsass/SassParser.php';
 		$sass = new SassParser();
 		$css = $sass->toCss( $scss_file );
 
@@ -562,7 +562,7 @@ class Webdogs_Support_Admin_Color_Schemes {
 		}
 
 		// Compile and write!
-		require_once( $this->base . '/lib/phpsass/SassParser.php' );
+		require_once $this->base . '/lib/phpsass/SassParser.php' ;
 		$sass = new SassParser();
 		$css = $sass->toCss( $scss_file );
 

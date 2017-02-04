@@ -35,6 +35,7 @@ define( 'WEBDOGS_SUPPORT_DIR', trailingslashit( __DIR__ ) );
 define( 'WEBDOGS_SUPPORT_DIR_PATH', plugin_dir_path( __FILE__ ) );
 
 define( 'WEBDOGS_SUPPORT_ID', "wds" );
+define( 'WEBDOGS_SUPPORT_SLUG', "webdogs-support" );
 
 if(!function_exists('WEBDOGS_VERSION')) {
 

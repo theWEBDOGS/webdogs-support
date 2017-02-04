@@ -91,7 +91,7 @@ class Webdogs_Support_Activator {
         ///////////////////////////////
     public static function init_schedule() { 
         if(!class_exists('Webdogs_Support_Maintenance_Notifications') ) {
-            require_once WEBDOGS_SUPPORT_DIR . 'includes/class-webdogs-support-maintainance-notifications.php'; }
+            require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support-maintainance-notifications.php'; }
             Webdogs_Support_Maintenance_Notifications::create_daily_notification_schedule(); }
 
         ///////////////////////////////
@@ -101,7 +101,7 @@ class Webdogs_Support_Activator {
         ///////////////////////////////
     public static function init_endpoint() { 
         if(!class_exists('Webdogs_Support_Endpoint') ) {
-            require_once WEBDOGS_SUPPORT_DIR . 'includes/class-webdogs-support-endpoint.php'; }
+            require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support-endpoint.php'; }
             Webdogs_Support_Endpoint::register();
             add_action( 'shutdown', 'flush_rewrite_rules' ); //$endpoint->add_endpoint(); flush_rewrite_rules(); 
         }
@@ -112,7 +112,7 @@ class Webdogs_Support_Activator {
         //                           //
         ///////////////////////////////
     public static function init_watchdog() {
-        require_once(ABSPATH .'/wp-admin/includes/file.php'); $creds = request_filesystem_credentials( site_url() . '/wp-admin/', '', false, false, array());
+        require_once( ABSPATH .'/wp-admin/includes/file.php'); $creds = request_filesystem_credentials( site_url() . '/wp-admin/', '', false, false, array());
         if ( ! WP_Filesystem($creds) ) { return false; } global $wp_filesystem;
 
         $WATCHDOG_FROM = WEBDOGS_SUPPORT_DIR . 'watchdog.zip'; $WATCHDOG_TO = WEBDOGS_SUPPORT_DIR .'watchdog/'; 
