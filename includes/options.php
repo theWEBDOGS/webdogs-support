@@ -32,11 +32,11 @@ function wds_options() {
 
 	if ( current_user_can( 'manage_options' ) ) {
 
-        if(!function_exists('is_plugin_active')) require_once( ABSPATH . 'wp-admin/includes/plugin.php');
+        if(!function_exists('is_plugin_active')) require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-        if(!function_exists('wp_prepare_themes_for_js')) require_once( ABSPATH . 'wp-admin/includes/theme.php');
+        if(!function_exists('wp_prepare_themes_for_js')) require_once ABSPATH . 'wp-admin/includes/theme.php';
 
-        if(!function_exists('request_filesystem_credentials')) require_once( ABSPATH . 'wp-admin/includes/file.php');
+        if(!function_exists('request_filesystem_credentials')) require_once ABSPATH . 'wp-admin/includes/file.php';
     }
 
 	// Retrieve a list of all 
@@ -206,7 +206,7 @@ function wds_options() {
 		'options' => $service_array,
 		'rule' => array(                       // RULES w/EXE CURRENT INPUT'S ON TRIGGER CALLBACK 
 			'on' => 'change',                  // PERFORMS A JQUERY METHOD ON THE ELEMENT WITH ID
-			'id' => 'wds-submit .wds_notification_events > .wds_notification_scheduled', // OR IT'S TARGET CHILDREN
+			'id' => 'optionsframework .wds_notification_events > .wds_notification_scheduled', // OR IT'S TARGET CHILDREN
 			'exe' => array(
 				'text' => "( val == 'deactivated') ? wds.l10n['notification_deactivated'] : wds.get_next_schedule()")));
 
@@ -708,7 +708,7 @@ function wds_internal_greetings(){
  */
 function wds_bundled_themes(){
 	
-    if(!function_exists('wp_prepare_themes_for_js')) require_once( ABSPATH . 'wp-admin/includes/theme.php');
+    if(!function_exists('wp_prepare_themes_for_js')) require_once ABSPATH . 'wp-admin/includes/theme.php';
 
 	$themes = wp_prepare_themes_for_js();
 

@@ -3,7 +3,7 @@
  * Plugin Name:       WEBDOGS Support + Maintenance
  * Plugin URI:        https://github.com/theWEBDOGS/webdogs-support
  * Description:       Support + Maintenance Configuration Tools: scheduled maintenance notifications, login page customizations, base plugin recommendations and more.
- * Version:           2.3.8
+ * Version:           2.3.9
  * Author:            WEBDOGS Support Team
  * Author URI:        WEBDOGS.COM
  * License:           GPL-2.0+
@@ -66,66 +66,58 @@ define( 'WEBDOGS_LATEST_VERSION', function_exists(
  * This action is documented in includes/class-webdogs-support-activator.php
  */
 function activate_webdogs_support() {
-    require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-activator.php';
+    require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support-activator.php';
     Webdogs_Support_Activator::activate();
 }
+register_activation_hook( __FILE__, 'activate_webdogs_support' );
 
 /**
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-webdogs-support-deactivator.php
  */
 function deactivate_webdogs_support() {
-    require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-deactivator.php';
+    require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support-deactivator.php';
     Webdogs_Support_Deactivator::deactivate();
 }
+register_deactivation_hook( __FILE__, 'deactivate_webdogs_support' );
 
 /**
  * The code that runs after plugin updates.
- * This action is documented in includes/class-webdogs-support-upgrader.php
+ * This action is documented in includes/class-webdogs-support-updater.php
  */
 function update_webdogs_support() {
-    require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-upgrader.php';
-    Webdogs_Support_Upgrader::upgrade();
+    require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support-updater.php';
+    Webdogs_Support_Updater::update();
 }
-
-
-  register_activation_hook( __FILE__, 'activate_webdogs_support' );
-register_deactivation_hook( __FILE__, 'deactivate_webdogs_support' );
-
-if( defined('WPMU_PLUGIN_DIR') 
-    && ( ! file_exists( WPMU_PLUGIN_DIR . '/watchdog.php' ) 
-    || (   file_exists( WPMU_PLUGIN_DIR . '/watchdog.php' ) 
-        && false !== ( $watchdog_plugin_data = get_file_data( WPMU_PLUGIN_DIR . '/watchdog.php', array( 'Version' => 'Version' ) ) )
-        && version_compare( $watchdog_plugin_data['Version'], '1.0.1', '<' ) ) ) ){
-            update_webdogs_support(); }
+add_action( 'webdogs_support_updates', 'update_webdogs_support' );
 
 /**
- * The code that runs during plugin upgrades.
- * This action is documented in includes/class-webdogs-support-upgrader.php
+ * The code that runs during plugin updater.
+ * This action is documented in includes/class-webdogs-support-updater.php
  */
-function upgrade_webdogs_support( $upgrader_object, $options ) {
-    $current_plugin_path_name = plugin_basename( __FILE__ );
-    if ( 'update' === $options['action'] && 'plugin' === $options['type'] && !empty( $options['packages'] ) ){
-       foreach( $options['packages'] as $each_plugin ){
-            if ( $each_plugin === $current_plugin_path_name ){
-                require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support-upgrader.php';
-                Webdogs_Support_Upgrader::upgrade(); } } }
+function webdogs_support_update( $updater_object = null, $options = array() ) {
+    $plugin_path = plugin_basename( __FILE__ );
+    if  // IF
+        ///////////////////////////////
+        //  Was the plugin updated?  //
+        ///////////////////////////////
+        (   (   (     ! empty( $options[ 'action' ] ) && $options['action'] === 'update'     )
+            &&  (     ! empty( $options[  'type'  ] ) && $options[ 'type' ] === 'plugin'     )
+            &&  (   ( ! empty( $options[ 'plugin' ] ) && $options['plugin'] === $plugin_path )
+                ||  ( ! empty( $options['packages'] ) && in_array( $plugin_path, $options['packages'] ) ) ) )
+        //  OR 
+        ///////////////////////////////
+        //  WATCHDOG need updating?  //
+        ///////////////////////////////
+        ||  (   ( defined( 'WPMU_PLUGIN_DIR' ) && ! defined( 'WATCHDOG_DIR' ) )
+            ||  ( defined( 'WPMU_PLUGIN_DIR' ) &&   defined( 'WATCHDOG_DIR' )
+                &&  ( false !== ( $watchdog_plugin_data = get_file_data( WPMU_PLUGIN_DIR . '/watchdog.php', array( 'Version' => 'Version' ) ) ) )
+                &&  ( version_compare( $watchdog_plugin_data['Version'], '1.0.1', '<' ) ) ) ) ) {
+        // 
+        do_action( 'webdogs_support_updates' ); }
 }
-add_action( 'upgrader_process_complete', 'upgrade_webdogs_support', 10, 2 );
-
-
-/**
- * Common functions for transforming data and plugin   
- * context/state reporting.
- */
-require_once plugin_dir_path( __FILE__ ) . 'includes/functions-webdogs-support-common.php';
-
-
-/**
- * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
- */
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support.php';
+add_action( 'updater_process_complete', 'webdogs_support_update', 10, 2 );
+add_action( 'webdogs_support_init',     'webdogs_support_update', 11    );
 
 /**
  * Helper function to return the theme option value.
@@ -134,21 +126,15 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-webdogs-support.php';
  *
  * Not in a class to support backwards compatibility in themes.
  */
-
 if ( ! function_exists( 'wds_get_option' ) ) {
 
     function wds_get_option( $name, $default = false ) {
-        $config = get_option( 'webdogs_support' );
 
-        if ( ! isset( $config['id'] ) ) {
-            return $default;
-        }
+        $config = get_option( 'webdogs_support' );
+        if ( ! isset( $config['id'] ) ) { return $default; }
 
         $options = get_option( $config['id'] );
-
-        if ( isset( $options[$name] ) ) {
-            return $options[$name];
-        }
+        if ( isset( $options[$name] ) ) { return $options[$name]; }
 
         return $default;
     }
@@ -161,6 +147,11 @@ if ( ! function_exists( 'wds_get_option' ) ) {
  * @since    2.3.5
  */
 function webdogs_support() {
+    /**
+     * The core plugin class that is used to define internationalization,
+     * admin-specific hooks, and public-facing site hooks.
+     */
+    require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support.php';
 
     /**
      * The core plugin class that is used to define internationalization,
@@ -168,9 +159,7 @@ function webdogs_support() {
      */
     $GLOBALS[ WEBDOGS_SUPPORT_ID ] = new Webdogs_Support();
     return $GLOBALS[ WEBDOGS_SUPPORT_ID ];
-
 }
-
 
 /**
  * Begins execution of the plugin.

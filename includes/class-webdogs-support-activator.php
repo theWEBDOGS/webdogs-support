@@ -31,13 +31,7 @@ class Webdogs_Support_Activator {
 	 */
 	public static function activate() {
 
-        if(!function_exists('wp_cookie_constants') ) require_once( ABSPATH . 'wp-includes/default-constants.php');
-
-        if(!function_exists('wp_get_current_user') ) require_once( ABSPATH . 'wp-includes/pluggable.php');
-
-        if(!function_exists('is_plugin_active')) require_once( ABSPATH . 'wp-admin/includes/plugin.php');
-
-        if(!function_exists('wp_prepare_themes_for_js')) require_once( ABSPATH . 'wp-admin/includes/theme.php');
+        if(!function_exists('deactivate_plugins')) require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
         $deactivate_plugins = apply_filters( 'webdogs_support_activator_deactivate_plugins', 
             array(
@@ -65,14 +59,6 @@ class Webdogs_Support_Activator {
 
 
         ///////////////////////////////
-        //                           //
-        //   UNPACK WATCHDOG TO MU   //
-        //                           //
-        ///////////////////////////////
-        Self::init_watchdog();
-
-
-        ///////////////////////////////
         ///////////////////////////////
         //                           //
         //    A C T I V A T I O N    //
@@ -89,7 +75,7 @@ class Webdogs_Support_Activator {
         //   ADD NOTIFICATION CRON   //
         //                           //
         ///////////////////////////////
-    public static function init_schedule() { 
+    protected static function init_schedule() { 
         if(!class_exists('Webdogs_Support_Maintenance_Notifications') ) {
             require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support-maintainance-notifications.php'; }
             Webdogs_Support_Maintenance_Notifications::create_daily_notification_schedule(); }
@@ -99,42 +85,10 @@ class Webdogs_Support_Activator {
         //   REWRITE API ENDPOINTS   //
         //                           //
         ///////////////////////////////
-    public static function init_endpoint() { 
+    protected static function init_endpoint() { 
         if(!class_exists('Webdogs_Support_Endpoint') ) {
             require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support-endpoint.php'; }
             Webdogs_Support_Endpoint::register();
-            add_action( 'shutdown', 'flush_rewrite_rules' ); //$endpoint->add_endpoint(); flush_rewrite_rules(); 
+            add_action( 'shutdown', 'flush_rewrite_rules' );
         }
-
-        ///////////////////////////////
-        //                           //
-        //   UNPACK WATCHDOG TO MU   //
-        //                           //
-        ///////////////////////////////
-    public static function init_watchdog() {
-        require_once( ABSPATH .'/wp-admin/includes/file.php'); $creds = request_filesystem_credentials( site_url() . '/wp-admin/', '', false, false, array());
-        if ( ! WP_Filesystem($creds) ) { return false; } global $wp_filesystem;
-
-        $WATCHDOG_FROM = WEBDOGS_SUPPORT_DIR . 'watchdog.zip'; $WATCHDOG_TO = WEBDOGS_SUPPORT_DIR .'watchdog/'; 
-        if( file_exists( $WATCHDOG_TO ) ) { $delete_file = $wp_filesystem->delete( $WATCHDOG_TO ); 
-        if( is_wp_error( $delete_file ) ) { wp_die( $delete_file->get_error_message()); } }
-        if( file_exists( $WATCHDOG_FROM ) ) { $unzip_file = unzip_file( $WATCHDOG_FROM, $WATCHDOG_TO );
-        if( is_wp_error( $unzip_file  ) ) { wp_die( $unzip_file->get_error_message() ); } }
-
-        if( defined('WPMU_PLUGIN_DIR')) { $WATCHDOG_FROM = WEBDOGS_SUPPORT_DIR . 'watchdog/watchdog.php'; $WATCHDOG_TO = str_replace( untrailingslashit( WEBDOGS_SUPPORT_DIR ), WPMU_PLUGIN_DIR, WEBDOGS_SUPPORT_DIR . 'watchdog.php' ); 
-        if( file_exists( $WATCHDOG_TO ) ) { $delete_file = $wp_filesystem->delete( $WATCHDOG_TO ); 
-        if( is_wp_error( $delete_file ) ) { wp_die( $delete_file->get_error_message()); } }
-        if( file_exists( $WATCHDOG_FROM ) ) { $move_file = $wp_filesystem->move( $WATCHDOG_FROM, $WATCHDOG_TO );
-        if( is_wp_error( $move_file   ) ) { wp_die( $move_file->get_error_message()); } } }
-
-        if( defined('WPMU_PLUGIN_DIR')) { $WATCHDOG_FROM = WEBDOGS_SUPPORT_DIR . 'watchdog/watchdog.zip'; $WATCHDOG_TO = WPMU_PLUGIN_DIR .'/watchdog/';
-        if( file_exists( $WATCHDOG_TO ) ) { $delete_file = $wp_filesystem->delete( $WATCHDOG_TO ); 
-        if( is_wp_error( $delete_file ) ) { wp_die( $delete_file->get_error_message()); } }
-        if( file_exists( $WATCHDOG_FROM ) ) { $unzip_file = unzip_file( $WATCHDOG_FROM, $WATCHDOG_TO );
-        if( is_wp_error( $unzip_file  ) ) { wp_die( $unzip_file->get_error_message() ); } } }
-
-        $WATCHDOG_TO = WEBDOGS_SUPPORT_DIR .'watchdog/'; 
-        if( file_exists( $WATCHDOG_TO ) ) { $delete_file = $wp_filesystem->delete( $WATCHDOG_TO ); 
-        if( is_wp_error( $delete_file ) ) { wp_die( $delete_file->get_error_message()); } } }
 }
-

@@ -111,7 +111,7 @@ class Webdogs_Support_Hosetname_Markers
         #webdogs_flags_wrap .wds-domain-flag {margin: 0 0 0 0; right: -500%; width: auto; padding: 0 44px 0 0; position: relative; display: block; float: right; } 
         #webdogs_flags_wrap .wds-domain-flag:before {content: " "; border: 27px solid transparent; border-bottom-color: rgba(<?php echo $color[1][0]; ?>,0.36); position: absolute; z-index: -1; top: -35px; left: -36px; right: -1000%; } 
         #webdogs_flags_wrap .wds-domain-flag > span {display: block; text-align: center; } 
-        
+
         #webdogs_flags_wrap.active, 
         #webdogs_flags_wrap.hover, 
         #webdogs_flags_wrap:hover {opacity: 1; -webkit-transition: all .23s linear; -moz-transition: all .23s linear; transition: all .23s linear; } 
@@ -133,18 +133,18 @@ class Webdogs_Support_Hosetname_Markers
 
         $flag_format = '
         #webdogs_flags_wrap .wds-domain-flag.wds-domain-flag-%1$s {
-            -webkit-transition: all 1.4s ease-in %2$Fs;
-            -moz-transition: all 1.4s ease-in %2$Fs;
-            transition: all 1.4s ease-in %2$Fs;
+            -webkit-transition: right 1.4s ease-in %2$Fs;
+            -moz-transition: right 1.4s ease-in %2$Fs;
+            transition: right 1.4s ease-in %2$Fs;
         }';
 
         $flag_format_hover = '
         #webdogs_flags_wrap.active .wds-domain-flag.wds-domain-flag-%1$s,
         #webdogs_flags_wrap.hover .wds-domain-flag.wds-domain-flag-%1$s,
         #webdogs_flags_wrap:hover .wds-domain-flag.wds-domain-flag-%1$s {
-            -webkit-transition: all .23s ease-out %2$Fs;
-            -moz-transition: all .23s ease-out %2$Fs;
-            transition: all .23s ease-out %2$Fs;
+            -webkit-transition: right .23s ease-out %2$Fs;
+            -moz-transition: right .23s ease-out %2$Fs;
+            transition: right .23s ease-out %2$Fs;
         }';
         $base_delay = 0;
         foreach ( array_reverse( $domain_flags ) as $flag ) {
@@ -155,10 +155,19 @@ class Webdogs_Support_Hosetname_Markers
         printf('
         #webdogs_flags_wrap, 
         #webdogs_flags {
-            -webkit-transition: all 1.4s ease-in-out %1$Fs;
-            -moz-transition: all 1.4s ease-in-out %1$Fs;
-            transition: all 1.4s ease-in-out %1$Fs;
+            -webkit-transition: opacity 1.4s ease-in-out %1$Fs, right 1.4s ease-in-out %1$Fs;
+            -moz-transition: opacity 1.4s ease-in-out %1$Fs, right 1.4s ease-in-out %1$Fs;
+            transition: opacity 1.4s ease-in-out %1$Fs, right 1.4s ease-in-out %1$Fs;
         }', $base_delay );
+        printf('
+        #webdogs_flags_wrap #webdogs_flags_inner, 
+        #webdogs_flags_wrap #webdogs_flags_inner, 
+        #webdogs_flags_wrap #webdogs_flags_inner {
+            min-width:0;
+            -webkit-transition: all 0s ease %1$Fs;
+            -moz-transition: all 0s ease %1$Fs;
+            transition: all 0s ease %1$Fs;
+        }', $base_delay + 1.23 );
 
         $base_delay = 0;
         foreach ( $domain_flags as $flag ) {
@@ -167,6 +176,14 @@ class Webdogs_Support_Hosetname_Markers
         }
         $base_delay = $base_delay + 0.23;
         ?>
+        #webdogs_flags_wrap.active #webdogs_flags_inner, 
+        #webdogs_flags_wrap.hover #webdogs_flags_inner, 
+        #webdogs_flags_wrap:hover #webdogs_flags_inner {
+            min-width: 100%;
+            -webkit-transition: all 0s;
+            -moz-transition: all 0s;
+            transition: all 0s;
+        }
         body.iframe #webdogs_flags_wrap {
             display:none !important;
         }

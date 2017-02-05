@@ -12,8 +12,6 @@
  * @package    Webdogs_Support
  * @subpackage Webdogs_Support/includes
  */
-defined('WEBDOGS_VERSION') and 
-defined('WEBDOGS_SUPPORT_SLUG') or die; 
 
 /**
  * The core plugin class.
@@ -70,8 +68,10 @@ class Webdogs_Support {
      */
     public function __construct() {
 
-        $this->plugin_name = WEBDOGS_SUPPORT_SLUG;
-        $this->version     = WEBDOGS_VERSION;
+        $this->plugin_name = defined('WEBDOGS_SUPPORT_SLUG') ? WEBDOGS_SUPPORT_SLUG : 'webdogs-support';
+        $this->version     = defined('WEBDOGS_VERSION') ? WEBDOGS_VERSION : '2.0.0';
+
+        do_action_ref_array( 'webdogs_support_init', array( &$this ) );
 
         $this
              ->load_dependencies()
@@ -104,7 +104,6 @@ class Webdogs_Support {
              ->define_admin_hooks()
              ->define_public_hooks()
              ->run();
-
     }
 
 
@@ -126,110 +125,122 @@ class Webdogs_Support {
      */
     private function load_dependencies() {
 
+        ///////////////
+        //           //
+        // FUNCTIONS //
+        //           //
+        ///////////////
 
         /**
-         * Template functions for outputting 
-         * core plugin.
+         * Setting functions for configuring fields, strings and options.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/functions-webdogs-support-template.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/options.php';
 
         /**
-         * Common functions for transforming data and plugin   
-         * context/state reporting.
+         * Template functions. (Not used yet)
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/functions-webdogs-support-common.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/functions-webdogs-support-template.php';
 
         /**
-         * Common functions for transforming data and plugin   
-         * context/state reporting.
+         * Common functions for transforming data and plugin context/state reporting.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/options.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/functions-webdogs-support-common.php';
+
+
+        ///////////////
+        //           //
+        //  CLASSES  //
+        //           //
+        ///////////////
+        
+        /**
+         * The class responsible for orchestrating the actions and filters of the core plugin.
+         */
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support-loader.php';
 
         /**
-         * The class responsible for orchestrating the actions and filters of the
-         * core plugin.
+         * The class responsible for defining internationalization functionality of the plugin.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-loader.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support-i18n.php';
 
         /**
-         * The class responsible for defining internationalization functionality
-         * of the plugin.
+         * The class responsible for contextual hostname markers, manus and capabilities.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-i18n.php';
-
-        /**
-         * The class responsible for the hostname markers.
-         */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-hostname-markers.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support-hostname-markers.php';
 
         /**
          * The class responsible for scheduling and sending maintainance notifications.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-maintainance-notifications.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support-maintainance-notifications.php';
 
         /**
          * The class responsible for providing a JSON data endpoint.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-endpoint.php';
-
-        /**
-         * The class responsible for customization of the login page logo and background.
-         */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-webdogs-support-login-logo.php';
-
-        /**
-         * The class responsible for customization of the admin color schemes.
-         */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-admin-color-schemes.php';
-
-        /**
-         * The class responsible for plugin installation, activation and upkeep.
-         */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-plugin-activation.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support-endpoint.php';
 
         /**
          * The class responsible for setting option defaults.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webdogs-support-framework.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/class-webdogs-support-framework.php';
+
+        /**
+         * The class responsible for customization of the admin color schemes.
+         */
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/class-webdogs-support-admin-color-schemes.php';
+
+        /**
+         * The class responsible for plugin installation, activation and upkeep.
+         */
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/class-webdogs-support-plugin-activation.php';
         
         /**
          * The class responsible for the options page, admin menu items, and options regisration.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-framework-admin.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/class-webdogs-support-framework-admin.php';
 
         /**
          * The class responsible for composing option screens and forms.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-interface.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/class-webdogs-support-interface.php';
 
         /**
          * The class responsible for handleing media upload support for the interface.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-media-uploader.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/class-webdogs-support-media-uploader.php';
 
         /**
          * The class responsible for the sanitization of posted oprion values.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-sanitization.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/class-webdogs-support-sanitization.php';
 
         /**
          * The class responsible for displaying and handeling interactions with support.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-dashboard-widget.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/class-webdogs-support-dashboard-widget.php';
         
         /**
          * The class responsible for defining all actions that occur in the admin area.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webdogs-support-admin.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/class-webdogs-support-admin.php';
+
+        /**
+         * The class responsible for customization of the login page logo and background.
+         */
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'public/class-webdogs-support-login-logo.php';
 
         /**
          * The class responsible for defining all actions that occur in the frontend.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-webdogs-support-public.php';
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'public/class-webdogs-support-public.php';
 
-
+        /**
+         * The loader that's responsible for maintaining and registering hooks that power the plugin.
+         *
+         * @since    1.0.0
+         * @access   protected
+         * @var      Webdogs_Support_Loader
+         */
         $this->loader = new Webdogs_Support_Loader();
-
 
         return $this;
     }
@@ -389,12 +400,14 @@ class Webdogs_Support {
      * @access   private
      */
     private function define_framework_hooks() {
+
         // Instantiate the main plugin class.
         $options_framework = new Webdogs_Options();
         $this->loader->add_action( 'admin_init', $options_framework, 'set_support_option' );
 
         // Instantiate the options page.
         $options_framework_admin = new Webdogs_Admin();
+
         // Gets options to load
         $options = &Webdogs_Options::_wds_options();
 
@@ -419,6 +432,7 @@ class Webdogs_Support {
             $this->loader->add_action( 'wp_before_admin_bar_render', $options_framework_admin, 'add_adminbar_sitename_logo' );
 
         } else {
+
             // Display a notice if options aren't present in the theme
             $this->loader->add_action( 'admin_notices', $options_framework_admin, 'options_notice' );
             $this->loader->add_action( 'admin_init', $options_framework_admin, 'options_notice_ignore' );
@@ -474,7 +488,6 @@ class Webdogs_Support {
      * @access   private
      */
     private function define_admin_hooks() {
-        // if ( ! is_admin() ) return;
 
         $plugin_admin = new Webdogs_Support_Admin( $this->get_plugin_name(), $this->get_version() );
 
@@ -492,7 +505,6 @@ class Webdogs_Support {
      * @access   private
      */
     private function define_public_hooks() {
-        // if ( is_admin() ) return;
 
         $plugin_public = new Webdogs_Support_Public( $this->get_plugin_name(), $this->get_version() );
 
