@@ -82,6 +82,7 @@ class Webdogs_Support {
              ->define_login_logo_hooks()
              ->define_admin_color_scheme_hooks()
              ->define_plugin_activation_hooks()
+             ->define_plugin_note_hooks()
              ->define_media_uploader_hooks()
              ->define_dashboard_widget_hooks()
                 ->loader
@@ -146,6 +147,11 @@ class Webdogs_Support {
          */
         require_once WEBDOGS_SUPPORT_DIR_PATH . 'includes/functions-webdogs-support-common.php';
 
+        /**
+         * The class responsible for the sanitization of posted oprion values.
+         */
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/functions-webdogs-support-sanitization.php';
+
 
         ///////////////
         //           //
@@ -194,6 +200,11 @@ class Webdogs_Support {
         require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/class-webdogs-support-plugin-activation.php';
         
         /**
+         * The class responsible for plugin notes.
+         */
+        require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/class-webdogs-support-plugin-notes.php';
+        
+        /**
          * The class responsible for the options page, admin menu items, and options regisration.
          */
         require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/class-webdogs-support-framework-admin.php';
@@ -207,11 +218,6 @@ class Webdogs_Support {
          * The class responsible for handleing media upload support for the interface.
          */
         require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/class-webdogs-support-media-uploader.php';
-
-        /**
-         * The class responsible for the sanitization of posted oprion values.
-         */
-        require_once WEBDOGS_SUPPORT_DIR_PATH . 'admin/class-webdogs-support-sanitization.php';
 
         /**
          * The class responsible for displaying and handeling interactions with support.
@@ -293,8 +299,8 @@ class Webdogs_Support {
 
         $this->loader->add_action( 'init', $plugin_maintainance_notifications, 'init' );
         $this->loader->add_action( 'admin_notices', $plugin_maintainance_notifications, 'admin_notices' );
-        $this->loader->add_action( 'wds_after_validate', $plugin_maintainance_notifications, 'report_schedule_changes' );
-        $this->loader->add_action( 'wds_scheduled_notification', $plugin_maintainance_notifications, 'send_maintenance_notification' );
+        $this->loader->add_action( 'wds_after_validate', $plugin_maintainance_notifications, 'report_schedule_changes', 10 );
+        $this->loader->add_action( 'wds_scheduled_notification', $plugin_maintainance_notifications, 'send_maintenance_notification', 10 );
         $this->loader->add_action( 'wds_test_maintenance_notification', $plugin_maintainance_notifications, 'send_test_maintenance_notification', 10, 1 );
 
         // wds_l10n
@@ -316,9 +322,6 @@ class Webdogs_Support {
 
         $this->loader->add_action( 'init', $plugin_endpoint, 'add_endpoint' );
         $this->loader->add_action( 'template_redirect', $plugin_endpoint, 'handle_endpoint' );
-        $this->loader->add_action( 'wds_scheduled_notification', $plugin_endpoint, 'post_site_data', 0 );
-        $this->loader->add_action( 'wds_after_validate', $plugin_endpoint, 'post_site_data', 0 );
-        $this->loader->add_action( 'wds_test_maintenance_notification', $plugin_endpoint, 'post_site_data', 0 );
 
         return $this;
     }
@@ -389,6 +392,30 @@ class Webdogs_Support {
     private function define_plugin_activation_hooks() {
 
         $plugin_activation = Webdogs_Plugin_Activation::get_instance();
+
+        return $this;
+    }
+
+    /**
+     * Register all of the hooks responsible for plugin notes.
+     *
+     * @since    2.4.0
+     * @access   private
+     */
+    private function define_plugin_note_hooks() {
+
+        $plugin_notes = new Webdogs_Support_Plugin_Notes();
+
+        $this->loader->add_filter( 'plugin_row_meta', $plugin_notes, 'insert_plugin_notes', 30, 4 );
+        $this->loader->add_filter( 'wds_site_get_plugins', $plugin_notes, 'add_plugin_notes', 10, 1 );
+
+        $this->loader->add_action( 'wp_ajax_wds-plugin-notes-save', $plugin_notes, 'save_plugin_notes' );
+
+        $this->loader->add_action( 'admin_enqueue_scripts', $plugin_notes, 'enqueue_scripts', 10, 1 );
+        $this->loader->add_filter( 'wds_localize_script', $plugin_notes, 'localize_script', 10, 1 );
+        
+        // wds_l10n
+        $this->loader->add_filter( 'wds_l10n', $plugin_notes, 'plugin_notes_l10n', 12, 1 );
 
         return $this;
     }

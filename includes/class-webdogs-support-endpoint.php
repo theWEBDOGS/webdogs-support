@@ -31,9 +31,6 @@ class Webdogs_Support_Endpoint {
 
         add_action( 'init', array( $plugin, 'add_endpoint' ) );
         add_action( 'template_redirect', array( $plugin, 'handle_endpoint' ) );
-        add_action( 'wds_scheduled_notification', array( $plugin, 'post_site_data' ), 0 );
-        add_action( 'wds_after_validate', array( $plugin, 'post_site_data' ), 0 );
-        add_action( 'wds_test_maintenance_notification', array( $plugin, 'post_site_data' ), 0 );
 
         return $plugin;
     }
@@ -63,10 +60,6 @@ class Webdogs_Support_Endpoint {
      */
     public function make_json_data( $object = null ){
 
-        if( false !== ( $data = get_transient( 'WDS_Sync_Data' ) ) ) {
-            return $data;
-        }
-
         if ( ! function_exists( 'wp_version_check' ) ) require_once ABSPATH . 'wp-includes/update.php'; 
 
         if ( ! function_exists( 'wp_prepare_themes_for_js' ) ) require_once ABSPATH . 'wp-admin/includes/theme.php';
@@ -90,9 +83,6 @@ class Webdogs_Support_Endpoint {
         } else {
             $object = array( $account => $data );
         }
-        
-        delete_transient( 'WDS_Sync_Data' );
-        set_transient( 'WDS_Sync_Data', $object, 20 );
 
         return $object;
     }
@@ -165,7 +155,7 @@ class Webdogs_Support_Endpoint {
     public function handle_endpoint(){
         // Nonce generated 0-12 hours ago
 
-        if ( ! isset( $_REQUEST['wds_nonce'] ) || ! $this->verify_nonce( $_REQUEST['wds_nonce'], $_REQUEST['wds_token'] ) ) {  // error_log( ."\n", 3, plugin_dir_path( dirname( __FILE__ ) ).'/activity.log');
+        if ( ! isset( $_REQUEST['wds_nonce'] ) || ! isset( $_REQUEST['wds_token'] ) || ! $this->verify_nonce( $_REQUEST['wds_nonce'], $_REQUEST['wds_token'] ) ) {  // error_log( ."\n", 3, plugin_dir_path( dirname( __FILE__ ) ).'/activity.log');
             return; 
         }
         global $wp_query;
@@ -422,6 +412,8 @@ class WDS_Site extends WDS_Object
 
         if ( in_array( $key, array_map( 'strtolower', $this->offsets ) ) ) {
 
+            wp_set_current_user( 1 );
+
             switch ( $key ) {
 
                 case 'bloginfo':
@@ -436,7 +428,7 @@ class WDS_Site extends WDS_Object
                 
                 
                 case 'plugins':
-                    $value = new WDS_Collection( array( 'installed' => get_plugins(), 'active' => array( 'is_plugin_active', true ), 'update' => get_plugin_updates() ), false, false );
+                    $value = new WDS_Collection( array( 'installed' => apply_filters( 'wds_site_get_plugins', get_plugins() ), 'active' => array( 'is_plugin_active', true ), 'update' => get_plugin_updates() ), false, false );
                     break;
                 
                 
