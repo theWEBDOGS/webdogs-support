@@ -259,6 +259,10 @@ if ( ! function_exists( 'wds_maybe_clear_cache' ) ) {
         if( $clear ){
 
             add_settings_error( 'webdogs-support', 'clear_cache', __( 'HTML-page-caching, CDN (statics), and WordPress Object/Transient Caches have been cleared.', 'webdogs-support' ), 'updated fade' ); 
+            
+            $plugin_endpoint = new Webdogs_Support_Endpoint();
+            add_action( 'shutdown', array( $plugin_endpoint, 'post_site_data') );
+            
             add_action( 'shutdown', 'webdogs_clear_cache' );
         }
     }
